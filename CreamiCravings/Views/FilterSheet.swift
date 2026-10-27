@@ -126,7 +126,7 @@ struct FilterSheet: View {
     private var quickSection: some View {
         Section("Quick") {
             FlowLayout {
-                flagChip("Favorites", \.favoritesOnly)
+                flagChip("Saved", \.favoritesOnly)
                 ChipToggle(title: "Book", isOn: st.sources.contains("book")) { flip(\.sources, "book") }
                 ChipToggle(title: "Web", isOn: st.sources.contains("web")) { flip(\.sources, "web") }
                 ForEach(["healthy", "indulgent", "high-protein"], id: \.self) { t in
@@ -134,6 +134,8 @@ struct FilterSheet: View {
                 }
                 flagChip("No affiliate products", \.hideAffiliate)
                 flagChip("Can make now", \.canMakeNow)
+                flagChip("Vegan", \.vegan)
+                flagChip("Has protein upgrade", \.hasUpgrade)
             }
             .padding(.vertical, 4)
         }

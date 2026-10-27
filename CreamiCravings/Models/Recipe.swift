@@ -114,6 +114,7 @@ struct Recipe: Codable, Hashable, Identifiable {
     var vegetarian: Bool?          // nil = not stated (Creami recipes)
     var containsEgg: Bool?
     var vegAdaptation: VegAdaptation?
+    var proteinUpgrade: ProteinUpgradeRef?
 
     /// "serving" or "piece" (per-piece recipes such as nuggets and falafel).
     var servingNoun: String { servingLabel == "piece" ? "piece" : "serving" }
@@ -172,7 +173,7 @@ struct Recipe: Codable, Hashable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case id, name, source, photo, photoURL, videoURL, macros, pintSize, prepMinutes, freezeHours
         case base, mixIns, instructions, proTip, tags
-        case servingLabel, course, cuisine, bookCategory, vegetarian, containsEgg, vegAdaptation
+        case proteinUpgrade, servingLabel, course, cuisine, bookCategory, vegetarian, containsEgg, vegAdaptation
         case section, dessertType, method, servings, cookMinutes, chillHours, evidence
     }
 
@@ -203,6 +204,7 @@ struct Recipe: Codable, Hashable, Identifiable {
         chillHours = (try? c.decodeIfPresent(Double.self, forKey: .chillHours)) ?? nil
         evidence = (try? c.decodeIfPresent(Evidence.self, forKey: .evidence)) ?? nil
         servingLabel = (try? c.decodeIfPresent(String.self, forKey: .servingLabel)) ?? nil
+        proteinUpgrade = (try? c.decodeIfPresent(ProteinUpgradeRef.self, forKey: .proteinUpgrade)) ?? nil
         cuisine = (try? c.decodeIfPresent(String.self, forKey: .cuisine)) ?? nil
         course = (try? c.decodeIfPresent(String.self, forKey: .course)) ?? nil
         bookCategory = (try? c.decodeIfPresent(String.self, forKey: .bookCategory)) ?? nil

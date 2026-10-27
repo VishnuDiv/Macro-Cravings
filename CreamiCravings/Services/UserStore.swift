@@ -69,19 +69,24 @@ final class UserStore {
     private final class DisplayCache { var items: [String: (sig: Int, value: Display)] = [:] }
     @ObservationIgnored private let displayCache = DisplayCache()
 
-    /// Everything that can change a recipe's displayed numbers or title, hashed.
-    private func signature(_ r: Recipe, _ cfg: RecipeConfig) -> Int {
+    /// Everything that can change a recipe's displayed numbers or title, hashed straight from the stored choices
+    /// (cheap; the heavy config and goal resolution only run on a cache miss). Goal versions are not part of it:
+    /// cards, filters and sorts always use the recipe as written.
+    private func signature(_ r: Recipe) -> Int {
         var h = Hasher()
-        h.combine(cfg.milk?.id); h.combine(cfg.powder?.id); h.combine(cfg.vegActive); h.combine(cfg.vegChoices); h.combine(cfg.preferEasy)
-        h.combine(cfg.swaps); h.combine(cfg.pints); h.combine(cfg.source.rawValue); h.combine(cfg.optionalOn); h.combine(cfg.overrides)
+        h.combine(data.recipeMilk[r.id] ?? data.defaultMilkId); h.combine(data.recipePowder[r.id] ?? data.defaultPowderId)
+        h.combine(data.isVegetarian); h.combine(data.showOriginal.contains(r.id)); h.combine(data.vegChoice[r.id] ?? [:]); h.combine(data.preferEasyAlternatives)
+        h.combine(data.swaps[r.id] ?? [:]); h.combine(data.pints[r.id]); h.combine(calorieSource(for: r.id).rawValue)
+        h.combine(data.optionalOn[r.id] ?? []); h.combine(data.nutritionOverrides)
+        h.combine(data.useEstimates); h.combine(data.lineGrams[r.id] ?? [:])
         return h.finalize()
     }
 
     /// Cached displayed macros + title for a recipe; recomputed only when its relevant choices change.
     func display(for r: Recipe, catalog: Catalog) -> Display {
-        let cfg = config(for: r, catalog: catalog)
-        let sig = signature(r, cfg)
+        let sig = signature(r)
         if let hit = displayCache.items[r.id], hit.sig == sig { return hit.value }
+        let cfg = config(for: r, catalog: catalog, applyGoal: false)
         let calc = NutritionCalculator(catalog: catalog)
         let res = calc.compute(r, cfg)
         var title = r.name
@@ -101,9 +106,33 @@ final class UserStore {
 
     // MARK: accessors
 
-    func isFavorite(_ id: String) -> Bool { data.favorites.contains(id) }
-    func toggleFavorite(_ id: String) {
-        if data.favorites.contains(id) { data.favorites.remove(id) } else { data.favorites.insert(id) }
+    // MARK: saved (per goal), rating, goal version
+
+    func isSaved(_ id: String) -> Bool { data.saved[id] != nil }
+    func savedGoal(_ id: String) -> Goal? { data.saved[id] }
+    func save(_ id: String, for goal: Goal) { data.saved[id] = goal }
+    func unsave(_ id: String) { data.saved[id] = nil }
+
+    func rating(_ id: String) -> Int { data.ratings[id] ?? 0 }
+    /// Setting the same rating again clears it.
+    func setRating(_ id: String, _ stars: Int) {
+        if stars <= 0 || data.ratings[id] == stars { data.ratings[id] = nil } else { data.ratings[id] = min(5, stars) }
+    }
+
+    /// The version (Cut / Maintain / Bulk) shown for a recipe: its own choice, else the global goal.
+    func versionGoal(_ id: String) -> Goal { data.recipeGoal[id] ?? data.goal }
+    func setVersion(_ id: String, _ goal: Goal) { data.recipeGoal[id] = (goal == data.goal) ? nil : goal }
+    func setChange(_ recipeId: String, _ changeId: String, _ on: Bool) {
+        var m = data.goalToggles[recipeId] ?? [:]
+        m[changeId] = on
+        data.goalToggles[recipeId] = m
+    }
+
+    /// The goal version's changes and resulting config for the recipe (Maintain: no changes).
+    func goalResolution(_ r: Recipe, catalog: Catalog) -> GoalResolution {
+        let base = config(for: r, catalog: catalog, applyGoal: false)
+        return GoalVersion.resolve(r, catalog: catalog, base: base, goal: versionGoal(r.id),
+                                   toggles: data.goalToggles[r.id] ?? [:], vegetarianUser: data.isVegetarian)
     }
 
     func allLiquids(_ catalog: Catalog) -> [BaseLiquid] {
@@ -130,9 +159,22 @@ final class UserStore {
         data.isVegetarian && r.vegAdaptation != nil && r.vegetarian != true && !data.showOriginal.contains(r.id)
     }
 
+    /// The recipe as shown: vegetarian version first, then the protein upgrade (title, lines, steps, macros).
     func effectiveRecipe(_ r: Recipe, catalog: Catalog) -> Recipe {
-        vegActive(r) ? VegAlternatives.resolve(r, catalog: catalog, choices: data.vegChoice[r.id] ?? [:], preferEasy: data.preferEasyAlternatives).recipe : r
+        ProteinUpgrades.effective(r, catalog: catalog, vegActive: vegActive(r), vegChoices: data.vegChoice[r.id] ?? [:],
+                                  preferEasy: data.preferEasyAlternatives, upgradeKey: data.upgradeChoice[r.id])
     }
+
+    /// The "Protein upgrade" card data (wings / crispy bites), built on the vegetarian version of the recipe.
+    func upgradeCard(_ r: Recipe, catalog: Catalog) -> UpgradeCardData? {
+        guard r.proteinUpgrade != nil else { return nil }
+        let base = ProteinUpgrades.effective(r, catalog: catalog, vegActive: vegActive(r), vegChoices: data.vegChoice[r.id] ?? [:],
+                                             preferEasy: data.preferEasyAlternatives, upgradeKey: nil)
+        return ProteinUpgrades.card(for: base, catalog: catalog, choice: data.upgradeChoice[r.id])
+    }
+
+    func upgradeChoice(_ id: String) -> String? { data.upgradeChoice[id] }
+    func setUpgrade(_ id: String, _ key: String?) { data.upgradeChoice[id] = key }
 
     func vegResolution(_ r: Recipe, catalog: Catalog) -> VegResolution {
         VegAlternatives.resolve(r, catalog: catalog, choices: data.vegChoice[r.id] ?? [:], preferEasy: data.preferEasyAlternatives)
@@ -140,11 +182,25 @@ final class UserStore {
 
     func calorieSource(for id: String) -> CalorieSource { data.recipeCalorieSource[id] ?? data.defaultCalorieSource }
 
-    func config(for r: Recipe, catalog: Catalog) -> RecipeConfig {
-        RecipeConfig(milk: milk(for: r.id, catalog: catalog), powder: powder(for: r.id, catalog: catalog), vegActive: vegActive(r), vegChoices: data.vegChoice[r.id] ?? [:], preferEasy: data.preferEasyAlternatives, swaps: data.swaps[r.id] ?? [:],
+    /// The user's choices for a recipe. `applyGoal` adds the Cut / Bulk version last (detail, shopping list, cook mode);
+    /// cards, filters and sorts pass false and use the recipe as written.
+    func config(for r: Recipe, catalog: Catalog, applyGoal: Bool = true) -> RecipeConfig {
+        var base = RecipeConfig(milk: milk(for: r.id, catalog: catalog), powder: powder(for: r.id, catalog: catalog), vegActive: vegActive(r), vegChoices: data.vegChoice[r.id] ?? [:], preferEasy: data.preferEasyAlternatives, upgradeKey: applyGoal ? data.upgradeChoice[r.id] : nil, swaps: data.swaps[r.id] ?? [:],
                      pints: max(1, min(5, data.pints[r.id] ?? 1)), source: calorieSource(for: r.id),
                      overrides: data.nutritionOverrides, optionalOn: data.optionalOn[r.id] ?? [],
                      missing: data.pantryMissing)
+        base.useEstimates = data.useEstimates
+        base.userGrams = data.lineGrams[r.id] ?? [:]
+        guard applyGoal, versionGoal(r.id) != .maintain else { return base }
+        return GoalVersion.resolve(r, catalog: catalog, base: base, goal: versionGoal(r.id),
+                                   toggles: data.goalToggles[r.id] ?? [:], vegetarianUser: data.isVegetarian).cfg
+    }
+
+    /// The user's own amount for a line with no amount in the recipe; nil or 0 removes it.
+    func setLineGrams(_ recipeId: String, line: String, grams: Double?) {
+        var m = data.lineGrams[recipeId] ?? [:]
+        if let g = grams, g > 0 { m[line] = g } else { m[line] = nil }
+        data.lineGrams[recipeId] = m.isEmpty ? nil : m
     }
 
     func setSwap(_ recipeId: String, line: String, index: Int?) {

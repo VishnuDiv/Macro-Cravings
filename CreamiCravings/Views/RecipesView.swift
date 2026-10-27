@@ -9,6 +9,7 @@ struct RecipesView: View {
     @Environment(Router.self) private var router
     @State private var query = ""
     @State private var showFilters = false
+    @State private var savedFilter: Goal?          // Saved tab: nil = All
     @Namespace private var zoom
 
     private var path: Binding<[String]> {
@@ -32,7 +33,8 @@ struct RecipesView: View {
 
     private var results: [Recipe] {
         let catalog = store.catalog
-        let ctx = FilterContext(favorites: user.data.favorites, missing: user.data.pantryMissing, madeLog: user.data.madeLog,
+        let saved = user.data.saved.filter { mode == .all || savedFilter == nil || $0.value == savedFilter }
+        let ctx = FilterContext(favorites: Set(saved.keys), missing: user.data.pantryMissing, madeLog: user.data.madeLog, ratings: user.data.ratings,
                                 displayed: { r in user.display(for: r, catalog: catalog).displayed * (1 / r.perServingDivisor) })
         return FilterEngine.apply(store: store, recipes: store.recipes, query: query, state: effective, ctx: ctx)
     }
@@ -53,6 +55,15 @@ struct RecipesView: View {
                         .pickerStyle(.segmented)
                         .padding(.horizontal)
                         .sensoryFeedback(.selection, trigger: user.data.filterState.section)
+                    }
+                    if mode == .favorites {
+                        Picker("Saved for", selection: $savedFilter) {
+                            Text("All").tag(Goal?.none)
+                            ForEach(Goal.allCases) { Text($0.title).tag(Goal?.some($0)) }
+                        }
+                        .pickerStyle(.segmented)
+                        .padding(.horizontal)
+                        .sensoryFeedback(.selection, trigger: savedFilter)
                     }
                     controlRow
                     pillsRow
@@ -80,7 +91,7 @@ struct RecipesView: View {
                 .padding(.vertical, 8)
             }
             .background(Color.screenBackground)
-            .navigationTitle(mode == .all ? "Recipes" : "Favorites")
+            .navigationTitle(mode == .all ? "Recipes" : "Saved")
             .largeTitle()
             .searchable(text: $query, prompt: "Search recipes, ingredients, tags")
             .navigationDestination(for: String.self) { id in
@@ -201,9 +212,9 @@ struct RecipesView: View {
     }
 
     @ViewBuilder private var emptyState: some View {
-        if mode == .favorites && user.data.favorites.isEmpty && query.isEmpty {
-            ContentUnavailableView("No favorites yet", systemImage: "star",
-                                   description: Text("Tap the star on any recipe to keep it here."))
+        if mode == .favorites && user.data.saved.isEmpty && query.isEmpty {
+            ContentUnavailableView("Nothing saved yet", systemImage: "bookmark",
+                                   description: Text("Tap the bookmark on any recipe and choose Cut, Maintain or Bulk."))
                 .padding(.top, 40)
         } else if !query.isEmpty {
             ContentUnavailableView.search(text: query).padding(.top, 40)
@@ -229,24 +240,19 @@ struct RecipeCard: View {
     var body: some View {
         let d = user.display(for: recipe, catalog: store.catalog)
         let shown = d.displayed * (1 / recipe.perServingDivisor)
-        let fav = user.isFavorite(recipe.id)
+        let rating = user.rating(recipe.id)
+        let original = Goal.original(shown, bookTitle: recipe.source.title)
         VStack(alignment: .leading, spacing: 0) {
             Color.clear
                 .aspectRatio(1, contentMode: .fit)
                 .overlay { RecipePhoto(recipe: recipe) }
                 .clipped()
                 .overlay(alignment: .topTrailing) {
-                    Button { user.toggleFavorite(recipe.id) } label: {
-                        Image(systemName: fav ? "star.fill" : "star")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(fav ? Color.yellow : Color.white)
-                            .padding(8)
-                            .background(.ultraThinMaterial, in: Circle())
-                            .padding(8)
-                    }
-                    .buttonStyle(.plain)
-                    .sensoryFeedback(.success, trigger: fav)
-                    .accessibilityLabel(fav ? "Remove from favorites" : "Add to favorites")
+                    SaveMenu(recipe: recipe)
+                        .foregroundStyle(Color.white)
+                        .padding(7)
+                        .background(.ultraThinMaterial, in: Circle())
+                        .padding(8)
                 }
             VStack(alignment: .leading, spacing: 6) {
                 Text(d.title).font(.subheadline.weight(.semibold)).lineLimit(2, reservesSpace: true)
@@ -255,9 +261,14 @@ struct RecipeCard: View {
                     SmallPill(text: "\(Int(shown.calories.rounded())) kcal", color: .calorieRed)
                     SmallPill(text: "\(Int(shown.protein.rounded())) g P", color: .proteinGreen)
                     if d.estimated { Text("est.").font(.caption2).foregroundStyle(.secondary) }
+                    if rating > 0 { Text("★\(rating)").font(.caption2.weight(.bold)).foregroundStyle(.yellow) }
+                    Spacer(minLength: 0)
+                    Circle().fill(original.color).frame(width: 9, height: 9)
+                        .accessibilityLabel("Original: \(original.title)")
                 }
                 HStack(spacing: 6) {
-                    if let badge = vegBadge { Text(badge).font(.caption2.weight(.semibold)).foregroundStyle(.green) }
+                    if let badge = vegBadge { Text(badge).font(.caption2.weight(.bold)).foregroundStyle(badge.contains("Vegan") ? Color.veganGreen : Color.green) }
+                    if recipe.proteinUpgrade != nil { SmallPill(text: "+Protein", color: .green) }
                     if let g = goalBadge(shown) { SmallPill(text: g, color: user.data.goal == .cut ? .carbBlue : .fatOrange) }
                 }
             }
@@ -284,6 +295,7 @@ extension RecipeCard {
 
     /// 🌱 badge for non-Creami recipes while vegetarian mode is on.
     var vegBadge: String? {
+        if store.index[recipe.id]?.vegan == true { return "🌿 Vegan" }       // vegan replaces "Veg"
         guard user.data.isVegetarian, recipe.section != "creami" else { return nil }
         if recipe.vegetarian == true { return "🌱 Veg" }
         if recipe.vegAdaptation != nil { return "🌱 Veg version" }
@@ -297,8 +309,13 @@ struct RecipeContextMenu: View {
     @Environment(UserStore.self) private var user
 
     var body: some View {
-        Button { user.toggleFavorite(recipe.id) } label: {
-            Label(user.isFavorite(recipe.id) ? "Remove star" : "Star", systemImage: user.isFavorite(recipe.id) ? "star.slash" : "star")
+        ForEach([user.data.goal] + Goal.allCases.filter { $0 != user.data.goal }) { g in
+            Button { user.save(recipe.id, for: g) } label: {
+                Label("Save for \(g.title)", systemImage: user.savedGoal(recipe.id) == g ? "checkmark" : g.symbol)
+            }
+        }
+        if user.isSaved(recipe.id) {
+            Button(role: .destructive) { user.unsave(recipe.id) } label: { Label("Remove from Saved", systemImage: "bookmark.slash") }
         }
         Button {
             let items = ShoppingList.items(for: recipe, cfg: user.config(for: recipe, catalog: store.catalog), catalog: store.catalog)

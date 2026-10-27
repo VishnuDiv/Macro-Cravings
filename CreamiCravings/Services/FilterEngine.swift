@@ -4,6 +4,7 @@ struct FilterContext {
     var favorites: Set<String> = []
     var missing: Set<String> = []
     var madeLog: [MadeEntry] = []
+    var ratings: [String: Int] = [:]          // the user's own 1...5 star ratings
     /// Displayed macros for a recipe (user's default milk, source setting).
     var displayed: (Recipe) -> Nutrition = { $0.macros ?? .zero }
 }
@@ -65,6 +66,8 @@ enum FilterEngine {
             if !f.books.isEmpty && !f.books.contains(r.source.title ?? "") { return false }
             if !f.mealChips.isEmpty && f.mealChips.isDisjoint(with: idx.chips) { return false }
             if f.highFiber && !idx.highFiber { return false }
+            if f.hasUpgrade && !idx.hasUpgrade { return false }
+            if f.vegan && !idx.vegan { return false }
             if f.vegAsWritten && !idx.vegAsWritten { return false }
             if f.hasVegVersion && !idx.hasVegVersion { return false }
             if f.noEgg && !idx.noEgg { return false }
@@ -109,6 +112,17 @@ enum FilterEngine {
             return 2
         }
         switch f.sort {
+        case .quickest:
+            // total time = prep + cook (chill and freeze excluded); unknown times last
+            func total(_ r: Recipe) -> Int? { (r.prepMinutes == nil && r.cookMinutes == nil) ? nil : (r.prepMinutes ?? 0) + (r.cookMinutes ?? 0) }
+            return out.sorted {
+                switch (total($0), total($1)) {
+                case let (a?, b?): return a != b ? a < b : byName($0, $1)
+                case (_?, nil): return true
+                case (nil, _?): return false
+                default: return byName($0, $1)
+                }
+            }
         case .featured:
             return out.sorted { featuredRank($0) != featuredRank($1) ? featuredRank($0) < featuredRank($1) : byName($0, $1) }
         case .highFiber:
@@ -134,7 +148,11 @@ enum FilterEngine {
                 }
             }
         case .rating:
-            func avg(_ r: Recipe) -> Double { let v = ratings[r.id] ?? []; return v.isEmpty ? 0 : Double(v.reduce(0, +)) / Double(v.count) }
+            // the user's own star rating wins; the made-log average is the fallback
+            func avg(_ r: Recipe) -> Double {
+                if let own = ctx.ratings[r.id], own > 0 { return Double(own) }
+                let v = ratings[r.id] ?? []; return v.isEmpty ? 0 : Double(v.reduce(0, +)) / Double(v.count)
+            }
             return out.sorted { avg($0) != avg($1) ? avg($0) > avg($1) : byName($0, $1) }
         }
     }

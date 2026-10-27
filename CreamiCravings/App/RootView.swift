@@ -13,7 +13,7 @@ struct RootView: View {
                     Tab("Recipes", systemImage: "fork.knife", value: AppTab.recipes) {
                         RecipesView(mode: .all)
                     }
-                    Tab("Favorites", systemImage: "star.fill", value: AppTab.favorites) {
+                    Tab("Saved", systemImage: "bookmark.fill", value: AppTab.favorites) {
                         RecipesView(mode: .favorites)
                     }
                     Tab("Freezer", systemImage: "snowflake", value: AppTab.freezer) {

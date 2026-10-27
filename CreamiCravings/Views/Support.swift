@@ -90,6 +90,60 @@ extension View {
     }
 }
 
+// MARK: - Goal colors, saved badge and save menu
+
+extension Color {
+    /// Deeper green used for the Vegan badge (distinct from the lighter "Vegetarian" green).
+    static let veganGreen = Color(red: 0.05, green: 0.46, blue: 0.24)
+}
+
+extension Goal {
+    /// Cut green, Maintain blue, Bulk orange.
+    var color: Color { self == .cut ? .green : (self == .bulk ? .orange : .blue) }
+}
+
+/// Colored bookmark with the goal's letter (C / M / B).
+struct SavedBadge: View {
+    let goal: Goal
+    var size: CGFloat = 20
+    var body: some View {
+        ZStack {
+            Image(systemName: "bookmark.fill").font(.system(size: size)).foregroundStyle(goal.color)
+            Text(goal.letter).font(.system(size: size * 0.42, weight: .heavy, design: .rounded)).foregroundStyle(.white).offset(y: -size * 0.1)
+        }
+        .accessibilityLabel("Saved for \(goal.title)")
+    }
+}
+
+/// Bookmark button. Tap: "Save for Cut / Maintain / Bulk" (your current goal first). Long-press: unsave.
+struct SaveMenu: View {
+    let recipe: Recipe
+    @Environment(UserStore.self) private var user
+
+    var body: some View {
+        let saved = user.savedGoal(recipe.id)
+        let order = [user.data.goal] + Goal.allCases.filter { $0 != user.data.goal }
+        Menu {
+            ForEach(order) { g in
+                Button {
+                    user.save(recipe.id, for: g)
+                } label: {
+                    Label("Save for \(g.title)" + (g == user.data.goal ? " · your goal" : ""), systemImage: saved == g ? "checkmark" : g.symbol)
+                }
+            }
+            if saved != nil {
+                Divider()
+                Button(role: .destructive) { user.unsave(recipe.id) } label: { Label("Remove from Saved", systemImage: "bookmark.slash") }
+            }
+        } label: {
+            if let g = saved { SavedBadge(goal: g) } else { Image(systemName: "bookmark").font(.title3) }
+        }
+        .simultaneousGesture(LongPressGesture(minimumDuration: 0.6).onEnded { _ in user.unsave(recipe.id) })
+        .sensoryFeedback(.success, trigger: saved?.rawValue ?? "")
+        .accessibilityLabel(saved.map { "Saved for \($0.title)" } ?? "Save")
+    }
+}
+
 // MARK: - Navigation state
 
 enum AppTab: Hashable { case recipes, favorites, freezer, shopping, settings }

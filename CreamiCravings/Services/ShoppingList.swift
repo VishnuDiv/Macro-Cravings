@@ -11,7 +11,7 @@ enum ShoppingList {
             if info?.pantryStaple == true, !(key.map { cfg.missing.contains($0) } ?? false) { continue }
             let name = (l.swap != nil || l.milk != nil || l.powder != nil) ? l.displayName : (info?.name ?? l.ing.text)
             out.append(ShoppingItem(key: key, text: name, category: info?.category ?? l.info?.category ?? "other",
-                                    grams: l.scaledGrams > 0 ? l.scaledGrams : nil))
+                                    grams: l.scaledGrams > 0 ? l.scaledGrams : nil, estimated: l.amount == .estimated))
         }
         return out
     }
@@ -25,6 +25,7 @@ enum ShoppingList {
                 case (nil, let b?): list[i].grams = b
                 default: break
                 }
+                if n.estimated { list[i].estimated = true }
             } else {
                 list.append(n)
             }
@@ -32,7 +33,7 @@ enum ShoppingList {
     }
 
     static func label(_ i: ShoppingItem) -> String {
-        if let g = i.grams { return "\(i.text) (\(Int(g.rounded())) g)" }
+        if let g = i.grams { return i.estimated ? "\(i.text) (≈ \(Int(g.rounded())) g, est.)" : "\(i.text) (\(Int(g.rounded())) g)" }
         return i.text
     }
 

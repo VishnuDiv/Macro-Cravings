@@ -15,6 +15,14 @@ enum Goal: String, Codable, CaseIterable, Identifiable {
     /// What "Featured" sorts as under this goal.
     var defaultSort: SortOption { self == .cut ? .healthiest : (self == .bulk ? .proteinDesc : .featured) }
 
+    /// What the recipe is as written (per serving; per pint for Creami): Cut, Bulk or Maintain.
+    static func original(_ n: Nutrition, bookTitle: String?) -> Goal {
+        if isCutFriendly(n) { return .cut }
+        if isBulkFriendly(n, bookTitle: bookTitle) { return .bulk }
+        return .maintain
+    }
+    var letter: String { self == .cut ? "C" : (self == .bulk ? "B" : "M") }
+
     static let bulkBook = "The Ultimate Guide to Lean Bulking"
 
     /// Cut-friendly: protein density >= 10 g per 100 kcal (protein x 10 >= kcal) and kcal <= 550. Per serving (per pint for Creami).
@@ -26,11 +34,12 @@ enum Goal: String, Codable, CaseIterable, Identifiable {
 }
 
 enum SortOption: String, Codable, CaseIterable, Identifiable {
-    case featured, name, caloriesAsc, proteinDesc, proteinPer100Desc, recentlyMade, rating, highFiber, healthiest
+    case featured, quickest, name, caloriesAsc, proteinDesc, proteinPer100Desc, recentlyMade, rating, highFiber, healthiest
     var id: String { rawValue }
     var title: String {
         switch self {
         case .featured: return "Featured"
+        case .quickest: return "Quickest"
         case .name: return "Name"
         case .caloriesAsc: return "Calories (low first)"
         case .proteinDesc: return "Protein (high first)"
@@ -72,6 +81,7 @@ struct ShoppingItem: Codable, Hashable, Identifiable {
     var category: String = "other"
     var grams: Double?
     var checked: Bool = false
+    var estimated = false          // the grams are a guess (shown as "≈ 20 g (est.)")
 }
 
 struct FilterState: Codable, Equatable {
@@ -104,6 +114,8 @@ struct FilterState: Codable, Equatable {
     var verdicts: Set<String> = []
     var proteinDensity: Double = 0           // g protein per 100 kcal, 0 = off
     var cutOnly = false
+    var hasUpgrade = false
+    var vegan = false
     var bulkOnly = false
 
     static let proteinDensitySteps: [Double] = [0, 5, 7.5, 10, 12.5, 15]
@@ -124,8 +136,10 @@ struct FilterState: Codable, Equatable {
     func activePills(keyName: (String) -> String = { FilterState.pretty($0) }) -> [Pill] {
         var out: [Pill] = []
         func add(_ kind: String, _ value: String, _ label: String) { out.append(Pill(id: kind + ":" + value, label: label)) }
-        if favoritesOnly { add("flag", "favoritesOnly", "Favorites") }
+        if favoritesOnly { add("flag", "favoritesOnly", "Saved") }
         for s in sources.sorted() { add("source", s, s == "book" ? "Book" : "Web") }
+        if vegan { add("flag", "vegan", "Vegan") }
+        if hasUpgrade { add("flag", "hasUpgrade", "Has protein upgrade") }
         if cutOnly { add("flag", "cutOnly", "Cut-friendly") }
         if bulkOnly { add("flag", "bulkOnly", "Bulk-friendly") }
         if proteinDensity > 0 { add("flag", "proteinDensity", "≥ \(FilterState.number(proteinDensity)) g P/100 kcal") }
@@ -177,6 +191,8 @@ struct FilterState: Codable, Equatable {
             switch v {
             case "favoritesOnly": favoritesOnly = false
             case "cutOnly": cutOnly = false
+            case "hasUpgrade": hasUpgrade = false
+            case "vegan": vegan = false
             case "bulkOnly": bulkOnly = false
             case "proteinDensity": proteinDensity = 0
             case "hideAffiliate": hideAffiliate = false
@@ -236,6 +252,8 @@ struct FilterState: Codable, Equatable {
         verdicts = (try? c.decode(Set<String>.self, forKey: .verdicts)) ?? []
         proteinDensity = (try? c.decode(Double.self, forKey: .proteinDensity)) ?? 0
         cutOnly = (try? c.decode(Bool.self, forKey: .cutOnly)) ?? false
+        hasUpgrade = (try? c.decode(Bool.self, forKey: .hasUpgrade)) ?? false
+        vegan = (try? c.decode(Bool.self, forKey: .vegan)) ?? false
         bulkOnly = (try? c.decode(Bool.self, forKey: .bulkOnly)) ?? false
     }
 }
@@ -262,6 +280,14 @@ struct UserData: Codable, Equatable {
     var filterState = FilterState()
     var notificationsAsked = false
     var goal: Goal = .maintain
+    var saved: [String: Goal] = [:]                 // recipeId -> goal it was saved for (replaces the old star)
+    var savedMigrated = true                        // false only while decoding an old file
+    var ratings: [String: Int] = [:]                // recipeId -> 1...5 stars
+    var recipeGoal: [String: Goal] = [:]            // per-recipe version (Cut / Maintain / Bulk); default = the global goal
+    var useEstimates = true                         // guess amounts for lines that have none
+    var lineGrams: [String: [String: Double]] = [:] // recipeId -> lineKey -> grams typed by the user
+    var upgradeChoice: [String: String] = [:]       // recipeId -> protein upgrade alternative key (absent = original)
+    var goalToggles: [String: [String: Bool]] = [:] // recipeId -> change id -> on/off (overrides the default)
     var isVegetarian = true
     var preferEasyAlternatives = true
     var vegChoice: [String: [String: String]] = [:]   // recipeId -> lineKey -> alternative key
@@ -296,6 +322,19 @@ struct UserData: Codable, Equatable {
         avoidsEggs = (try? c.decode(Bool.self, forKey: .avoidsEggs)) ?? false
         showOriginal = (try? c.decode(Set<String>.self, forKey: .showOriginal)) ?? []
         goal = (try? c.decode(Goal.self, forKey: .goal)) ?? .maintain
+        saved = (try? c.decode([String: Goal].self, forKey: .saved)) ?? [:]
+        ratings = (try? c.decode([String: Int].self, forKey: .ratings)) ?? [:]
+        recipeGoal = (try? c.decode([String: Goal].self, forKey: .recipeGoal)) ?? [:]
+        useEstimates = (try? c.decode(Bool.self, forKey: .useEstimates)) ?? true
+        lineGrams = (try? c.decode([String: [String: Double]].self, forKey: .lineGrams)) ?? [:]
+        upgradeChoice = (try? c.decode([String: String].self, forKey: .upgradeChoice)) ?? [:]
+        goalToggles = (try? c.decode([String: [String: Bool]].self, forKey: .goalToggles)) ?? [:]
+        // One-time migration: old stars become "Saved for Maintain", and are kept.
+        if !((try? c.decode(Bool.self, forKey: .savedMigrated)) ?? false) {
+            for id in favorites where saved[id] == nil { saved[id] = .maintain }
+            favorites = []
+        }
+        savedMigrated = true
         notificationsAsked = (try? c.decode(Bool.self, forKey: .notificationsAsked)) ?? false
     }
 }

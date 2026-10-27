@@ -440,6 +440,74 @@ def fix7_pieces(recipes):
     return n
 
 
+# ---------------------------------------------------------------- protein upgrade (wings / crispy bites)
+
+LEGUME_WORDS = ("chickpea", "lentil", "bean", "pea")
+
+
+def _keyword_hit(text, keywords):
+    """Whole-word / phrase match of any keyword in text (case-insensitive)."""
+    t = " " + re.sub(r"[^a-z0-9]+", " ", text.lower()).strip() + " "
+    return any((" %s " % re.sub(r"[^a-z0-9]+", " ", k.lower()).strip()) in t for k in keywords)
+
+
+def line_grams(ing, info):
+    """Grams of a line the way the app computes them: grams, else ml x gramsPerMl, else count x gramsPerCount, else defaultGrams."""
+    info = info or {}
+    if isinstance(ing.get("grams"), (int, float)):
+        return ing["grams"]
+    if isinstance(ing.get("ml"), (int, float)):
+        return ing["ml"] * (info.get("gramsPerMl") or 1.0)
+    if isinstance(ing.get("count"), (int, float)) and info.get("gramsPerCount"):
+        return ing["count"] * info["gramsPerCount"]
+    return info.get("defaultGrams") or 0.0
+
+
+MIN_BASE_GRAMS = 150      # a real "main" ingredient: a garnish of mushrooms in a pasta dish is not a wing base
+
+
+def mark_protein_upgrades(recipes, catalog, valts):
+    """Marks wing / crispy-bite recipes whose main produce or legume line (by weight) is a wing base such as cauliflower.
+
+    Sets recipe["proteinUpgrade"] = {"role": "wing_base", "lineIndex": i} (i = index in `base`). Meals only (courses meal / snack / side),
+    never Creami or dessert. Returns the list of marked recipes."""
+    role = ((valts or {}).get("upgrades") or {}).get("wing_base")
+    if not role:
+        return []
+    base_keys = set(role.get("baseKeys") or [])
+    keywords = role.get("keywords") or []
+    marked = []
+    for r in recipes:
+        r.pop("proteinUpgrade", None)
+        if (r.get("section") or "creami") != "meal":
+            continue
+        # produce / legume lines by grams; the wing base has to be the largest of them
+        best, best_g = None, 0.0
+        for i, ing in enumerate(r.get("base") or []):
+            k = ing.get("key") or ""
+            info = (catalog or {}).get(k) or {}
+            g = line_grams(ing, info)
+            if g <= 0:
+                continue
+            cat = info.get("category")
+            if cat == "produce" or any(w in k for w in LEGUME_WORDS):
+                if g > best_g:
+                    best, best_g = i, g
+        if best is None or best_g < MIN_BASE_GRAMS or (r["base"][best].get("key") or "") not in base_keys:
+            continue
+        name_tags = " ".join([r.get("name") or ""] + list(r.get("tags") or []))
+        # already built on a protein, or the vegetable is a rice substitute: nothing to upgrade
+        if re.search(r"\b(tofu|paneer|seitan|tempeh)\b|cauliflower rice|riced", (r.get("name") or "").lower()):
+            continue
+        if any(re.search(r"tofu|paneer|seitan|tempeh|soy_chunks", (i.get("key") or "")) and line_grams(i, (catalog or {}).get(i.get("key") or "")) >= 100
+               for i in r.get("base") or []):
+            continue
+        if (r.get("cuisine") or "").lower() == "wings" or _keyword_hit(name_tags, keywords):
+            r["proteinUpgrade"] = {"role": "wing_base", "lineIndex": best}
+            marked.append(r)
+    return marked
+
+
 # ---------------------------------------------------------------- entry point
 
 def apply(recipes):

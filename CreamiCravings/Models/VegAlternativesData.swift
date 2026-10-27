@@ -58,13 +58,16 @@ struct VegRole: Codable, Hashable {
 struct VegAlternativesData: Codable, Hashable {
     var roles: [String: VegRole]
     var keyToRole: [String: String]
+    var upgrades: [String: UpgradeRole]
 
-    enum CodingKeys: String, CodingKey { case roles, keyToRole }
+    enum CodingKeys: String, CodingKey { case roles, keyToRole, upgrades }
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         let boxes = (try? c.decodeIfPresent([String: LenientBox<VegRole>].self, forKey: .roles)) ?? nil
         roles = (boxes ?? [:]).compactMapValues { $0.v }
         keyToRole = (try? c.decodeIfPresent([String: String].self, forKey: .keyToRole)) ?? [:]
+        let ups = (try? c.decodeIfPresent([String: LenientBox<UpgradeRole>].self, forKey: .upgrades)) ?? nil
+        upgrades = (ups ?? [:]).compactMapValues { $0.v }
     }
 
     private static func padded(_ text: String) -> String {
@@ -98,4 +101,29 @@ struct VegAlternativesData: Codable, Hashable {
         if let keyed { return (keyed, roles[keyed]!) }
         return nil
     }
+}
+
+/// "Protein upgrade" for wings and crispy bites: swap the vegetable base (cauliflower, chickpeas ...) for a protein at the same weight.
+struct UpgradeRole: Codable, Hashable {
+    var label: String
+    var baseKeys: [String]
+    var keywords: [String]
+    var basePer100g: Nutrition
+    var alternatives: [VegAlt]
+
+    enum CodingKeys: String, CodingKey { case label, baseKeys, keywords, basePer100g, alternatives }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        label = (try? c.decodeIfPresent(String.self, forKey: .label)) ?? "Protein upgrade"
+        baseKeys = (try? c.decodeIfPresent([String].self, forKey: .baseKeys)) ?? []
+        keywords = (try? c.decodeIfPresent([String].self, forKey: .keywords)) ?? []
+        basePer100g = (try? c.decodeIfPresent(Nutrition.self, forKey: .basePer100g)) ?? .zero
+        alternatives = decodeLenientArray(from: c, key: .alternatives)
+    }
+}
+
+/// Build-time mark on a recipe: which role applies and which `base` line is the wing base.
+struct ProteinUpgradeRef: Codable, Hashable {
+    var role: String
+    var lineIndex: Int
 }

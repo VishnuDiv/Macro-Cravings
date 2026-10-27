@@ -272,6 +272,9 @@ def main():
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import data_fixes
     out, fix_report = data_fixes.apply(out)
+    catalog_for_marks = load(os.path.join(DATA, "catalog", "ingredients.json"), {})
+    valts = load(os.path.join(DATA, "catalog", "veg_alternatives.json"), {})
+    upgraded = data_fixes.mark_protein_upgrades(out, catalog_for_marks, valts)
 
     # Photos: bundled Resources/Photos/<id>.jpg first (books), else a remote photoURL for web recipes (data/web_images.json).
     web_images = load(os.path.join(DATA, "web_images.json"), {})
@@ -312,6 +315,9 @@ def main():
         print("  %s: %s" % (k, v))
     print("photo coverage (bundled / remote URL / total): " + ", ".join(
         "%s %d/%d/%d" % (k, v[1], v[2], v[0]) for k, v in sorted(photo_cov.items())))
+    print("protein upgrade (wing_base): %d recipes" % len(upgraded))
+    for r in upgraded[:15]:
+        print("    - %s [%s, line %d: %s]" % (r["name"], r.get("course") or r.get("section"), r["proteinUpgrade"]["lineIndex"], r["base"][r["proteinUpgrade"]["lineIndex"]]["text"][:40]))
     print("key aliases: %d loaded, %d ingredient keys rewritten" % (len(aliases), aliased))
     print("catalog files copied: %s" % (", ".join(copied) or "none"))
     cat = load(os.path.join(RES, "ingredients.json"))

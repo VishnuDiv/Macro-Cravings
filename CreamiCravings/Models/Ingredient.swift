@@ -93,9 +93,11 @@ struct IngredientInfo: Codable, Hashable {
     var allergens: [String]
     var vegetarian: VegFlag
     var vegNote: String?
+    var veganOverride: Bool?        // explicit "vegan": true/false in the catalog entry
 
     enum CodingKeys: String, CodingKey {
         case vegetarian, vegNote
+        case veganOverride = "vegan"
         case name, category, per100g, gramsPerCount, gramsPerMl, defaultGrams, affiliate
         case storeAlternative, homemadeAlternative, swaps, pantryStaple, allergens
     }
@@ -121,6 +123,7 @@ struct IngredientInfo: Codable, Hashable {
         allergens = (try? c.decodeIfPresent([String].self, forKey: .allergens)) ?? []
         vegetarian = (try? c.decodeIfPresent(VegFlag.self, forKey: .vegetarian)) ?? .yes
         vegNote = (try? c.decodeIfPresent(String.self, forKey: .vegNote)) ?? nil
+        veganOverride = (try? c.decodeIfPresent(Bool.self, forKey: .veganOverride)) ?? nil
     }
 }
 

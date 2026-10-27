@@ -21,15 +21,27 @@ enum BaseKind: String, CaseIterable, Identifiable, Codable {
 
 /// Ingredient catalog plus helpers that tolerate missing entries.
 struct Catalog {
-    var ingredients: [String: IngredientInfo] = [:]
+    var ingredients: [String: IngredientInfo] = [:] { didSet { rebuildVegan() } }
     var liquids: [BaseLiquid] = []
-    var powders: [ProteinPowder] = []
+    var powders: [ProteinPowder] = [] { didSet { rebuildVegan() } }
     var sourceBrands: [String: String] = [:]
     var guides: [Guide] = []
     var paneer: PaneerModel?
     var vegAlts: VegAlternativesData? {
-        didSet { vegInfo = Catalog.buildVegInfo(vegAlts) }
+        didSet { vegInfo = Catalog.buildVegInfo(vegAlts); rebuildVegan() }
     }
+    /// Derived vegan flag per ingredient key (see VeganRules); alternatives from veg_alternatives.json are included.
+    private(set) var veganMap: [String: Bool] = [:]
+
+    mutating func rebuildVegan() {
+        var m: [String: Bool] = [:]
+        for (k, v) in vegInfo { m[k] = VeganRules.isVegan(key: k, info: v, powders: powders) }
+        for (k, v) in ingredients { m[k] = VeganRules.isVegan(key: k, info: v, powders: powders) }
+        veganMap = m
+    }
+
+    /// nil when the key is not in the catalog.
+    func isVegan(_ key: String?) -> Bool? { key.flatMap { veganMap[$0] } }
     /// Catalog-style entries synthesized from veg alternatives, so their nutrition and names resolve.
     private(set) var vegInfo: [String: IngredientInfo] = [:]
 
@@ -108,6 +120,8 @@ struct RecipeIndex {
     var noEgg: Bool
     var chips: Set<String>
     var highFiber: Bool
+    var hasUpgrade: Bool
+    var vegan: Bool
 }
 
 struct LoadedData {
@@ -223,7 +237,7 @@ final class RecipeStore {
                 vegAsWritten: r.vegetarian ?? !keys.contains { cat.info($0)?.vegetarian == .no },
                 hasVegVersion: r.vegAdaptation != nil,
                 noEgg: r.containsEgg.map { !$0 } ?? !allergens.contains("egg"),
-                chips: r.mealChipMatches(keys: keys), highFiber: r.isHighFiber)
+                chips: r.mealChipMatches(keys: keys), highFiber: r.isHighFiber, hasUpgrade: r.proteinUpgrade != nil, vegan: VeganRules.isVeganForLists(r, catalog: cat))
         }
         return out
     }

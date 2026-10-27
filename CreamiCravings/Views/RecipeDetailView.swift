@@ -27,22 +27,35 @@ struct RecipeDetailView: View {
     private var vegRes: VegResolution { vegOn ? user.vegResolution(recipe, catalog: store.catalog) : VegResolution(recipe: recipe, lines: [:]) }
     private var shown: Recipe { user.effectiveRecipe(recipe, catalog: store.catalog) }
 
+    /// Vegan for the version on screen: veg version, chosen alternatives, protein upgrade, goal swaps and add-ons.
+    private var veganNow: Bool {
+        var keys: [String?] = []
+        for l in result.lines where l.included {
+            if l.swap != nil && l.swap?.key == nil { continue }       // "leave it out"
+            keys.append(l.isExtra ? l.ing.key : l.effectiveKey)
+        }
+        return VeganRules.recipeIsVegan(keys: keys, tags: recipe.tags, catalog: store.catalog)
+    }
+
     private var cfg: RecipeConfig { user.config(for: recipe, catalog: store.catalog) }
     private var result: RecipeNutrition { NutritionCalculator(catalog: store.catalog).compute(recipe, cfg) }
 
     var body: some View {
         let res = result
+        let goalRes = user.goalResolution(recipe, catalog: store.catalog)
         ScrollView {
             VStack(spacing: 0) {
                 hero
                 VStack(alignment: .leading, spacing: 20) {
                     header
                     if hasVegChoice { vegToggle }
+                    versionSection(goalRes)
+                    if let up = user.upgradeCard(recipe, catalog: store.catalog) { UpgradeCard(card: up) { user.setUpgrade(recipe.id, $0) } }
                     macroSection(res)
                     if let ev = recipe.evidence { EvidenceCard(evidence: ev) }
                     controls(res)
                     ingredientSection("Base", lines: res.lines.filter { $0.isBase })
-                    if !recipe.mixIns.isEmpty { ingredientSection("Mix-ins", lines: res.lines.filter { !$0.isBase }) }
+                    if !recipe.mixIns.isEmpty || res.lines.contains(where: \.isExtra) { ingredientSection("Mix-ins", lines: res.lines.filter { !$0.isBase }) }
                     instructions
                     if let tip = recipe.proTip(vegMode: user.data.isVegetarian) { proTip(tip) }
                     links
@@ -58,14 +71,7 @@ struct RecipeDetailView: View {
         .background(Color.screenBackground)
         .inlineTitle()
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button { user.toggleFavorite(recipe.id) } label: {
-                    Image(systemName: user.isFavorite(recipe.id) ? "star.fill" : "star")
-                        .foregroundStyle(user.isFavorite(recipe.id) ? Color.yellow : Color.accentColor)
-                }
-                .sensoryFeedback(.success, trigger: user.isFavorite(recipe.id))
-                .accessibilityLabel("Favorite")
-            }
+            ToolbarItem(placement: .primaryAction) { SaveMenu(recipe: recipe) }
         }
         .safeAreaInset(edge: .bottom) { bottomBar }
         .sheet(isPresented: $showCompare) { CompareSheet(recipe: recipe).environment(store).environment(user) }
@@ -93,44 +99,52 @@ struct RecipeDetailView: View {
 
     // MARK: sections
 
+    /// Fixed-height hero (about 320 pt plus the status bar). The photo is aspect-filled and clipped to it; only the title
+    /// sits on the image (over a dark scrim). Everything else lives below, on the normal background.
     private var hero: some View {
-        GeometryReader { g in
-            let minY = g.frame(in: .named("detailScroll")).minY
-            RecipePhoto(recipe: recipe, maxPixel: 1400)
-                .frame(width: g.size.width, height: 300 + max(0, minY))
-                .overlay(alignment: .bottomLeading) {
-                    // Dark scrim so the white title stays readable on any photo.
-                    ZStack(alignment: .bottomLeading) {
-                        LinearGradient(colors: [.clear, .black.opacity(0.72)], startPoint: .top, endPoint: .bottom)
-                        Text(shown.name)
-                            .font(.largeTitle.bold())
-                            .foregroundStyle(.white)
-                            .shadow(color: .black.opacity(0.4), radius: 3, y: 1)
-                            .lineLimit(3)
-                            .minimumScaleFactor(0.7)
-                            .padding(.horizontal).padding(.bottom, 14)
-                    }
-                    .frame(height: 170)
+        Color.clear
+            .frame(height: 340)
+            .overlay { RecipePhoto(recipe: recipe, maxPixel: 1400).allowsHitTesting(false) }
+            .clipped()
+            .overlay(alignment: .bottomLeading) {
+                ZStack(alignment: .bottomLeading) {
+                    LinearGradient(colors: [.clear, .black.opacity(0.75)], startPoint: .top, endPoint: .bottom)
+                    Text(shown.name)
+                        .font(.largeTitle.bold())
+                        .foregroundStyle(.white)
+                        .shadow(color: .black.opacity(0.4), radius: 3, y: 1)
+                        .lineLimit(3)
+                        .minimumScaleFactor(0.8)
+                        .padding(.horizontal).padding(.bottom, 14)
                 }
-                .offset(y: -max(0, minY))
-        }
-        .frame(height: 300)
+                .frame(height: 180)
+            }
     }
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
-            if vegOn, shown.name != recipe.name {
-                Text("Veg version of: \(recipe.name)").font(.caption).foregroundStyle(.secondary)
+            if shown.name != recipe.name {
+                Text((user.upgradeChoice(recipe.id) != nil && recipe.proteinUpgrade != nil ? "Protein upgrade of: " : "Veg version of: ") + recipe.name).font(.caption).foregroundStyle(.secondary)
             }
             sourceLine
             if recipe.photo == nil, let u = recipe.photoURL {
                 Text("Photo: \(recipe.source.site ?? URL(string: u)?.host ?? "source site")").font(.caption2).foregroundStyle(.secondary)
             }
+            HStack(spacing: 10) {
+                Text("Your rating").font(.subheadline).foregroundStyle(.secondary)
+                StarRating(rating: Binding(get: { user.rating(recipe.id) }, set: { user.setRating(recipe.id, $0) }))
+                if let g = user.savedGoal(recipe.id) { SavedBadge(goal: g, size: 18) }
+            }
             if recipe.section != "creami", recipe.course != nil || recipe.bookCategory != nil {
                 Text([recipe.course?.capitalized, recipe.bookCategory].compactMap { $0 }.joined(separator: " · "))
                     .font(.subheadline).foregroundStyle(.secondary)
             }
-            if user.data.isVegetarian, recipe.section != "creami" {
+            if veganNow {
+                Label("Vegan", systemImage: "leaf.fill")
+                    .font(.subheadline.weight(.bold)).foregroundStyle(.white)
+                    .padding(.horizontal, 10).padding(.vertical, 4)
+                    .background(Color.veganGreen, in: Capsule())
+            } else if user.data.isVegetarian, recipe.section != "creami" {
                 if recipe.vegetarian == true { Text("🌱 Vegetarian").font(.subheadline.weight(.semibold)).foregroundStyle(.green) }
                 else if recipe.vegAdaptation != nil { Text(vegOn ? "🌱 Vegetarian version" : "Contains meat or fish as written")
                     .font(.subheadline.weight(.semibold)).foregroundStyle(vegOn ? .green : .orange) }
@@ -158,6 +172,57 @@ struct RecipeDetailView: View {
             }
             .font(.caption).foregroundStyle(.secondary)
         }
+    }
+
+    private var originalGoal: Goal {
+        let d = user.display(for: recipe, catalog: store.catalog)
+        return Goal.original(d.displayed * (1 / recipe.perServingDivisor), bookTitle: recipe.source.title)
+    }
+
+    /// "Version: Cut | Maintain | Bulk", the original's class, and the toggleable changes for the chosen version.
+    private func versionSection(_ goalRes: GoalResolution) -> some View {
+        let ver = user.versionGoal(recipe.id)
+        let orig = originalGoal
+        return VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Version").font(.subheadline.weight(.semibold))
+                Spacer()
+                Label("Original: \(orig.title)", systemImage: orig.symbol)
+                    .font(.caption.weight(.semibold))
+                    .padding(.horizontal, 9).padding(.vertical, 4)
+                    .background(orig.color.opacity(0.16), in: Capsule())
+                    .foregroundStyle(orig.color)
+            }
+            Picker("Version", selection: Binding(get: { ver }, set: { user.setVersion(recipe.id, $0) })) {
+                ForEach(Goal.allCases) { Text($0.title).tag($0) }
+            }
+            .pickerStyle(.segmented)
+            .sensoryFeedback(.selection, trigger: ver)
+            if ver != .maintain { changesCard(goalRes) }
+        }
+        .animation(.snappy, value: ver)
+    }
+
+    private func changesCard(_ goalRes: GoalResolution) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Changes for \(goalRes.goal.title)", systemImage: goalRes.goal.symbol)
+                .font(.subheadline.weight(.semibold)).foregroundStyle(goalRes.goal.color)
+            if goalRes.changes.isEmpty {
+                Text(goalRes.goal == .cut ? "Nothing to trim: this recipe already fits a cut." : "Nothing to add: this recipe already fits a bulk.")
+                    .font(.footnote).foregroundStyle(.secondary)
+            }
+            ForEach(goalRes.changes) { c in
+                Toggle(isOn: Binding(get: { c.enabled }, set: { user.setChange(recipe.id, c.id, $0) })) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(c.title).font(.footnote.weight(.medium))
+                        if let d = c.detail { Text(d).font(.caption).foregroundStyle(.secondary) }
+                    }
+                }
+                .toggleStyle(.switch).tint(goalRes.goal.color)
+            }
+        }
+        .padding(12)
+        .background(goalRes.goal.color.opacity(0.10), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     private var vegToggle: some View {
@@ -204,7 +269,9 @@ struct RecipeDetailView: View {
 
     private func macroSection(_ res: RecipeNutrition) -> some View {
         let div = recipe.usesServings ? recipe.perServingDivisor : Double(servings)
-        let shown = perServing ? (recipe.usesServings ? res.displayed * (Double(servings) / div) : res.displayed * (1 / div)) : res.displayed
+        // the goal portion applies per serving (and per pint for Creami); the whole-recipe view shows the full recipe
+        let whole = recipe.usesServings ? res.displayedFull : res.displayed
+        let shown = perServing ? (recipe.usesServings ? res.displayed * (Double(servings) / div) : res.displayed * (1 / div)) : whole
         return VStack(alignment: .leading, spacing: 10) {
             MacroRow(n: shown)
                 .animation(.snappy, value: shown)
@@ -216,7 +283,7 @@ struct RecipeDetailView: View {
             Picker("Calories from", selection: Binding(
                 get: { res.usedSource },
                 set: { user.data.recipeCalorieSource[recipe.id] = $0 })) {
-                ForEach(CalorieSource.allCases) { Text($0.title).tag($0) }
+                ForEach(CalorieSource.allCases) { Text($0 == .book ? (recipe.source.isBook ? "Book" : "Source") : $0.title).tag($0) }
             }
             .pickerStyle(.segmented)
             .sensoryFeedback(.selection, trigger: res.usedSource)
@@ -228,7 +295,8 @@ struct RecipeDetailView: View {
                     } else if vegOn && res.usedSource == .book && recipe.vegAdaptation?.macrosPerServing != nil {
                         Label("Vegetarian version (estimated)", systemImage: "leaf.fill").foregroundStyle(.green)
                     } else if res.usedSource == .book {
-                        Label("Recipe-book numbers" + (res.pints > 1 ? " × \(res.pints) pints" : " for the whole pint"), systemImage: "book.closed")
+                        Label("\(recipe.source.isBook ? "Book" : "Source") numbers " + (recipe.usesServings ? (perServing ? "per serving" : "for the whole recipe")
+                                                                                       : (res.pints > 1 ? "× \(res.pints) pints" : "for the whole pint")), systemImage: "book.closed")
                     } else {
                         Label("Calculated from the ingredient database", systemImage: "function")
                     }
@@ -237,9 +305,25 @@ struct RecipeDetailView: View {
                 Spacer()
                 Button("Compare") { showCompare = true }.font(.caption.weight(.semibold))
             }
-            if res.uncounted > 0 {
-                Label("\(res.uncounted) ingredient\(res.uncounted == 1 ? "" : "s") not counted", systemImage: "exclamationmark.circle")
-                    .font(.caption).foregroundStyle(.orange)
+            if res.estimatedCount > 0 || res.uncounted > 0 || user.data.useEstimates == false {
+                VStack(alignment: .leading, spacing: 4) {
+                    if res.estimatedCount > 0 {
+                        Label("Includes \(res.estimatedCount) estimated amount\(res.estimatedCount == 1 ? "" : "s")", systemImage: "wand.and.stars")
+                            .font(.caption).foregroundStyle(.orange)
+                    }
+                    if res.uncounted > 0 {
+                        Label("\(res.uncounted) ingredient\(res.uncounted == 1 ? "" : "s") not counted", systemImage: "exclamationmark.circle")
+                            .font(.caption).foregroundStyle(.orange)
+                    }
+                    Toggle(isOn: Binding(get: { user.data.useEstimates }, set: { user.data.useEstimates = $0 })) {
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text("Use estimates").font(.caption.weight(.semibold))
+                            Text("Guesses typical amounts for lines with none. Affects Calculated numbers and Cut / Bulk changes, not the book or source numbers.")
+                                .font(.caption2).foregroundStyle(.secondary)
+                        }
+                    }
+                    .toggleStyle(.switch).tint(.orange)
+                }
             }
             Picker("View", selection: $perServing.animation(.snappy)) {
                 Text(recipe.usesServings ? "Whole recipe" : "Whole pint").tag(false)

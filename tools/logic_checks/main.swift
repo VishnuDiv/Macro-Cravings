@@ -188,7 +188,7 @@ MainActor.assumeIsolated {
     let fstore = RecipeStore()
     fstore.apply(fx)
     let fcalc = NutritionCalculator(catalog: fstore.catalog)
-    check(fx.recipes.count == 7, "fixture build produced 4 book + 3 web meal recipes (\(fx.recipes.count))")
+    check(fx.recipes.count == 8, "fixture build produced 4 book + 4 web meal recipes (\(fx.recipes.count))")
     if let wrap = fx.recipes.first(where: { $0.id == "chef-chicken-wrap" }) {
         check(wrap.macros?.calories == 1000 && wrap.macros?.protein == 80, "macros = macrosPerServing x servings (500x2 kcal -> \(wrap.macros?.calories ?? -1))")
         check(wrap.vegAdaptation?.macrosPerServing?.calories == 450 && wrap.servings == 2, "vegAdaptation.macrosPerServing stays per serving (450)")
@@ -265,6 +265,287 @@ MainActor.assumeIsolated {
     if let enc = try? JSONEncoder().encode(many), let back = try? JSONDecoder().decode(FilterState.self, from: enc) {
         check(back == many && back.activePills() == pills, "pill list round-trips with FilterState through JSON")
     } else { check(false, "FilterState encode/decode failed") }
+
+    // ---- vegan
+    print("(vegan) vegan badge and filter")
+    func vi(_ name: String, _ cat: String = "other", veg: String = "true", allergens: [String] = []) -> IngredientInfo {
+        try! JSONDecoder().decode(IngredientInfo.self, from: Data(#"{"name":"\#(name)","category":"\#(cat)","vegetarian":\#(veg),"allergens":\#(String(data: try! JSONEncoder().encode(allergens), encoding: .utf8)!)}"#.utf8))
+    }
+    var vcat = Catalog()
+    vcat.powders = [try! JSONDecoder().decode(ProteinPowder.self, from: Data(#"{"id":"w","name":"Whey","type":"whey_isolate","scoopGrams":30,"perScoop":{},"ingredientKey":"protein_powder_vanilla"}"#.utf8)),
+                    try! JSONDecoder().decode(ProteinPowder.self, from: Data(#"{"id":"p","name":"Pea","type":"plant","scoopGrams":30,"perScoop":{},"ingredientKey":"protein_powder_pea"}"#.utf8))]
+    vcat.ingredients = [
+        "tofu_extra_firm": vi("Extra-firm tofu", allergens: ["soy"]), "soy_sauce": vi("Soy sauce", "sauce", allergens: ["soy"]), "rice_cooked": vi("Cooked rice"),
+        "honey": vi("Honey"), "protein_powder_vanilla": vi("Vanilla protein powder", "protein_powder", allergens: ["dairy"]),
+        "protein_powder_pea": vi("Pea protein powder", "protein_powder"), "peanut_butter": vi("Peanut butter", "nut"), "butter": vi("Butter", "dairy", allergens: ["dairy"]),
+        "almond_milk": vi("Almond milk", "plant_milk"), "whole_milk": vi("Whole milk", "milk"), "mayonnaise": vi("Mayonnaise", "sauce"), "vegan_mayonnaise": vi("Vegan mayonnaise", "sauce"),
+        "eggplant": vi("Eggplant", "produce"), "eggs": vi("Eggs", "dairy"), "ghee": vi("Ghee"), "gelatin": vi("Gelatin", "stabilizer"), "chicken_breast": vi("Chicken breast", veg: "false"),
+        "coconut_cream": vi("Coconut cream", "dairy"), "cream_cheese": vi("Cream cheese", "dairy"), "ice_cream": vi("Ice cream", "dairy"), "butternut_squash": vi("Butternut squash", "produce"),
+        "greek_yogurt": vi("Greek yogurt", "dairy"), "banana": vi("Banana", "fruit", veg: #""check""#), "tempeh": vi("Tempeh"), "vegetarian_parmesan": vi("Vegetarian parmesan", "dairy"),
+    ]
+    let vflags = ["tofu_extra_firm", "soy_sauce", "rice_cooked", "protein_powder_pea", "peanut_butter", "almond_milk", "vegan_mayonnaise", "eggplant", "coconut_cream", "butternut_squash", "tempeh"].map { vcat.isVegan($0) }
+    let nflags = ["honey", "protein_powder_vanilla", "butter", "whole_milk", "mayonnaise", "eggs", "ghee", "gelatin", "chicken_breast", "cream_cheese", "ice_cream", "greek_yogurt", "banana", "vegetarian_parmesan"].map { vcat.isVegan($0) }
+    check(vflags.allSatisfy { $0 == true } && nflags.allSatisfy { $0 == false }, "vegan rules: tofu, peanut butter, almond milk, coconut cream, pea powder yes; honey, whey, butter, milk, mayo, eggs, ghee, gelatin, cheese, 'check' items no")
+    func vrecipe(_ keys: [String], tags: [String] = []) -> Recipe {
+        let lines = keys.map { #"{"text":"\#($0)","key":"\#($0)"}"# }.joined(separator: ",")
+        return RecipeStore.decodeRecipes(Data(#"[{"id":"v","name":"v","tags":\#(String(data: try! JSONEncoder().encode(tags), encoding: .utf8)!),"base":[\#(lines)],"instructions":["a","b"]}]"#.utf8))[0]
+    }
+    check(VeganRules.isVegan(vrecipe(["tofu_extra_firm", "soy_sauce", "rice_cooked"]), catalog: vcat), "a tofu stir-fry with soy sauce is vegan")
+    check(!VeganRules.isVegan(vrecipe(["tofu_extra_firm", "soy_sauce", "honey"]), catalog: vcat), "the same recipe with honey is not vegan")
+    check(!VeganRules.isVegan(vrecipe(["tofu_extra_firm", "protein_powder_vanilla"]), catalog: vcat), "... or with a whey line")
+    check(VeganRules.isVegan(vrecipe(["tofu_extra_firm", "mystery_spice"], tags: ["vegan"]), catalog: vcat) && !VeganRules.isVegan(vrecipe(["tofu_extra_firm", "mystery_spice"]), catalog: vcat), "a recipe tagged vegan with an unknown line stays vegan (untagged does not)")
+    check(!VeganRules.isVegan(vrecipe(["honey", "mystery_spice"], tags: ["vegan"]), catalog: vcat), "a tagged recipe with a resolved non-vegan line is not vegan")
+    if let bowl = fx.recipes.first(where: { $0.id == "chef-chicken-bowl" }) {
+        let vu = UserStore(fileURL: nil)
+        check(vu.vegActive(bowl) && fstore.catalog.isVegan("tofu_extra_firm") == true, "fixture catalog: tofu is vegan")
+        let withTofu = vu.effectiveRecipe(bowl, catalog: fstore.catalog)       // preferEasy default: tofu is the first 'everywhere' alternative
+        check(withTofu.base[0].key == "tofu_extra_firm" && VeganRules.isVegan(withTofu, catalog: fstore.catalog), "veg version with the tofu alternative is vegan")
+        vu.data.vegChoice[bowl.id] = ["b0": "paneer_low_fat"]
+        let withPaneer = vu.effectiveRecipe(bowl, catalog: fstore.catalog)
+        check(withPaneer.base[0].key == "paneer_low_fat" && !VeganRules.isVegan(withPaneer, catalog: fstore.catalog), "switching the alternative to paneer flips it back to vegetarian")
+        var vf = FilterState(); vf.section = nil; vf.vegan = true
+        check(vf.activePills().map(\.label) == ["Vegan"], "Vegan filter pill")
+    }
+    do {
+        var bySection: [String: (vegan: Int, total: Int)] = [:]
+        for r in store.recipes {
+            let s = r.section
+            var v = bySection[s] ?? (0, 0)
+            v.total += 1
+            if store.index[r.id]?.vegan == true { v.vegan += 1 }
+            bySection[s] = v
+        }
+        print("  real data vegan (as written + default veg version): " + bySection.sorted { $0.key < $1.key }.map { "\($0.key) \($0.value.vegan)/\($0.value.total)" }.joined(separator: ", "))
+        check(bySection.values.reduce(0, { $0 + $1.vegan }) > 100, "real data has a sensible number of vegan recipes")
+    }
+
+    // ---- estimated amounts
+    print("(est) estimated amounts")
+    func ing2(_ name: String, _ cat: String, _ kcal: Double, _ p: Double) -> IngredientInfo { IngredientInfo(name: name, category: cat, per100g: Nutrition(calories: kcal, protein: p)) }
+    var ecat = Catalog()
+    ecat.ingredients = [
+        "salt": ing2("Salt", "spice", 0, 0), "black_pepper": ing2("Black pepper", "spice", 251, 10), "olive_oil": ing2("Olive oil", "other", 884, 0),
+        "cheddar": ing2("Cheddar", "dairy", 404, 23), "cilantro": ing2("Cilantro", "produce", 23, 2), "tomato": ing2("Tomato", "produce", 18, 0.9),
+        "mix_in_choice": ing2("Mix-in of your choice", "mix_in", 0, 0), "rice_dry": ing2("Rice", "other", 365, 7),
+    ]
+    func est(_ text: String, _ key: String) -> Double? { EstimateRules.estimate(text: text, key: key, info: ecat.info(key))?.grams }
+    check(est("Salt to taste", "salt") == 0.5 && est("Black pepper to taste", "black_pepper") == 0.3, "Salt to taste = 0.5 g, pepper to taste = 0.3 g")
+    check(est("Olive oil for frying", "olive_oil") == 5 && est("Olive oil spray", "olive_oil") == 1, "Olive oil for frying = 5 g, spray = 1 g")
+    check(est("Shredded cheddar for topping", "cheddar") == 20, "Shredded cheddar for topping = 20 g")
+    check(est("Cilantro to garnish", "cilantro") == 3 && est("Tomato, sliced", "tomato") == 50 && est("Rice", "rice_dry") == 50, "Cilantro to garnish = 3 g; tomato 50 g; rice 50 g dry")
+    check(est("Mix-in of your choice", "mix_in_choice") == nil, "unknown categories stay unestimated (not counted)")
+    func erecipe(_ lines: String, macros: String = "null") -> Recipe {
+        RecipeStore.decodeRecipes(Data(#"[{"id":"er","name":"er","servings":1,"macros":\#(macros),"base":[\#(lines)],"instructions":["a","b"]}]"#.utf8))[0]
+    }
+    func el(_ text: String, _ key: String, optional: Bool = false) -> String { #"{"text":"\#(text)","key":"\#(key)","optional":\#(optional)}"# }
+    let er = erecipe([el("Salt to taste", "salt"), el("Olive oil for frying", "olive_oil"), el("Shredded cheddar for topping", "cheddar"), el("Cilantro to garnish", "cilantro"), el("Chilli flakes", "tomato", optional: true)].joined(separator: ","))
+    let ecalc = NutritionCalculator(catalog: ecat)
+    var ecfg = RecipeConfig(source: .calculated)
+    let eon = ecalc.compute(er, ecfg)
+    check(eon.estimatedCount == 4 && eon.lines.prefix(4).allSatisfy { $0.amount == .estimated } && eon.lines[4].amount == .known && eon.lines[4].grams == 0, "four lines estimated; the optional line gets no estimate (\(eon.estimatedCount))")
+    check(near(eon.calculated.calories, 884 * 0.05 + 404 * 0.20 + 23 * 0.03, 0.01), "calculated macros include the estimates (\(String(format: "%.1f", eon.calculated.calories)) kcal)")
+    ecfg.useEstimates = false
+    let eoff = ecalc.compute(er, ecfg)
+    check(eoff.calculated.calories == 0 && eoff.estimatedCount == 0 && eoff.uncounted == 4, "estimates off: calculated macros revert and the lines are 'not counted' again")
+    // Book numbers are the source's own: estimates do not move them
+    let erb = erecipe([el("Salt to taste", "salt"), el("Olive oil for frying", "olive_oil")].joined(separator: ","), macros: #"{"calories":500,"protein":30,"carbs":40,"fat":20}"#)
+    check(ecalc.compute(erb, RecipeConfig(source: .book)).displayed.calories == 500 && ecalc.compute(erb, RecipeConfig(source: .book, useEstimates: false)).displayed.calories == 500, "Book numbers stay the source's own with estimates on or off")
+    // the user's own amount wins, works with estimates off, and persists
+    let eu = UserStore(fileURL: nil)
+    eu.setLineGrams("er", line: "b1", grams: 12)
+    var ucfg = eu.config(for: er, catalog: ecat); ucfg.source = .calculated
+    let ures = ecalc.compute(er, ucfg)
+    check(ures.lines[1].amount == .user && ures.lines[1].grams == 12 && near(ures.lines[1].nutrition.calories, 884 * 0.12, 0.01), "a user-entered amount overrides the estimate (12 g oil)")
+    eu.data.useEstimates = false
+    ucfg = eu.config(for: er, catalog: ecat); ucfg.source = .calculated
+    check(ecalc.compute(er, ucfg).lines[1].amount == .user, "the user's own amount stays when estimates are off")
+    if let back = UserStore.encode(eu.data).flatMap({ UserStore.decode($0) }) { check(back.lineGrams["er"]?["b1"] == 12 && back.useEstimates == false, "user amount and the estimates switch persist") }
+    eu.setLineGrams("er", line: "b1", grams: nil)
+    check(eu.data.lineGrams["er"] == nil, "clearing the user's amount goes back to the estimate")
+    var sitem = ShoppingItem(key: "cheddar", text: "Cheddar", grams: 20)
+    sitem.estimated = true
+    check(ShoppingList.label(sitem) == "Cheddar (≈ 20 g, est.)" && ShoppingList.label(ShoppingItem(key: "x", text: "Rice", grams: 50)) == "Rice (50 g)", "shopping list marks estimated amounts with ≈ and (est.)")
+    let shopRes = ShoppingList.items(for: er, cfg: { var c = RecipeConfig(); c.source = .calculated; return c }(), catalog: ecat)
+    check(shopRes.first { $0.key == "cheddar" }?.estimated == true, "shopping items carry the estimated flag")
+    do {
+        let rc = NutritionCalculator(catalog: store.catalog)
+        let eu2 = UserStore(fileURL: nil)
+        var withEst = 0, lines = 0, notCounted = 0, withoutEstNotCounted = 0
+        for r in store.recipes {
+            let cfg = eu2.config(for: r, catalog: store.catalog, applyGoal: false)
+            let res = rc.compute(r, cfg)
+            if res.estimatedCount > 0 { withEst += 1 }
+            lines += res.estimatedCount
+            notCounted += res.uncounted
+            var off = cfg; off.useEstimates = false
+            withoutEstNotCounted += rc.compute(r, off).uncounted
+        }
+        print("  real data: \(withEst) of \(store.recipes.count) recipes have at least one estimated line (\(lines) lines); still not counted: \(notCounted) lines (was \(withoutEstNotCounted) before estimates)")
+    }
+
+    // ---- protein upgrade (wings / crispy bites)
+    print("(pu) protein upgrade")
+    if let wing = fx.recipes.first(where: { $0.id == "web-korean-cauliflower-wings" }) {
+        check(wing.proteinUpgrade?.role == "wing_base" && wing.proteinUpgrade?.lineIndex == 0, "build marks the Korean cauliflower wings for the protein upgrade")
+        check(fx.recipes.filter { $0.proteinUpgrade != nil }.map(\.id) == ["web-korean-cauliflower-wings"], "only wing-style recipes with a produce base get it")
+        let pcalc = NutritionCalculator(catalog: fstore.catalog)
+        let pu = UserStore(fileURL: nil)
+        pu.data.isVegetarian = false
+        let baseKcal = pcalc.compute(wing, pu.config(for: wing, catalog: fstore.catalog)).displayed
+        pu.setUpgrade(wing.id, "tofu_extra_firm")
+        let tofu = pcalc.compute(wing, pu.config(for: wing, catalog: fstore.catalog)).displayed
+        let expectP = 400 * (16 - 1.9) / 100 / 2
+        check(near((tofu.protein - baseKcal.protein) / 2, expectP, 0.01), "400 g cauliflower -> tofu: protein +\(String(format: "%.2f", (tofu.protein - baseKcal.protein) / 2)) g per serving (expected \(String(format: "%.2f", expectP)))")
+        check(near((tofu.calories - baseKcal.calories) / 2, 400 * (145 - 25) / 100 / 2, 0.01), "kcal delta = alt - base at the same weight")
+        let shownW = pu.effectiveRecipe(wing, catalog: fstore.catalog)
+        check(shownW.name == "Spicy Korean Fried Tofu Wings" && shownW.base[0].text == "400 g extra-firm tofu (pressed, torn into wing-size pieces)" && shownW.base[0].grams == 400, "title and line: \(shownW.name) / \(shownW.base[0].text)")
+        check(shownW.instructions.first?.hasPrefix("Prep (Extra-firm tofu): Press 20 min") == true && shownW.instructions.contains { $0.contains("Toss the tofu pieces") }, "prep is step 0 and the base word is replaced in the steps (\(shownW.instructions.dropFirst().first ?? ""))")
+        pu.setUpgrade(wing.id, "soy_chunks")
+        let soy = pu.upgradeCard(wing, catalog: fstore.catalog)
+        check(soy?.chosen?.grams == 133 && pu.effectiveRecipe(wing, catalog: fstore.catalog).base[0].text.hasPrefix("133 g dry soy chunks (rehydrated"), "soy chunks show dry grams = weight / 3 (133 g)")
+        check(near((soy?.chosen?.nutrition.protein ?? 0), 52 * 1.33, 0.1), "soy chunks nutrition is computed from the dry weight")
+        pu.setUpgrade(wing.id, "tofu_extra_firm")
+        if let back = UserStore.encode(pu.data).flatMap({ UserStore.decode($0) }) { check(back.upgradeChoice[wing.id] == "tofu_extra_firm", "the choice persists per recipe") }
+        // composes with the Cut version: the goal changes see the upgraded lines
+        pu.data.goal = .cut
+        let withCut = pcalc.compute(wing, pu.config(for: wing, catalog: fstore.catalog))
+        check(withCut.lines.first?.ing.key == "tofu_extra_firm" && withCut.displayedFull.protein >= tofu.protein - 0.01, "Cut version composes with the upgrade (upgrade first)")
+        check(ShoppingList.items(for: wing, cfg: pu.config(for: wing, catalog: fstore.catalog), catalog: fstore.catalog).contains { $0.key == "tofu_extra_firm" }, "shopping list uses the upgraded ingredient")
+        var uf = FilterState(); uf.section = nil; uf.hasUpgrade = true
+        check(FilterEngine.apply(store: fstore, recipes: fstore.recipes, query: "", state: uf, ctx: FilterContext()).map(\.id) == ["web-korean-cauliflower-wings"] && uf.activePills().map(\.label) == ["Has protein upgrade"], "Has protein upgrade filter and pill")
+    } else { check(false, "fixture Korean cauliflower wings missing") }
+
+    // ---- goal versions, saved-per-goal, ratings, quickest sort
+    print("(gv) goal versions / saved / rating / quickest")
+    check(Goal.original(nut(300, 31), bookTitle: nil) == .cut && Goal.original(nut(700, 40), bookTitle: nil) == .bulk && Goal.original(nut(500, 25), bookTitle: nil) == .maintain
+          && Goal.original(nut(400, 20), bookTitle: Goal.bulkBook) == .bulk && Goal.original(nut(300, 31), bookTitle: Goal.bulkBook) == .cut, "original classification: Cut / Bulk / Maintain (Lean Bulking book counts as Bulk unless cut-friendly)")
+
+    func ing(_ name: String, _ cat: String, _ kcal: Double, _ p: Double, swaps: [SwapOption] = []) -> IngredientInfo {
+        var i = IngredientInfo(name: name, category: cat, per100g: Nutrition(calories: kcal, protein: p)); i.swaps = swaps; return i
+    }
+    func sw(_ key: String, _ name: String) -> SwapOption { try! JSONDecoder().decode(SwapOption.self, from: Data(#"{"name":"\#(name)","key":"\#(key)","ratio":1}"#.utf8)) }
+    var gcat = Catalog()
+    gcat.ingredients = [
+        "cheddar": ing("Cheddar", "dairy", 400, 25, swaps: [sw("cheddar_light", "Light cheddar"), sw("blue_cheese", "Blue cheese")]),
+        "cheddar_light": ing("Light cheddar", "dairy", 300, 27),
+        "blue_cheese": ing("Blue cheese", "dairy", 350, 21),         // only 12% lighter: not eligible
+        "olive_oil": ing("Olive oil", "other", 884, 0),
+        "fat_free_ultra_filtered_milk": ing("Fat-free milk", "ultra_filtered", 32, 5, swaps: [sw("whole_milk", "Whole milk")]),
+        "whole_milk": ing("Whole milk", "milk", 61, 3.2),
+        "nuts": ing("Mixed nuts", "nut", 607, 20),
+        "rice_cooked": ing("Cooked rice", "other", 130, 2.7),
+    ]
+    let gcalc = NutritionCalculator(catalog: gcat)
+    func grecipe(_ id: String, servings: Int, kcal: Double, protein: Double, lines: String, section: String = "meal") -> Recipe {
+        RecipeStore.decodeRecipes(Data(#"[{"id":"\#(id)","name":"\#(id)","section":"\#(section)","course":"dinner","servings":\#(servings),"macros":{"calories":\#(kcal),"protein":\#(protein),"carbs":50,"fat":30},"base":[\#(lines)],"instructions":["a","b"]}]"#.utf8))[0]
+    }
+    func gl(_ text: String, _ key: String, _ grams: Double) -> String { #"{"text":"\#(text)","key":"\#(key)","grams":\#(grams)}"# }
+    let gr = grecipe("cutme", servings: 2, kcal: 1400, protein: 80, lines: [gl("200 g cheddar", "cheddar", 200), gl("20 g olive oil", "olive_oil", 20)].joined(separator: ","))
+    let gu = UserStore(fileURL: nil)
+    gu.data.goal = .cut
+    let gres = gu.goalResolution(gr, catalog: gcat)
+    let ids = gres.changes.map(\.id)
+    check(ids == ["cut:swap:b0", "cut:fat:b1", "cut:portion"] && gres.changes.allSatisfy(\.enabled), "cut changes: lighter cheese, halved oil, portion (\(ids)); blue cheese (12% lighter) is not eligible")
+    let cutCfg = gu.config(for: gr, catalog: gcat)
+    let cutRes = gcalc.compute(gr, cutCfg)
+    // 1400 - 200 (cheddar 200 g: 800 -> 600 kcal) - 88.4 (20 g oil -> 10 g) = 1111.6 per recipe = 555.8 per serving > 450 -> 0.80 serving
+    check(near(cutRes.displayedFull.calories, 1111.6, 0.01), "cut swap + fat math: \(String(format: "%.1f", cutRes.displayedFull.calories)) kcal (expected 1111.6)")
+    check(gres.portion == 0.8 && near(cutRes.displayed.calories, 1111.6 * 0.8, 0.01) && gres.portionLabel == "Cut portion: 0.8 serving", "cut portion: \(gres.portion), label \(gres.portionLabel ?? "-"), displayed \(String(format: "%.1f", cutRes.displayed.calories)) kcal")
+    check(near(cutRes.displayed.protein, (80 + 3 * 2 * 1.0 * 0 + (27 - 25) * 2) * 0.8, 0.01), "cut swap protein: +4 g from the lighter cheese, then x0.8 (\(String(format: "%.1f", cutRes.displayed.protein)))")
+    check(cutRes.lines.first?.swapFromGoal == true && cutRes.lines[1].lineScale == 0.5 && cutRes.lines[1].grams == 10, "cut lines flagged: goal swap, halved oil (10 g)")
+    gu.setChange("cutme", "cut:portion", false)
+    check(gu.goalResolution(gr, catalog: gcat).portion == 1 && near(gcalc.compute(gr, gu.config(for: gr, catalog: gcat)).displayed.calories, 1111.6, 0.01), "a change can be toggled off individually (portion off -> full portion)")
+    gu.setChange("cutme", "cut:swap:b0", false)
+    check(near(gcalc.compute(gr, gu.config(for: gr, catalog: gcat)).displayedFull.calories, 1400 - 88.4, 0.01), "swap off too: only the halved oil remains")
+    check(near(gcalc.compute(gr, gu.config(for: gr, catalog: gcat, applyGoal: false)).displayed.calories, 1400, 0.01), "cards and filters (applyGoal false) always see the recipe as written")
+    gu.data.goalToggles = [:]
+    gu.setVersion("cutme", .maintain)
+    check(gu.goalResolution(gr, catalog: gcat).changes.isEmpty && near(gcalc.compute(gr, gu.config(for: gr, catalog: gcat)).displayed.calories, 1400, 0.01), "per-recipe version Maintain = the recipe as-is")
+    gu.setVersion("cutme", .cut)
+    check(gu.data.recipeGoal["cutme"] == nil || gu.versionGoal("cutme") == .cut, "version defaults to the global goal")
+    // a user's own swap on a line is left alone
+    gu.setSwap("cutme", line: "b0", index: 0)
+    check(!gu.goalResolution(gr, catalog: gcat).changes.contains { $0.id == "cut:swap:b0" }, "lines the user swapped are not touched by the goal version")
+    gu.setSwap("cutme", line: "b0", index: nil)
+
+    // bulk: richer milk, portion rounding up to 0.25, capped at 2.0, optional add-on off by default
+    let bu = UserStore(fileURL: nil); bu.data.goal = .bulk
+    let small = grecipe("small", servings: 1, kcal: 300, protein: 20, lines: gl("400 g fat-free milk", "fat_free_ultra_filtered_milk", 400))
+    let bres = bu.goalResolution(small, catalog: gcat)
+    check(bres.changes.contains { $0.id == "bulk:swap:b0" && $0.enabled } && bres.portion == 2.0, "bulk: fat-free milk -> whole milk, portion capped at 2.0 (\(bres.portion))")
+    let mid = grecipe("mid", servings: 1, kcal: 500, protein: 40, lines: gl("200 g cooked rice", "rice_cooked", 200))
+    check(bu.goalResolution(mid, catalog: gcat).portion == 1.5, "bulk portion: 750 / 500 = 1.5 exactly")
+    let mid2 = grecipe("mid2", servings: 1, kcal: 600, protein: 40, lines: gl("200 g cooked rice", "rice_cooked", 200))
+    check(bu.goalResolution(mid2, catalog: gcat).portion == 1.25, "bulk portion rounds up to 0.25: 750 / 600 = 1.25")
+    let big = grecipe("big", servings: 1, kcal: 800, protein: 40, lines: gl("200 g cooked rice", "rice_cooked", 200))
+    let bigRes = bu.goalResolution(big, catalog: gcat)
+    check(bigRes.portion == 1 && !bigRes.changes.contains { $0.kind == .portion }, "bulk: no portion change when already at the target")
+    let addon = bigRes.changes.first { $0.kind == .addon }
+    check(addon != nil && addon?.enabled == false && bigRes.cfg.extras.isEmpty, "bulk add-on is suggested but OFF by default (\(addon?.title ?? "-"))")
+    let offKcal = gcalc.compute(big, bigRes.cfg).displayed.calories
+    bu.setChange("big", addon!.id, true)
+    let onRes = bu.goalResolution(big, catalog: gcat)
+    let onKcal = gcalc.compute(big, onRes.cfg).displayed.calories
+    check(onRes.cfg.extras.count == 1 && near(onKcal - offKcal, 130 * 1.5, 0.01), "add-on ON adds its catalog nutrition (+\(String(format: "%.1f", onKcal - offKcal)) kcal for 150 g cooked rice, per serving)")
+    check(ShoppingList.items(for: big, cfg: onRes.cfg, catalog: gcat).contains { $0.text.contains("Cooked rice") }, "shopping list includes the add-on")
+
+    // real data: goal versions are monotonic and cheap
+    do {
+        let rc = NutritionCalculator(catalog: store.catalog)
+        let cu = UserStore(fileURL: nil); cu.data.goal = .cut
+        let bk = UserStore(fileURL: nil); bk.data.goal = .bulk
+        var cutUp = 0, bulkDown = 0, cutChanged = 0, bulkChanged = 0
+        let t0 = DispatchTime.now().uptimeNanoseconds
+        for r in store.recipes {
+            let orig = rc.compute(r, cu.config(for: r, catalog: store.catalog, applyGoal: false)).displayed.calories
+            let c = rc.compute(r, cu.config(for: r, catalog: store.catalog)).displayed.calories
+            let b = rc.compute(r, bk.config(for: r, catalog: store.catalog)).displayed.calories
+            if c > orig + 0.01 { cutUp += 1; if cutUp <= 4 { print("    cut up: \(r.id) \(orig) -> \(c) \(cu.goalResolution(r, catalog: store.catalog).changes.map(\.id))") } }
+            if b < orig - 0.01 { bulkDown += 1; if bulkDown <= 4 { print("    bulk down: \(r.id) \(orig) -> \(b) \(bk.goalResolution(r, catalog: store.catalog).changes.map(\.id))") } }
+            if abs(c - orig) > 0.01 { cutChanged += 1 }
+            if abs(b - orig) > 0.01 { bulkChanged += 1 }
+        }
+        let ms = Double(DispatchTime.now().uptimeNanoseconds - t0) / 1e6
+        check(cutUp == 0 && bulkDown == 0, "real data: cut versions never add calories, bulk versions never remove them (cut changed \(cutChanged), bulk changed \(bulkChanged) of \(store.recipes.count) recipes; \(String(format: "%.0f", ms)) ms for all three versions)")
+    }
+
+    // saved per goal: migration, persistence
+    let oldFile = Data(#"{"favorites":["a","b"],"goal":"cut"}"#.utf8)
+    let mig = UserStore.decode(oldFile)
+    check(mig?.saved == ["a": .maintain, "b": .maintain] && mig?.favorites.isEmpty == true, "old favorites migrate to Saved for Maintain and are kept")
+    if let mig, let again = UserStore.encode(mig).flatMap({ UserStore.decode($0) }) {
+        var more = again; more.saved["c"] = .bulk
+        let third = UserStore.encode(more).flatMap { UserStore.decode($0) }
+        check(again.saved == mig.saved && third?.saved["c"] == .bulk && third?.saved.count == 3, "migration runs once; later saves persist")
+    }
+    let sv = UserStore(fileURL: nil)
+    sv.save("r1", for: .cut); sv.save("r1", for: .bulk); sv.save("r2", for: .maintain); sv.unsave("r2")
+    check(sv.savedGoal("r1") == .bulk && !sv.isSaved("r2"), "save for a goal, re-save for another, unsave")
+
+    // rating: persistence, clear on same star, rating sort prefers the user's stars over the made log
+    sv.setRating("r1", 4); sv.setRating("r3", 2)
+    check(sv.rating("r1") == 4, "rating set")
+    sv.setRating("r3", 2)
+    check(sv.rating("r3") == 0, "tapping the same star again clears the rating")
+    if let back = UserStore.encode(sv.data).flatMap({ UserStore.decode($0) }) { check(back.ratings == ["r1": 4], "ratings round-trip through JSON") }
+    let rated = RecipeStore.decodeRecipes(Data(#"[{"id":"r1","name":"Alpha","base":[{"text":"x","key":"x"}],"instructions":["a","b"]},{"id":"r2","name":"Beta","base":[{"text":"x","key":"x"}],"instructions":["a","b"]},{"id":"r3","name":"Gamma","base":[{"text":"x","key":"x"}],"instructions":["a","b"]}]"#.utf8))
+    let rs = RecipeStore(); rs.apply(LoadedData(recipes: rated, catalog: Catalog()))
+    var rctx = FilterContext(madeLog: [MadeEntry(recipeId: "r2", rating: 5), MadeEntry(recipeId: "r3", rating: 3)], ratings: ["r1": 4])
+    var rf = FilterState(); rf.section = nil; rf.sort = .rating
+    check(FilterEngine.apply(store: rs, recipes: rs.recipes, query: "", state: rf, ctx: rctx).map(\.id) == ["r2", "r1", "r3"], "rating sort: own stars (r1 = 4) beat nothing, made-log average (r2 = 5, r3 = 3) is the fallback")
+    rctx.ratings = ["r1": 5]
+    check(FilterEngine.apply(store: rs, recipes: rs.recipes, query: "", state: rf, ctx: rctx).first?.id == "r1" || FilterEngine.apply(store: rs, recipes: rs.recipes, query: "", state: rf, ctx: rctx).map(\.id) == ["r1", "r2", "r3"], "own rating changes the order")
+
+    // quickest sort: prep + cook, unknown last
+    let qr = RecipeStore.decodeRecipes(Data(#"""
+    [{"id":"q1","name":"Slow","prepMinutes":20,"cookMinutes":40,"chillHours":8,"base":[{"text":"x","key":"x"}],"instructions":["a","b"]},
+     {"id":"q2","name":"Fast","prepMinutes":5,"cookMinutes":10,"base":[{"text":"x","key":"x"}],"instructions":["a","b"]},
+     {"id":"q3","name":"Unknown","base":[{"text":"x","key":"x"}],"instructions":["a","b"]},
+     {"id":"q4","name":"CookOnly","cookMinutes":12,"freezeHours":16,"base":[{"text":"x","key":"x"}],"instructions":["a","b"]}]
+    """#.utf8))
+    let qs = RecipeStore(); qs.apply(LoadedData(recipes: qr, catalog: Catalog()))
+    var qf = FilterState(); qf.section = nil; qf.sort = .quickest
+    check(FilterEngine.apply(store: qs, recipes: qs.recipes, query: "", state: qf, ctx: FilterContext()).map(\.id) == ["q4", "q2", "q1", "q3"], "quickest: prep + cook ascending (chill/freeze excluded), unknown time last")
 
     // null macros show a dash
     let nullMacros = RecipeStore.decodeRecipes(Data(#"[{"name":"N","servings":1,"macros":{"calories":300,"protein":20,"carbs":30,"fat":10,"sugar":null}}]"#.utf8))
@@ -432,7 +713,7 @@ MainActor.assumeIsolated {
     var fv2 = FilterState(); fv2.section = nil; fv2.hasVegVersion = true
     check(FilterEngine.apply(store: fstore, recipes: fstore.recipes, query: "", state: fv2, ctx: ctx).map(\.id).sorted() == ["chef-chicken-bowl", "chef-chicken-wrap"], "Has veg version filter")
     fv2 = FilterState(); fv2.section = nil; fv2.vegAsWritten = true
-    check(Set(FilterEngine.apply(store: fstore, recipes: fstore.recipes, query: "", state: fv2, ctx: ctx).map(\.id)) == ["chef-omelette", "bulk-oat-shake", "web-paneer-tikka", "web-carbonara", "web-hakka"], "Vegetarian as written filter")
+    check(Set(FilterEngine.apply(store: fstore, recipes: fstore.recipes, query: "", state: fv2, ctx: ctx).map(\.id)) == ["chef-omelette", "bulk-oat-shake", "web-paneer-tikka", "web-carbonara", "web-hakka", "web-korean-cauliflower-wings"], "Vegetarian as written filter")
     var fm = FilterState(); fm.section = "meal"; fm.courses = ["breakfast"]
     check(FilterEngine.apply(store: fstore, recipes: fstore.recipes, query: "", state: fm, ctx: ctx).map(\.id) == ["chef-omelette"], "meal section + course filter")
     fm = FilterState(); fm.section = "meal"; fm.books = ["The Ultimate Guide to Lean Bulking"]
@@ -444,7 +725,7 @@ MainActor.assumeIsolated {
         var s = FilterState(); s.section = nil; s.mealChips = [id]
         return FilterEngine.apply(store: fstore, recipes: fstore.recipes, query: "", state: s, ctx: ctx).map(\.id)
     }
-    check(chip("paneer") == ["web-paneer-tikka"] && chip("indian") == ["web-paneer-tikka"] && chip("spicy") == ["web-paneer-tikka"], "meal chips: paneer (ingredient), indian (cuisine), spicy (tag)")
+    check(chip("paneer") == ["web-paneer-tikka"] && chip("indian") == ["web-paneer-tikka"] && chip("spicy").sorted() == ["web-korean-cauliflower-wings", "web-paneer-tikka"], "meal chips: paneer (ingredient), indian (cuisine), spicy (tag)")
     check(chip("pasta") == ["web-carbonara"], "Pasta chip catches the Carbonara recipe (by name)")
     check(chip("noodles") == ["web-hakka"], "Noodles chip catches Hakka Noodles")
     check(chip("paneer") == ["web-paneer-tikka"] && !chip("pasta").contains("web-hakka"), "Pasta chip does not catch noodle recipes")
@@ -503,7 +784,7 @@ MainActor.assumeIsolated {
     // (h) persistence
     print("(h) persistence")
     var u = UserData()
-    u.favorites = ["a", "b"]; u.recipeMilk = ["a": "oat"]; u.defaultMilkId = "fairlife_2pct"
+    u.saved = ["a": .cut, "b": .bulk]; u.ratings = ["a": 4]; u.recipeGoal = ["a": .bulk]; u.goalToggles = ["a": ["cut:portion": false]]; u.recipeMilk = ["a": "oat"]; u.defaultMilkId = "fairlife_2pct"
     u.swaps = ["a": ["b0": 1]]; u.pints = ["a": 3]; u.defaultCalorieSource = .calculated
     u.pantryMissing = ["salt"]
     u.nutritionOverrides = ["salt": NutritionOverride(per100g: Nutrition(calories: 1, protein: 2), sourceLabel: "OFF", productName: "Salt")]
@@ -522,11 +803,11 @@ MainActor.assumeIsolated {
     check(UserStore.loadData(at: tmp.appendingPathExtension("nope")) == UserData(), "missing file yields fresh data")
     try? Data(#"{"favorites":["x"],"pints":"oops"}"#.utf8).write(to: tmp)
     let partial = UserStore.loadData(at: tmp)
-    check(partial.favorites == ["x"] && partial.pints.isEmpty, "partially valid file keeps good fields")
+    check(partial.saved["x"] == .maintain && partial.pints.isEmpty, "partially valid file keeps good fields (an old favorite becomes Saved for Maintain)")
     try? FileManager.default.removeItem(at: tmp)
     let us = UserStore(fileURL: nil)
-    us.toggleFavorite("z")
-    check(us.isFavorite("z"), "in-memory store works")
+    us.save("z", for: .bulk)
+    check(us.isSaved("z") && us.savedGoal("z") == .bulk, "in-memory store works")
 }
 
 print("\n\(passes) passed, \(failures) failed")

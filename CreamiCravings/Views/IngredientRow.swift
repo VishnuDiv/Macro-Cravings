@@ -6,6 +6,7 @@ struct IngredientRow: View {
     var vegSwap: VegSwap?
     var vegAlt: VegLineAlt?
     var onPickAlt: (String) -> Void = { _ in }
+    @State private var showAmount = false
     let onSwap: () -> Void
     @Environment(UserStore.self) private var user
 
@@ -18,7 +19,7 @@ struct IngredientRow: View {
                         .foregroundStyle(line.missing || !line.included ? .secondary : .primary)
                         .fixedSize(horizontal: false, vertical: true)
                     if let s = line.swap {
-                        Label("Using \(s.name)" + (line.swapNotRecalculated ? " · macros not recalculated" : ""), systemImage: "arrow.triangle.swap")
+                        Label("Using \(s.name)" + (line.swapFromGoal ? " · goal version" : "") + (line.swapNotRecalculated ? " · macros not recalculated" : ""), systemImage: "arrow.triangle.swap")
                             .font(.caption).foregroundStyle(Color.accentColor)
                     } else if let p = line.powder {
                         Label("Using \(p.name)", systemImage: "scalemass").font(.caption).foregroundStyle(Color.accentColor)
@@ -40,8 +41,29 @@ struct IngredientRow: View {
                             Text(o).font(.caption2.bold()).padding(.horizontal, 6).padding(.vertical, 2)
                                 .background(Color.carbBlue.opacity(0.18), in: Capsule()).foregroundStyle(Color.carbBlue)
                         }
-                        if line.noData && line.included {
-                            Text(line.info == nil ? "no nutrition data" : "amount unknown").font(.caption2).foregroundStyle(.secondary)
+                        if line.amount == .estimated {
+                            Button { showAmount = true } label: {
+                                Text("≈ \(Int(line.grams.rounded())) g · est.")
+                                    .font(.caption2.weight(.semibold))
+                                    .padding(.horizontal, 6).padding(.vertical, 2)
+                                    .background(Color.orange.opacity(0.18), in: Capsule()).foregroundStyle(.orange)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Estimated amount \(Int(line.grams.rounded())) grams. Tap for details.")
+                        } else if line.amount == .user {
+                            Button { showAmount = true } label: {
+                                Text("your amount: \(Int(line.grams.rounded())) g")
+                                    .font(.caption2.weight(.semibold))
+                                    .padding(.horizontal, 6).padding(.vertical, 2)
+                                    .background(Color.accentColor.opacity(0.16), in: Capsule()).foregroundStyle(Color.accentColor)
+                            }
+                            .buttonStyle(.plain)
+                        } else if line.noData && line.included {
+                            if line.info == nil { Text("no nutrition data").font(.caption2).foregroundStyle(.secondary) }
+                            else {
+                                Button { showAmount = true } label: { Text("amount unknown · set").font(.caption2).foregroundStyle(.secondary).underline() }
+                                    .buttonStyle(.plain)
+                            }
                         }
                     }
                     if line.missing, let first = line.info?.swaps.first {
@@ -49,12 +71,16 @@ struct IngredientRow: View {
                     }
                 }
                 Spacer(minLength: 4)
+                if line.isExtra {
+                    Label("Add-on", systemImage: "plus.circle.fill").labelStyle(.iconOnly).foregroundStyle(.orange)
+                } else {
                 Button(action: onSwap) {
                     Image(systemName: "arrow.left.arrow.right.circle")
                         .font(.title3)
                 }
                 .buttonStyle(.plain).foregroundStyle(Color.accentColor)
                 .accessibilityLabel("Swap or I don't have it")
+                }
             }
             if let v = vegSwap {
                 VStack(alignment: .leading, spacing: 3) {
@@ -73,6 +99,7 @@ struct IngredientRow: View {
         }
         .padding(.horizontal).padding(.vertical, 10)
         .contentShape(Rectangle())
+        .sheet(isPresented: $showAmount) { AmountSheet(recipe: recipe, line: line).environment(user) }
         .contextMenu {
             Button { onSwap() } label: { Label("Swap / I don't have it", systemImage: "arrow.left.arrow.right") }
             if let k = line.ing.key {
@@ -189,7 +216,7 @@ struct SwapSheet: View {
     @Environment(UserStore.self) private var user
     @Environment(\.dismiss) private var dismiss
 
-    private var cfg: RecipeConfig { user.config(for: recipe, catalog: store.catalog) }
+    private var cfg: RecipeConfig { user.config(for: recipe, catalog: store.catalog, applyGoal: false) }
     private var calc: NutritionCalculator { NutritionCalculator(catalog: store.catalog) }
     private var line: LineResult? { calc.compute(recipe, cfg).lines.first { $0.lineKey == lineKey } }
 
@@ -334,5 +361,50 @@ struct CompareSheet: View {
         } else {
             LabeledContent(title, value: "—")
         }
+    }
+}
+
+/// Explains an estimated amount and lets the user type their own grams (saved per recipe and line).
+struct AmountSheet: View {
+    let recipe: Recipe
+    let line: LineResult
+    @Environment(UserStore.self) private var user
+    @Environment(\.dismiss) private var dismiss
+    @State private var text = ""
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    Text(line.ing.text).font(.headline)
+                    if line.amount == .estimated {
+                        Label("≈ \(Int(line.grams.rounded())) g (estimate: \(line.estimateReason ?? "typical use"))", systemImage: "wand.and.stars").foregroundStyle(.orange)
+                    }
+                } footer: {
+                    Text("No amount in the recipe. Macro Kitchen estimated this from typical use. Tap to set your own amount.")
+                }
+                Section("Your amount") {
+                    HStack {
+                        TextField(line.grams > 0 ? "\(Int(line.grams.rounded()))" : "grams", text: $text).decimalKeyboard()
+                        Text("g").foregroundStyle(.secondary)
+                    }
+                    Button("Save my amount") {
+                        user.setLineGrams(recipe.id, line: line.lineKey, grams: Double(text.replacingOccurrences(of: ",", with: ".")))
+                        dismiss()
+                    }
+                    .disabled((Double(text.replacingOccurrences(of: ",", with: ".")) ?? 0) <= 0)
+                    if line.amount == .user {
+                        Button("Go back to the estimate", role: .destructive) {
+                            user.setLineGrams(recipe.id, line: line.lineKey, grams: nil)
+                            dismiss()
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Amount")
+            .inlineTitle()
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+        }
+        .presentationDetents([.medium])
     }
 }

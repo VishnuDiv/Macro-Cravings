@@ -1146,6 +1146,12 @@
     "key": null,
     "ratio": 1.0,
     "note": "Skip it; macros not recalculated."
+   },
+   {
+    "name": "Light butter / spread",
+    "key": "butter_light",
+    "ratio": 1.0,
+    "note": "Light butter: about half the calories"
    }
   ],
   "pantryStaple": true,
@@ -3954,6 +3960,12 @@
     "key": "two_percent_milk",
     "ratio": 1.0,
     "note": "Easy to find; about +70 kcal, -8 g protein and double the sugar per 400 g; a bit icier."
+   },
+   {
+    "name": "Whole milk",
+    "key": "whole_milk",
+    "ratio": 1.0,
+    "note": "Whole milk: richer, more calories"
    }
   ],
   "pantryStaple": false,
@@ -11235,6 +11247,12 @@
     "key": "one_percent_milk",
     "ratio": 1.0,
     "note": "Slightly creamier, +~30 kcal per 400 g."
+   },
+   {
+    "name": "2% reduced-fat milk",
+    "key": "two_percent_milk",
+    "ratio": 1.0,
+    "note": "2% milk: richer and creamier"
    }
   ],
   "pantryStaple": false,
@@ -12247,6 +12265,12 @@
     "key": "whole_milk",
     "ratio": 1.0,
     "note": "Creamier, +~30 kcal per 400 g."
+   },
+   {
+    "name": "Skim (fat-free) milk",
+    "key": "skim_milk",
+    "ratio": 1.0,
+    "note": "Skim: far fewer calories, same protein"
    }
   ],
   "pantryStaple": false,
@@ -13378,6 +13402,12 @@
     "key": "half_and_half",
     "ratio": 1.0,
     "note": "Much richer: roughly double the calories; use for gelato-style bases."
+   },
+   {
+    "name": "Skim (fat-free) milk",
+    "key": "skim_milk",
+    "ratio": 1.0,
+    "note": "Same volume, about half the calories"
    }
   ],
   "pantryStaple": false,
@@ -13700,6 +13730,12 @@
     "key": "pita",
     "ratio": 1.0,
     "note": "Pocket instead."
+   },
+   {
+    "name": "Low-carb / low-calorie tortilla (Carb Balance, Carbzone)",
+    "key": "low_carb_tortilla",
+    "ratio": 1.0,
+    "note": "Low-carb wrap: about half the calories, more protein"
    }
   ],
   "pantryStaple": false,
@@ -23495,6 +23531,12 @@
     "key": "vegan_mayonnaise",
     "ratio": 1.0,
     "note": "Egg-free but full-fat."
+   },
+   {
+    "name": "Mayonnaise",
+    "key": "mayonnaise",
+    "ratio": 1.0,
+    "note": "Full-fat mayo for a richer, higher-calorie version"
    }
   ],
   "pantryStaple": true,
@@ -23879,6 +23921,12 @@
     "key": "greek_yogurt",
     "ratio": 1,
     "note": "Far fewer calories."
+   },
+   {
+    "name": "Mayonnaise",
+    "key": "mayonnaise",
+    "ratio": 1.0,
+    "note": "Full-fat mayo for a richer, higher-calorie version"
    }
   ],
   "pantryStaple": false,
@@ -27477,6 +27525,919 @@
   "homemadeAlternative": null,
   "swaps": [],
   "pantryStaple": true,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "pecorino_romano": {
+  "name": "Pecorino Romano cheese (grated)",
+  "category": "dairy",
+  "per100g": {
+   "calories": 387,
+   "protein": 31.8,
+   "carbs": 3.6,
+   "fat": 26.9,
+   "sugar": 0.7,
+   "fiber": 0
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 0.42,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Vegetarian Parmesan-style cheese",
+    "key": "vegetarian_parmesan",
+    "ratio": 1.0,
+    "note": "Microbial rennet; similar salty bite."
+   },
+   {
+    "name": "Vegan Parmesan",
+    "key": "vegan_parmesan",
+    "ratio": 1.0,
+    "note": "Dairy-free; less protein."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [
+   "dairy"
+  ],
+  "vegetarian": false,
+  "vegNote": "Pecorino Romano (PDO) is always made with animal (lamb) rennet, so it is not vegetarian. Use a vegetarian Parmesan-style cheese made with microbial rennet."
+ },
+ "asiago_cheese": {
+  "name": "Asiago cheese (aged, grated)",
+  "category": "dairy",
+  "per100g": {
+   "calories": 393,
+   "protein": 25,
+   "carbs": 1,
+   "fat": 32,
+   "sugar": 0,
+   "fiber": 0
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 0.42,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Vegetarian Parmesan-style cheese",
+    "key": "vegetarian_parmesan",
+    "ratio": 1.0,
+    "note": "Microbial rennet; similar sharp flavor."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [
+   "dairy"
+  ],
+  "vegetarian": "check",
+  "vegNote": "Traditional Asiago uses animal rennet; check the label for microbial or vegetable rennet."
+ },
+ "ricotta_part_skim": {
+  "name": "Ricotta cheese (part-skim)",
+  "category": "dairy",
+  "per100g": {
+   "calories": 138,
+   "protein": 11.4,
+   "carbs": 5.1,
+   "fat": 7.9,
+   "sugar": 0.3,
+   "fiber": 0
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 1.04,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Ricotta (whole milk)",
+    "key": "ricotta",
+    "ratio": 1.0,
+    "note": "Richer, ~35 kcal more per 100 g."
+   },
+   {
+    "name": "Low-fat cottage cheese, blended",
+    "key": "cottage_cheese",
+    "ratio": 1.0,
+    "note": "Less fat, more protein."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [
+   "dairy"
+  ],
+  "vegetarian": true,
+  "vegNote": "Ricotta is acid-set (vinegar or citric acid) in most brands, no rennet."
+ },
+ "hung_curd": {
+  "name": "Hung curd (strained whole-milk yogurt)",
+  "category": "dairy",
+  "per100g": {
+   "calories": 97,
+   "protein": 9,
+   "carbs": 4,
+   "fat": 5,
+   "sugar": 4,
+   "fiber": 0
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 1.1,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": "Strain plain whole-milk yogurt in a cloth for 4-6 hours in the fridge; about half the weight remains.",
+  "swaps": [
+   {
+    "name": "Nonfat Greek yogurt",
+    "key": "greek_yogurt",
+    "ratio": 1.0,
+    "note": "Same thickness, far less fat."
+   },
+   {
+    "name": "Plain whole-milk yogurt",
+    "key": "plain_yogurt",
+    "ratio": 1.0,
+    "note": "Thinner; strain it first."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [
+   "dairy"
+  ],
+  "vegetarian": true
+ },
+ "fat_free_half_and_half": {
+  "name": "Fat-free half-and-half",
+  "category": "dairy",
+  "per100g": {
+   "calories": 67,
+   "protein": 3.3,
+   "carbs": 10,
+   "fat": 0,
+   "sugar": 6.7,
+   "fiber": 0
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 1.03,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Half-and-half",
+    "key": "half_and_half",
+    "ratio": 1.0,
+    "note": "Richer, +~65 kcal per 100 g."
+   },
+   {
+    "name": "Skim milk",
+    "key": "skim_milk",
+    "ratio": 1.0,
+    "note": "Thinner, less sugar."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [
+   "dairy"
+  ],
+  "vegetarian": true
+ },
+ "soybeans_dry": {
+  "name": "Soybeans (whole soya), dry",
+  "category": "other",
+  "per100g": {
+   "calories": 446,
+   "protein": 36.5,
+   "carbs": 30.2,
+   "fat": 19.9,
+   "sugar": 7.3,
+   "fiber": 9.3
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 0.79,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Soy chunks / TVP",
+    "key": "soy_chunks",
+    "ratio": 1.0,
+    "note": "Faster, more protein."
+   },
+   {
+    "name": "Edamame",
+    "key": "edamame",
+    "ratio": 1.0,
+    "note": "Fresh green soybeans; no soaking."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [
+   "soy"
+  ],
+  "vegetarian": true
+ },
+ "ragi_flour": {
+  "name": "Ragi (finger millet) flour",
+  "category": "other",
+  "per100g": {
+   "calories": 321,
+   "protein": 7.2,
+   "carbs": 66.8,
+   "fat": 1.9,
+   "sugar": 0.6,
+   "fiber": 11.2
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 0.5,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Whole-wheat flour",
+    "key": "whole_wheat_flour",
+    "ratio": 1.0,
+    "note": "More protein; contains gluten."
+   },
+   {
+    "name": "Oat flour",
+    "key": "oat_flour",
+    "ratio": 1.0,
+    "note": "Mild flavor."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "ragi": {
+  "name": "Ragi (finger millet), whole grain",
+  "category": "other",
+  "per100g": {
+   "calories": 321,
+   "protein": 7.2,
+   "carbs": 66.8,
+   "fat": 1.9,
+   "sugar": 0.6,
+   "fiber": 11.2
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 0.85,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Quinoa",
+    "key": "quinoa",
+    "ratio": 1.0,
+    "note": "More protein."
+   },
+   {
+    "name": "Bulgur / daliya",
+    "key": "bulgur",
+    "ratio": 1.0,
+    "note": "Similar grain texture; contains gluten."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "cornmeal": {
+  "name": "Cornmeal (whole-grain yellow, makki ka atta)",
+  "category": "other",
+  "per100g": {
+   "calories": 362,
+   "protein": 8.1,
+   "carbs": 76.9,
+   "fat": 3.6,
+   "sugar": 0.6,
+   "fiber": 7.3
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 0.52,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Whole-wheat flour",
+    "key": "whole_wheat_flour",
+    "ratio": 1.0,
+    "note": "Softer dough; contains gluten."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "quinoa_flour": {
+  "name": "Quinoa flour",
+  "category": "other",
+  "per100g": {
+   "calories": 368,
+   "protein": 14.1,
+   "carbs": 64.2,
+   "fat": 6.1,
+   "sugar": 0,
+   "fiber": 7
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 0.47,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Oat flour",
+    "key": "oat_flour",
+    "ratio": 1.0,
+    "note": "Milder flavor."
+   },
+   {
+    "name": "Whole-wheat flour",
+    "key": "whole_wheat_flour",
+    "ratio": 1.0,
+    "note": "Contains gluten."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "peanut_flour": {
+  "name": "Peanut flour (defatted)",
+  "category": "nut",
+  "per100g": {
+   "calories": 327,
+   "protein": 52.2,
+   "carbs": 34.7,
+   "fat": 0.6,
+   "sugar": 8.2,
+   "fiber": 15.8
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 0.47,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Peanut butter powder",
+    "key": "peanut_butter_powder",
+    "ratio": 1.0,
+    "note": "Usually has added sugar and salt."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [
+   "peanut"
+  ],
+  "vegetarian": true
+ },
+ "caraway_seeds": {
+  "name": "Caraway seeds",
+  "category": "spice",
+  "per100g": {
+   "calories": 333,
+   "protein": 19.8,
+   "carbs": 49.9,
+   "fat": 14.6,
+   "sugar": 0.6,
+   "fiber": 38
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 0.43,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Fennel seeds",
+    "key": "fennel_seeds",
+    "ratio": 1.0,
+    "note": "Sweeter anise note."
+   },
+   {
+    "name": "Cumin seeds",
+    "key": "cumin",
+    "ratio": 1.0,
+    "note": "Earthier."
+   }
+  ],
+  "pantryStaple": true,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "biryani_masala_powder": {
+  "name": "Biryani masala powder",
+  "category": "spice",
+  "per100g": {
+   "calories": 350,
+   "protein": 12,
+   "carbs": 50,
+   "fat": 14,
+   "sugar": 2,
+   "fiber": 25
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 0.5,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Garam masala",
+    "key": "garam_masala",
+    "ratio": 1.0,
+    "note": "Close; add a pinch of nutmeg and mace."
+   }
+  ],
+  "pantryStaple": true,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "sambar_powder": {
+  "name": "Sambar powder (sambar masala)",
+  "category": "spice",
+  "per100g": {
+   "calories": 310,
+   "protein": 15,
+   "carbs": 40,
+   "fat": 10,
+   "sugar": 3,
+   "fiber": 20
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 0.5,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Curry powder",
+    "key": "curry_powder",
+    "ratio": 1.0,
+    "note": "Milder; add chili and a pinch of hing."
+   }
+  ],
+  "pantryStaple": true,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "kashmiri_chili_powder": {
+  "name": "Kashmiri red chili powder",
+  "category": "spice",
+  "per100g": {
+   "calories": 282,
+   "protein": 14.1,
+   "carbs": 54,
+   "fat": 12.9,
+   "sugar": 10.3,
+   "fiber": 34.9
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 0.5,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Paprika",
+    "key": "paprika",
+    "ratio": 1.0,
+    "note": "Same color, milder."
+   },
+   {
+    "name": "Cayenne",
+    "key": "cayenne",
+    "ratio": 0.25,
+    "note": "Much hotter; use a quarter."
+   }
+  ],
+  "pantryStaple": true,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "dried_red_chilies": {
+  "name": "Dried red chilies (whole)",
+  "category": "spice",
+  "per100g": {
+   "calories": 324,
+   "protein": 10.6,
+   "carbs": 69.9,
+   "fat": 5.8,
+   "sugar": 41.1,
+   "fiber": 28.7
+  },
+  "gramsPerCount": 0.5,
+  "gramsPerMl": null,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Red chili flakes",
+    "key": "chili_flakes",
+    "ratio": 1.0,
+    "note": "About 1/4 tsp per chili."
+   },
+   {
+    "name": "Cayenne",
+    "key": "cayenne",
+    "ratio": 1.0,
+    "note": "Ground; add with the spices."
+   }
+  ],
+  "pantryStaple": true,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "jaggery": {
+  "name": "Jaggery (gur), powdered",
+  "category": "sweetener",
+  "per100g": {
+   "calories": 383,
+   "protein": 0.4,
+   "carbs": 95,
+   "fat": 0.1,
+   "sugar": 85,
+   "fiber": 0
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 0.8,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Brown sugar",
+    "key": "brown_sugar",
+    "ratio": 1.0,
+    "note": "Same use, similar calories."
+   },
+   {
+    "name": "Coconut sugar",
+    "key": "coconut_sugar",
+    "ratio": 1.0,
+    "note": "Similar caramel flavor."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "cashew_paste": {
+  "name": "Cashew paste (soaked cashews blended, about 2:1 with water)",
+  "category": "nut",
+  "per100g": {
+   "calories": 369,
+   "protein": 12.1,
+   "carbs": 20.1,
+   "fat": 29.3,
+   "sugar": 3.9,
+   "fiber": 2.2
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 1.1,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": "Soak 30 g raw cashews in hot water 15 minutes, drain, blend with 15 ml water until smooth.",
+  "swaps": [
+   {
+    "name": "Cashew cream",
+    "key": "cashew_cream",
+    "ratio": 1.0,
+    "note": "Thinner; use a little more."
+   },
+   {
+    "name": "Cashews",
+    "key": "cashews",
+    "ratio": 1.0,
+    "note": "Grind with a splash of water."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [
+   "tree_nut"
+  ],
+  "vegetarian": true
+ },
+ "fresh_coconut": {
+  "name": "Fresh coconut, grated",
+  "category": "fruit",
+  "per100g": {
+   "calories": 354,
+   "protein": 3.3,
+   "carbs": 15.2,
+   "fat": 33.5,
+   "sugar": 6.2,
+   "fiber": 9
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 0.34,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": "Frozen grated coconut (Indian groceries) works the same.",
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Sweetened shredded coconut",
+    "key": "shredded_coconut",
+    "ratio": 1.0,
+    "note": "Drier and sweeter; use less."
+   },
+   {
+    "name": "Coconut milk",
+    "key": "coconut_milk",
+    "ratio": 1.0,
+    "note": "For gravies."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [
+   "coconut"
+  ],
+  "vegetarian": true
+ },
+ "sev": {
+  "name": "Sev (fried chickpea-flour noodles)",
+  "category": "other",
+  "per100g": {
+   "calories": 555,
+   "protein": 15,
+   "carbs": 45,
+   "fat": 35,
+   "sugar": 2,
+   "fiber": 6
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 0.35,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Crispy onions",
+    "key": "crispy_onions",
+    "ratio": 1.0,
+    "note": "Similar crunch on top."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "green_chutney": {
+  "name": "Green chutney (cilantro-mint)",
+  "category": "sauce",
+  "per100g": {
+   "calories": 60,
+   "protein": 2.5,
+   "carbs": 7,
+   "fat": 2.5,
+   "sugar": 2,
+   "fiber": 3
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 1.0,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": "Blend 1 cup cilantro, 1/2 cup mint, 1 green chili, 1 tbsp lemon juice, a few peanuts, salt and a splash of water.",
+  "swaps": [
+   {
+    "name": "Pesto",
+    "key": "pesto",
+    "ratio": 1.0,
+    "note": "Richer; Italian herbs."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "mustard_greens": {
+  "name": "Mustard greens (sarson)",
+  "category": "produce",
+  "per100g": {
+   "calories": 27,
+   "protein": 2.9,
+   "carbs": 4.7,
+   "fat": 0.4,
+   "sugar": 1.3,
+   "fiber": 3.2
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 0.24,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Spinach",
+    "key": "spinach",
+    "ratio": 1.0,
+    "note": "Milder."
+   },
+   {
+    "name": "Kale",
+    "key": "kale",
+    "ratio": 1.0,
+    "note": "Similar bite."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "moringa_drumsticks": {
+  "name": "Drumsticks (moringa pods)",
+  "category": "produce",
+  "per100g": {
+   "calories": 37,
+   "protein": 2.1,
+   "carbs": 8.5,
+   "fat": 0.2,
+   "sugar": 0,
+   "fiber": 3.2
+  },
+  "gramsPerCount": 8,
+  "gramsPerMl": null,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Green beans",
+    "key": "green_beans",
+    "ratio": 1.0,
+    "note": "Easier to find; similar bite in sambar."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [],
+  "vegetarian": true,
+  "vegNote": "Vegetable (moringa seed pods), not chicken."
+ },
+ "swiss_chard": {
+  "name": "Swiss chard",
+  "category": "produce",
+  "per100g": {
+   "calories": 19,
+   "protein": 1.8,
+   "carbs": 3.7,
+   "fat": 0.2,
+   "sugar": 1.1,
+   "fiber": 1.6
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 0.15,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Spinach",
+    "key": "spinach",
+    "ratio": 1.0,
+    "note": "Cooks faster."
+   },
+   {
+    "name": "Kale",
+    "key": "kale",
+    "ratio": 1.0,
+    "note": "Chewier."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "portobello_mushroom": {
+  "name": "Portobello mushroom caps",
+  "category": "produce",
+  "per100g": {
+   "calories": 22,
+   "protein": 2.1,
+   "carbs": 3.9,
+   "fat": 0.4,
+   "sugar": 2.5,
+   "fiber": 1.3
+  },
+  "gramsPerCount": 85,
+  "gramsPerMl": 0.3,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Mushrooms (white / cremini)",
+    "key": "mushrooms",
+    "ratio": 1.0,
+    "note": "Smaller; use about 5 per cap."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "canned_green_chiles": {
+  "name": "Canned chopped green chiles",
+  "category": "produce",
+  "per100g": {
+   "calories": 21,
+   "protein": 0.7,
+   "carbs": 4.6,
+   "fat": 0.3,
+   "sugar": 2.4,
+   "fiber": 1.7
+  },
+  "gramsPerCount": 127,
+  "gramsPerMl": 0.95,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Fresh chili pepper",
+    "key": "chili_pepper",
+    "ratio": 1.0,
+    "note": "Hotter; roast first for the same flavor."
+   },
+   {
+    "name": "Jalapeno",
+    "key": "jalapeno",
+    "ratio": 1.0,
+    "note": "Hotter."
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "kala_chana_cooked": {
+  "name": "Kala chana (black chickpeas), boiled",
+  "category": "other",
+  "per100g": {
+   "calories": 164,
+   "protein": 8.9,
+   "carbs": 27.4,
+   "fat": 2.6,
+   "sugar": 4.8,
+   "fiber": 7.6
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 0.69,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Chickpeas",
+    "key": "chickpeas",
+    "ratio": 1.0,
+    "note": "Same macros, softer."
+   },
+   {
+    "name": "Chickpeas, dry",
+    "key": "chickpeas_dry",
+    "ratio": 0.42,
+    "note": "Soak overnight and boil; about 2.4x weight cooked."
+   }
+  ],
+  "pantryStaple": false,
   "allergens": [],
   "vegetarian": true
  }

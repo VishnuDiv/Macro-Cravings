@@ -115,6 +115,7 @@ enum VegAlternatives {
         if has("seitan") { return "Seitan" }
         if has("paneer") { return "Paneer" }
         if has("tempeh") { return "Tempeh" }
+        if has("soy") && has("chunk") { return "Soy chunks" }
         if has("soy") { return "Soy" }
         if has("jackfruit") { return "Jackfruit" }
         if has("mushroom") { return "Mushroom" }

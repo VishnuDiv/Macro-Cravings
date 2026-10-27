@@ -108,5 +108,48 @@
   "vegetarian": true,
   "containsEgg": false,
   "vegAdaptation": null
+ },
+ {
+  "id": "web-korean-cauliflower-wings",
+  "name": "Spicy Korean Fried Cauliflower Wings",
+  "section": "meal",
+  "course": "snack",
+  "cuisine": "wings",
+  "servings": 2,
+  "source": {
+   "site": "example.com",
+   "url": "https://example.com/korean-wings"
+  },
+  "macrosPerServing": {
+   "calories": 300,
+   "protein": 10,
+   "carbs": 45,
+   "fat": 8,
+   "sugar": 12,
+   "fiber": 6
+  },
+  "base": [
+   {
+    "text": "400 g cauliflower florets",
+    "key": "cauliflower",
+    "grams": 400
+   },
+   {
+    "text": "2 tbsp gochujang",
+    "key": "gochujang",
+    "grams": 30
+   }
+  ],
+  "instructions": [
+   "Toss the cauliflower florets in batter.",
+   "Bake the cauliflower 25 minutes at 220C.",
+   "Glaze and serve the wings."
+  ],
+  "tags": [
+   "spicy"
+  ],
+  "vegetarian": true,
+  "containsEgg": false,
+  "vegAdaptation": null
  }
 ]
