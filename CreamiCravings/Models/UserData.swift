@@ -6,6 +6,25 @@ enum CalorieSource: String, Codable, CaseIterable, Identifiable {
     var title: String { self == .book ? "Book" : "Calculated" }
 }
 
+/// The user's nutrition goal. It never hides recipes: it changes the default sort, adds badges and offers a filter.
+enum Goal: String, Codable, CaseIterable, Identifiable {
+    case cut, maintain, bulk
+    var id: String { rawValue }
+    var title: String { rawValue.capitalized }
+    var symbol: String { self == .cut ? "arrow.down.circle" : (self == .bulk ? "arrow.up.circle" : "equal.circle") }
+    /// What "Featured" sorts as under this goal.
+    var defaultSort: SortOption { self == .cut ? .healthiest : (self == .bulk ? .proteinDesc : .featured) }
+
+    static let bulkBook = "The Ultimate Guide to Lean Bulking"
+
+    /// Cut-friendly: protein density >= 10 g per 100 kcal (protein x 10 >= kcal) and kcal <= 550. Per serving (per pint for Creami).
+    static func isCutFriendly(_ n: Nutrition) -> Bool { n.calories > 0 && n.protein * 10 >= n.calories && n.calories <= 550 }
+    /// Bulk-friendly: kcal >= 600 and protein >= 35 g, or a recipe from the Lean Bulking book.
+    static func isBulkFriendly(_ n: Nutrition, bookTitle: String?) -> Bool {
+        (n.calories >= 600 && n.protein >= 35) || bookTitle == bulkBook
+    }
+}
+
 enum SortOption: String, Codable, CaseIterable, Identifiable {
     case featured, name, caloriesAsc, proteinDesc, proteinPer100Desc, recentlyMade, rating, highFiber, healthiest
     var id: String { rawValue }
@@ -83,25 +102,105 @@ struct FilterState: Codable, Equatable {
     var section: String? = "creami"        // nil = both
     var dessertTypes: Set<String> = []
     var verdicts: Set<String> = []
+    var proteinDensity: Double = 0           // g protein per 100 kcal, 0 = off
+    var cutOnly = false
+    var bulkOnly = false
 
+    static let proteinDensitySteps: [Double] = [0, 5, 7.5, 10, 12.5, 15]
     static let maxCaloriesCeiling: Double = 1500
 
-    /// Number of active filters (sort excluded).
-    var activeCount: Int {
-        var n = 0
-        if !sources.isEmpty { n += 1 }
-        n += tags.count
-        if hideAffiliate { n += 1 }
-        n += excludedBrands.count
-        n += baseKinds.count + shakeFlavors.count
-        n += containsKeys.count + excludesKeys.count
-        n += allergens.count + dessertTypes.count + verdicts.count + courses.count + books.count
-        n += mealChips.count
-        for b in [vegAsWritten, hasVegVersion, noEgg, highFiber] where b { n += 1 }
-        if maxCalories < FilterState.maxCaloriesCeiling { n += 1 }
-        if minProtein > 0 { n += 1 }
-        for b in [canMakeNow, canMakeWithSwaps, favoritesOnly, hasVideo, madeBefore] where b { n += 1 }
-        return n
+    /// Number of active filters (sort and section excluded); one per pill.
+    var activeCount: Int { activePills().count }
+
+    struct Pill: Identifiable, Hashable {
+        var id: String          // "kind:value", understood by remove(pill:)
+        var label: String
+    }
+
+    private static func pretty(_ s: String) -> String { s.replacingOccurrences(of: "-", with: " ").replacingOccurrences(of: "_", with: " ").capitalized }
+    private static func number(_ d: Double) -> String { d == d.rounded() ? String(Int(d)) : String(d) }
+
+    /// One pill per active filter, in a stable order, for the active-filter row. `keyName` resolves ingredient keys to names.
+    func activePills(keyName: (String) -> String = { FilterState.pretty($0) }) -> [Pill] {
+        var out: [Pill] = []
+        func add(_ kind: String, _ value: String, _ label: String) { out.append(Pill(id: kind + ":" + value, label: label)) }
+        if favoritesOnly { add("flag", "favoritesOnly", "Favorites") }
+        for s in sources.sorted() { add("source", s, s == "book" ? "Book" : "Web") }
+        if cutOnly { add("flag", "cutOnly", "Cut-friendly") }
+        if bulkOnly { add("flag", "bulkOnly", "Bulk-friendly") }
+        if proteinDensity > 0 { add("flag", "proteinDensity", "≥ \(FilterState.number(proteinDensity)) g P/100 kcal") }
+        for c in courses.sorted() { add("course", c, FilterState.pretty(c)) }
+        for c in mealChips.sorted() { add("chip", c, Recipe.mealChips.first { $0.id == c }?.title ?? FilterState.pretty(c)) }
+        for b in books.sorted() { add("book", b, b.replacingOccurrences(of: "The Ultimate ", with: "")) }
+        for d in dessertTypes.sorted() { add("dessertType", d, FilterState.pretty(d)) }
+        for v in verdicts.sorted() { add("verdict", v, FilterState.pretty(v)) }
+        for t in tags.sorted() { add("tag", t, FilterState.pretty(t)) }
+        if hideAffiliate { add("flag", "hideAffiliate", "No affiliate products") }
+        for b in excludedBrands.sorted() { add("brand", b, "No \(b)") }
+        for k in baseKinds.sorted() { add("base", k, BaseKind(rawValue: k)?.title ?? FilterState.pretty(k)) }
+        for k in shakeFlavors.sorted() { add("shake", k, "\(FilterState.pretty(k)) shake") }
+        for k in containsKeys.sorted() { add("contains", k, "Has \(keyName(k))") }
+        for k in excludesKeys.sorted() { add("excludes", k, "No \(keyName(k))") }
+        for a in allergens.sorted() { add("allergen", a, "No \(FilterState.pretty(a))") }
+        if vegAsWritten { add("flag", "vegAsWritten", "Vegetarian as written") }
+        if hasVegVersion { add("flag", "hasVegVersion", "Has veg version") }
+        if noEgg { add("flag", "noEgg", "No egg") }
+        if highFiber { add("flag", "highFiber", "High fiber") }
+        if maxCalories < FilterState.maxCaloriesCeiling { add("flag", "maxCalories", "Max \(Int(maxCalories)) kcal") }
+        if minProtein > 0 { add("flag", "minProtein", "Min \(Int(minProtein)) g protein") }
+        if canMakeNow { add("flag", "canMakeNow", "Can make now") }
+        if canMakeWithSwaps { add("flag", "canMakeWithSwaps", "Can make with swaps") }
+        if hasVideo { add("flag", "hasVideo", "Has video") }
+        if madeBefore { add("flag", "madeBefore", "Made before") }
+        return out
+    }
+
+    /// Removes exactly the filter a pill stands for; every other filter stays.
+    mutating func remove(pill id: String) {
+        guard let colon = id.firstIndex(of: ":") else { return }
+        let kind = String(id[..<colon]), v = String(id[id.index(after: colon)...])
+        switch kind {
+        case "source": sources.remove(v)
+        case "course": courses.remove(v)
+        case "chip": mealChips.remove(v)
+        case "book": books.remove(v)
+        case "dessertType": dessertTypes.remove(v)
+        case "verdict": verdicts.remove(v)
+        case "tag": tags.remove(v)
+        case "brand": excludedBrands.remove(v)
+        case "base": baseKinds.remove(v)
+        case "shake": shakeFlavors.remove(v)
+        case "contains": containsKeys.remove(v)
+        case "excludes": excludesKeys.remove(v)
+        case "allergen": allergens.remove(v)
+        case "flag":
+            switch v {
+            case "favoritesOnly": favoritesOnly = false
+            case "cutOnly": cutOnly = false
+            case "bulkOnly": bulkOnly = false
+            case "proteinDensity": proteinDensity = 0
+            case "hideAffiliate": hideAffiliate = false
+            case "vegAsWritten": vegAsWritten = false
+            case "hasVegVersion": hasVegVersion = false
+            case "noEgg": noEgg = false
+            case "highFiber": highFiber = false
+            case "maxCalories": maxCalories = FilterState.maxCaloriesCeiling
+            case "minProtein": minProtein = 0
+            case "canMakeNow": canMakeNow = false
+            case "canMakeWithSwaps": canMakeWithSwaps = false
+            case "hasVideo": hasVideo = false
+            case "madeBefore": madeBefore = false
+            default: break
+            }
+        default: break
+        }
+    }
+
+    /// Clears every filter but keeps the section and the sort.
+    mutating func clearFilters() {
+        let keepSection = section, keepSort = sort
+        self = FilterState()
+        section = keepSection; sort = keepSort
     }
 
     init() {}
@@ -135,6 +234,9 @@ struct FilterState: Codable, Equatable {
         hasVegVersion = (try? c.decode(Bool.self, forKey: .hasVegVersion)) ?? false
         noEgg = (try? c.decode(Bool.self, forKey: .noEgg)) ?? false
         verdicts = (try? c.decode(Set<String>.self, forKey: .verdicts)) ?? []
+        proteinDensity = (try? c.decode(Double.self, forKey: .proteinDensity)) ?? 0
+        cutOnly = (try? c.decode(Bool.self, forKey: .cutOnly)) ?? false
+        bulkOnly = (try? c.decode(Bool.self, forKey: .bulkOnly)) ?? false
     }
 }
 
@@ -159,6 +261,7 @@ struct UserData: Codable, Equatable {
     var shopping: [ShoppingItem] = []
     var filterState = FilterState()
     var notificationsAsked = false
+    var goal: Goal = .maintain
     var isVegetarian = true
     var preferEasyAlternatives = true
     var vegChoice: [String: [String: String]] = [:]   // recipeId -> lineKey -> alternative key
@@ -192,6 +295,7 @@ struct UserData: Codable, Equatable {
         isVegetarian = (try? c.decode(Bool.self, forKey: .isVegetarian)) ?? true
         avoidsEggs = (try? c.decode(Bool.self, forKey: .avoidsEggs)) ?? false
         showOriginal = (try? c.decode(Set<String>.self, forKey: .showOriginal)) ?? []
+        goal = (try? c.decode(Goal.self, forKey: .goal)) ?? .maintain
         notificationsAsked = (try? c.decode(Bool.self, forKey: .notificationsAsked)) ?? false
     }
 }

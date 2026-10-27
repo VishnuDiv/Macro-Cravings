@@ -208,6 +208,11 @@ struct RecipeDetailView: View {
         return VStack(alignment: .leading, spacing: 10) {
             MacroRow(n: shown)
                 .animation(.snappy, value: shown)
+            if shown.calories > 0 {
+                Label("\(String(format: "%.1f", shown.proteinPer100kcal)) g protein / 100 kcal", systemImage: "gauge.with.dots.needle.33percent")
+                    .font(.caption.weight(.medium)).foregroundStyle(.secondary)
+                    .contentTransition(.numericText(value: shown.proteinPer100kcal))
+            }
             Picker("Calories from", selection: Binding(
                 get: { res.usedSource },
                 set: { user.data.recipeCalorieSource[recipe.id] = $0 })) {

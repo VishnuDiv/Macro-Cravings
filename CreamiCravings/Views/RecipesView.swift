@@ -26,6 +26,7 @@ struct RecipesView: View {
     private var effective: FilterState {
         var f = user.data.filterState
         if mode == .favorites { f.favoritesOnly = true; f.section = nil }
+        if f.sort == .featured { f.sort = user.data.goal.defaultSort }      // the goal decides what "Featured" means
         return f
     }
 
@@ -53,14 +54,13 @@ struct RecipesView: View {
                         .padding(.horizontal)
                         .sensoryFeedback(.selection, trigger: user.data.filterState.section)
                     }
-                    chipBar
-                    if mode == .all && user.data.filterState.section == "meal" { mealChips }
+                    controlRow
+                    pillsRow
                     HStack {
                         Text("\(list.count) recipe\(list.count == 1 ? "" : "s")" + (perServingHeader ? " · per serving" : ""))
                             .font(.subheadline.weight(.medium)).foregroundStyle(.secondary)
                             .contentTransition(.numericText(value: Double(list.count)))
                         Spacer()
-                        Text(effective.sort.title).font(.caption).foregroundStyle(.secondary)
                     }
                     .padding(.horizontal)
 
@@ -100,92 +100,104 @@ struct RecipesView: View {
                     }
                     .disabled(list.isEmpty)
                 }
-                ToolbarItem(placement: .primaryAction) {
-                    Menu {
-                        Picker("Sort", selection: filter.sort) {
-                            ForEach(SortOption.allCases) { Text($0.title).tag($0) }
-                        }
-                    } label: { Label("Sort", systemImage: "arrow.up.arrow.down") }
-                }
             }
             .sheet(isPresented: $showFilters) {
-                FilterSheet().environment(store).environment(user)
+                FilterSheet(section: mode == .all ? user.data.filterState.section : nil, resultCount: list.count)
+                    .environment(store).environment(user)
             }
         }
     }
 
-    // MARK: chips
+    // MARK: controls
 
-    private var chipBar: some View {
+    private var activeCount: Int { user.data.filterState.activeCount }
+
+    private func keyName(_ k: String) -> String {
+        store.catalog.info(k)?.name ?? k.replacingOccurrences(of: "_", with: " ").capitalized
+    }
+
+    /// Filters (n) · Sort · Goal: the only controls under the section picker.
+    private var controlRow: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 Button { showFilters = true } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "line.3.horizontal.decrease")
                         Text("Filters")
-                        if user.data.filterState.activeCount > 0 {
-                            Text("\(user.data.filterState.activeCount)")
+                        if activeCount > 0 {
+                            Text("\(activeCount)")
                                 .font(.caption2.bold()).foregroundStyle(.white)
                                 .padding(.horizontal, 6).padding(.vertical, 2)
                                 .background(Color.accentColor, in: Capsule())
                         }
                     }
-                    .font(.subheadline.weight(.semibold))
-                    .padding(.horizontal, 12).padding(.vertical, 7)
-                    .background(Color.cardBackground, in: Capsule())
-                    .overlay(Capsule().strokeBorder(Color.accentColor.opacity(0.5)))
+                    .controlCapsule(prominent: activeCount > 0)
                 }
                 .buttonStyle(.plain)
 
-                if mode == .all {
-                    ChipToggle(title: "Favorites", isOn: filter.wrappedValue.favoritesOnly) { filter.wrappedValue.favoritesOnly.toggle() }
-                }
-                ChipToggle(title: "Book", isOn: filter.wrappedValue.sources.contains("book")) { toggle(&filter.wrappedValue.sources, "book") }
-                ChipToggle(title: "Web", isOn: filter.wrappedValue.sources.contains("web")) { toggle(&filter.wrappedValue.sources, "web") }
-                ForEach(["healthy", "indulgent", "sorbet", "high-protein"], id: \.self) { t in
-                    ChipToggle(title: t.replacingOccurrences(of: "-", with: " ").capitalized, isOn: filter.wrappedValue.tags.contains(t)) {
-                        toggle(&filter.wrappedValue.tags, t)
+                Menu {
+                    Picker("Sort", selection: filter.sort) {
+                        ForEach(SortOption.allCases) { opt in
+                            Text(opt == .featured && user.data.goal != .maintain ? "Featured · \(user.data.goal.defaultSort.title)" : opt.title).tag(opt)
+                        }
                     }
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "arrow.up.arrow.down")
+                        Text("Sort").lineLimit(1)
+                        Image(systemName: "chevron.down").font(.caption2)
+                    }
+                    .controlCapsule()
                 }
-                ChipToggle(title: "No affiliate products", isOn: filter.wrappedValue.hideAffiliate) { filter.wrappedValue.hideAffiliate.toggle() }
-                ChipToggle(title: "Can make now", isOn: filter.wrappedValue.canMakeNow) { filter.wrappedValue.canMakeNow.toggle() }
+
+                Menu {
+                    Picker("Goal", selection: Binding(get: { user.data.goal }, set: { user.data.goal = $0 })) {
+                        ForEach(Goal.allCases) { Label($0.title, systemImage: $0.symbol).tag($0) }
+                    }
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: user.data.goal.symbol)
+                        Text(user.data.goal.title).lineLimit(1)
+                        Image(systemName: "chevron.down").font(.caption2)
+                    }
+                    .controlCapsule(prominent: user.data.goal != .maintain)
+                }
             }
             .padding(.horizontal)
         }
+        .sensoryFeedback(.selection, trigger: user.data.goal)
     }
 
-    /// Two rows under the section control: courses + source books, then cuisine / style chips.
-    private var mealChips: some View {
-        VStack(alignment: .leading, spacing: 8) {
+    /// One removable pill per active filter, plus "Clear all".
+    @ViewBuilder private var pillsRow: some View {
+        let pills = user.data.filterState.activePills(keyName: keyName)
+        if !pills.isEmpty {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    ForEach(Recipe.courses, id: \.self) { c in
-                        ChipToggle(title: c.capitalized, isOn: filter.wrappedValue.courses.contains(c)) { toggle(&filter.wrappedValue.courses, c) }
-                    }
-                    if !store.bookTitles.isEmpty {
-                        Divider().frame(height: 22)
-                        ForEach(store.bookTitles, id: \.self) { t in
-                            ChipToggle(title: t.replacingOccurrences(of: "The Ultimate ", with: ""), isOn: filter.wrappedValue.books.contains(t)) {
-                                toggle(&filter.wrappedValue.books, t)
+                    ForEach(pills) { p in
+                        Button {
+                            withAnimation(.snappy) { user.data.filterState.remove(pill: p.id) }
+                        } label: {
+                            HStack(spacing: 6) {
+                                Text(p.label).lineLimit(1)
+                                Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
                             }
+                            .font(.footnote.weight(.medium))
+                            .padding(.leading, 12).padding(.trailing, 8).padding(.vertical, 6)
+                            .background(Color.accentColor.opacity(0.14), in: Capsule())
+                            .foregroundStyle(Color.accentColor)
                         }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Remove filter \(p.label)")
                     }
+                    Button("Clear all") { withAnimation(.snappy) { user.data.filterState.clearFilters() } }
+                        .font(.footnote.weight(.semibold))
+                        .padding(.horizontal, 6)
                 }
                 .padding(.horizontal)
             }
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(Recipe.mealChips, id: \.id) { c in
-                        ChipToggle(title: c.title, isOn: filter.wrappedValue.mealChips.contains(c.id)) { toggle(&filter.wrappedValue.mealChips, c.id) }
-                    }
-                }
-                .padding(.horizontal)
-            }
+            .sensoryFeedback(.selection, trigger: pills.count)
         }
-    }
-
-    private func toggle(_ set: inout Set<String>, _ v: String) {
-        if set.contains(v) { set.remove(v) } else { set.insert(v) }
     }
 
     @ViewBuilder private var emptyState: some View {
@@ -201,7 +213,7 @@ struct RecipesView: View {
             } description: {
                 Text("Your filters are hiding everything.")
             } actions: {
-                Button("Reset filters") { var f = FilterState(); f.sort = user.data.filterState.sort; f.section = user.data.filterState.section; user.data.filterState = f }
+                Button("Reset filters") { user.data.filterState.clearFilters() }
                     .buttonStyle(.borderedProminent)
             }
             .padding(.top, 40)
@@ -244,7 +256,10 @@ struct RecipeCard: View {
                     SmallPill(text: "\(Int(shown.protein.rounded())) g P", color: .proteinGreen)
                     if d.estimated { Text("est.").font(.caption2).foregroundStyle(.secondary) }
                 }
-                if let badge = vegBadge { Text(badge).font(.caption2.weight(.semibold)).foregroundStyle(.green) }
+                HStack(spacing: 6) {
+                    if let badge = vegBadge { Text(badge).font(.caption2.weight(.semibold)).foregroundStyle(.green) }
+                    if let g = goalBadge(shown) { SmallPill(text: g, color: user.data.goal == .cut ? .carbBlue : .fatOrange) }
+                }
             }
             .padding(10)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -258,6 +273,15 @@ struct RecipeCard: View {
 }
 
 extension RecipeCard {
+    /// "Cut" or "Bulk" when the recipe suits the user's goal (per serving; per pint for Creami).
+    func goalBadge(_ n: Nutrition) -> String? {
+        switch user.data.goal {
+        case .cut: return Goal.isCutFriendly(n) ? "Cut" : nil
+        case .bulk: return Goal.isBulkFriendly(n, bookTitle: recipe.source.title) ? "Bulk" : nil
+        case .maintain: return nil
+        }
+    }
+
     /// 🌱 badge for non-Creami recipes while vegetarian mode is on.
     var vegBadge: String? {
         guard user.data.isVegetarian, recipe.section != "creami" else { return nil }
@@ -282,5 +306,16 @@ struct RecipeContextMenu: View {
         } label: { Label("Add to shopping list", systemImage: "cart.badge.plus") }
         Button { Notifier.startTimer(for: recipe, user: user) } label: { Label("Start freeze timer", systemImage: "timer") }
         Button { user.logMade(recipeId: recipe.id, rating: 0, note: "") } label: { Label("Mark as made", systemImage: "checkmark.circle") }
+    }
+}
+
+extension View {
+    /// The rounded capsule used by the Filters / Sort / Goal controls.
+    func controlCapsule(prominent: Bool = false) -> some View {
+        self.font(.subheadline.weight(.semibold))
+            .padding(.horizontal, 12).padding(.vertical, 7)
+            .background(Color.cardBackground, in: Capsule())
+            .overlay(Capsule().strokeBorder(prominent ? Color.accentColor.opacity(0.6) : Color.secondary.opacity(0.25)))
+            .foregroundStyle(prominent ? Color.accentColor : Color.primary)
     }
 }

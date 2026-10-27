@@ -13,6 +13,14 @@ struct SettingsView: View {
                     NavigationLink { GuidesView() } label: { Label("Guides and paneer calculator", systemImage: "book.pages") }
                 }
                 Section {
+                    Picker("My goal", selection: Binding(get: { user.data.goal }, set: { user.data.goal = $0 })) {
+                        ForEach(Goal.allCases) { Text($0.title).tag($0) }
+                    }
+                    .pickerStyle(.segmented)
+                } header: { Text("Goal") } footer: {
+                    Text("Cut sorts by protein per 100 kcal and badges cut-friendly recipes. Bulk sorts by protein and badges bulk-friendly ones. Maintain changes nothing. A goal never hides recipes.")
+                }
+                Section {
                     Toggle("I'm vegetarian", isOn: Binding(get: { user.data.isVegetarian }, set: { user.data.isVegetarian = $0 }))
                     Toggle("Prefer easy-to-find alternatives", isOn: Binding(get: { user.data.preferEasyAlternatives }, set: { user.data.preferEasyAlternatives = $0 }))
                     Toggle("I avoid eggs", isOn: Binding(get: { user.data.avoidsEggs }, set: {

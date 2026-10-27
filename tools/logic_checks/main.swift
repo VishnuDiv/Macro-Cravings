@@ -218,6 +218,54 @@ MainActor.assumeIsolated {
     check(fxr("web-paneer-tikka")?.photo == nil && fxr("web-paneer-tikka")?.photoURL == "https://example.com/tikka.jpg", "build_data: web recipe without a bundled photo gets photoURL")
     check(fxr("web-carbonara")?.photo == nil && fxr("web-carbonara")?.photoURL == nil && fxr("chef-chicken-wrap")?.photo == nil, "build_data: no photo and no URL stays empty (gradient placeholder)")
 
+    // goals, protein density, active-filter pills
+    print("(g) goal / density / pills")
+    func nut(_ kcal: Double, _ p: Double) -> Nutrition { Nutrition(calories: kcal, protein: p) }
+    check(Goal.isCutFriendly(nut(300, 31)) && !Goal.isCutFriendly(nut(300, 25)) && !Goal.isCutFriendly(nut(600, 70)) && Goal.isCutFriendly(nut(550, 55)), "cut-friendly: 300 kcal / 31 g P yes; 300 / 25 no; 600 kcal no (> 550)")
+    check(Goal.isBulkFriendly(nut(700, 40), bookTitle: nil) && !Goal.isBulkFriendly(nut(700, 30), bookTitle: nil) && !Goal.isBulkFriendly(nut(500, 50), bookTitle: nil)
+          && Goal.isBulkFriendly(nut(400, 20), bookTitle: "The Ultimate Guide to Lean Bulking"), "bulk-friendly: 700 kcal / 40 g P yes; 700 / 30 no; Lean Bulking book always")
+    check(Goal.cut.defaultSort == .healthiest && Goal.bulk.defaultSort == .proteinDesc && Goal.maintain.defaultSort == .featured, "goal default sorts: cut Healthiest, bulk Protein, maintain Featured")
+    var gd = UserData(); gd.goal = .bulk
+    check(UserStore.encode(gd).flatMap { UserStore.decode($0) }?.goal == .bulk && UserData().goal == .maintain, "goal persists; default is Maintain")
+
+    let dRecipes = RecipeStore.decodeRecipes(Data(#"""
+    [{"name":"A","id":"a","section":"meal","servings":1,"macros":{"calories":300,"protein":25,"carbs":30,"fat":8},"base":[{"text":"x","key":"x"}],"instructions":["a","b"]},
+     {"name":"B","id":"b","section":"meal","servings":1,"macros":{"calories":300,"protein":30,"carbs":30,"fat":8},"base":[{"text":"x","key":"x"}],"instructions":["a","b"]},
+     {"name":"C","id":"c","section":"meal","servings":1,"macros":null,"base":[{"text":"x","key":"x"}],"instructions":["a","b"]},
+     {"name":"D","id":"d","section":"meal","servings":1,"macros":{"calories":700,"protein":40,"carbs":50,"fat":30},"base":[{"text":"x","key":"x"}],"instructions":["a","b"]}]
+    """#.utf8))
+    let dStore = RecipeStore()
+    dStore.apply(LoadedData(recipes: dRecipes, catalog: Catalog()))
+    let dctx = FilterContext(displayed: { $0.macros ?? .zero })
+    @MainActor func ids(_ s: FilterState) -> [String] { FilterEngine.apply(store: dStore, recipes: dStore.recipes, query: "", state: s, ctx: dctx).map(\.id).sorted() }
+    var dens = FilterState(); dens.section = nil; dens.proteinDensity = 10
+    check(ids(dens) == ["b"], "density 10: 300 kcal / 25 g P excluded, 300 / 30 included, no macros excluded, 700 / 40 excluded (\(ids(dens)))")
+    dens.proteinDensity = 5
+    check(ids(dens) == ["a", "b", "d"], "density 5 keeps everything with macros (\(ids(dens)))")
+    var cutF = FilterState(); cutF.section = nil; cutF.cutOnly = true
+    var bulkF = FilterState(); bulkF.section = nil; bulkF.bulkOnly = true
+    check(ids(cutF) == ["b"] && ids(bulkF) == ["d"], "Cut-friendly only and Bulk-friendly only filters")
+
+    var many = FilterState(); many.section = "meal"; many.tags = ["healthy", "high-protein"]; many.noEgg = true; many.courses = ["dinner"]
+    many.proteinDensity = 10; many.mealChips = ["paneer"]; many.maxCalories = 500; many.sources = ["book"]; many.cutOnly = true; many.sort = .rating
+    let pills = many.activePills()
+    check(pills.count == many.activeCount && Set(pills.map(\.id)).count == pills.count && pills.contains { $0.label == "≥ 10 g P/100 kcal" }
+          && pills.contains { $0.label == "Max 500 kcal" } && pills.contains { $0.label == "No egg" } && pills.contains { $0.label == "Dinner" } && pills.contains { $0.label == "Paneer" },
+          "active pills: one per filter with readable labels (\(pills.map(\.label)))")
+    var one = many
+    one.remove(pill: "tag:healthy")
+    var expected = many; expected.tags = ["high-protein"]
+    check(one == expected && one.activePills().count == pills.count - 1, "removing one pill keeps every other filter")
+    var emptied = many
+    for p in pills { emptied.remove(pill: p.id) }
+    var bare = FilterState(); bare.section = "meal"; bare.sort = .rating
+    check(emptied == bare && emptied.activeCount == 0, "removing every pill returns to the bare state (section and sort kept)")
+    var cleared = many; cleared.clearFilters()
+    check(cleared == bare, "Clear all keeps section and sort")
+    if let enc = try? JSONEncoder().encode(many), let back = try? JSONDecoder().decode(FilterState.self, from: enc) {
+        check(back == many && back.activePills() == pills, "pill list round-trips with FilterState through JSON")
+    } else { check(false, "FilterState encode/decode failed") }
+
     // null macros show a dash
     let nullMacros = RecipeStore.decodeRecipes(Data(#"[{"name":"N","servings":1,"macros":{"calories":300,"protein":20,"carbs":30,"fat":10,"sugar":null}}]"#.utf8))
     if let n = nullMacros.first?.macros {

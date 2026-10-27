@@ -89,6 +89,14 @@ enum FilterEngine {
                 if f.maxCalories < FilterState.maxCaloriesCeiling && m.calories > f.maxCalories { return false }
                 if f.minProtein > 0 && m.protein < f.minProtein { return false }
             }
+            if f.proteinDensity > 0 {
+                // protein per 100 kcal >= density; recipes without printed macros are excluded while this is on
+                guard r.macros != nil else { return false }
+                let m = macros(r)
+                if m.calories <= 0 || m.protein * 100 < f.proteinDensity * m.calories { return false }
+            }
+            if f.cutOnly && !Goal.isCutFriendly(macros(r)) { return false }
+            if f.bulkOnly && !Goal.isBulkFriendly(macros(r), bookTitle: r.source.title) { return false }
             return true
         }
 
