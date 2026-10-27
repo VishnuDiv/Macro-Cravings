@@ -7,20 +7,52 @@ struct IngredientRow: View {
     var vegAlt: VegLineAlt?
     var onPickAlt: (String) -> Void = { _ in }
     @State private var showAmount = false
+    @State private var showNote = false
     let onSwap: () -> Void
     @Environment(UserStore.self) private var user
+    @Environment(RecipeStore.self) private var store
+
+    /// A swap-note line such as "(Omit the baking soda — not needed for seitan)": shown as a note, not as an ingredient.
+    private var isNoteRow: Bool {
+        let t = line.ing.text.trimmingCharacters(in: .whitespaces)
+        return line.ing.key == "mix_in_choice" && t.hasPrefix("(") && t.hasSuffix(")")
+    }
+
+    private var note: IngredientNote? {
+        guard let k = line.effectiveKey ?? line.ing.key else { return nil }
+        return store.catalog.clarity?.ingredientNotes[k]
+    }
 
     var body: some View {
+        if isNoteRow {
+            Text(line.ing.text).font(.footnote.italic()).foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal).padding(.vertical, 8)
+        } else {
+            rowBody
+        }
+    }
+
+    @ViewBuilder private var rowBody: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top, spacing: 10) {
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(NutritionCalculator.amountText(line))
-                        .strikethrough(line.missing)
-                        .foregroundStyle(line.missing || !line.included ? .secondary : .primary)
-                        .fixedSize(horizontal: false, vertical: true)
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text(NutritionCalculator.amountText(line))
+                            .strikethrough(line.missing)
+                            .foregroundStyle(line.missing || !line.included ? .secondary : .primary)
+                            .fixedSize(horizontal: false, vertical: true)
+                        if note != nil {
+                            Button { showNote = true } label: { Image(systemName: "info.circle").font(.footnote) }
+                                .buttonStyle(.plain).foregroundStyle(Color.accentColor)
+                                .accessibilityLabel("About this ingredient")
+                        }
+                    }
                     if let s = line.swap {
                         Label("Using \(s.name)" + (line.swapFromGoal ? " · goal version" : "") + (line.swapNotRecalculated ? " · macros not recalculated" : ""), systemImage: "arrow.triangle.swap")
                             .font(.caption).foregroundStyle(Color.accentColor)
+                    } else if let y = line.yogurtLabel {
+                        Label("Using \(y)", systemImage: "leaf").font(.caption).foregroundStyle(Color.accentColor)
                     } else if let p = line.powder {
                         Label("Using \(p.name)", systemImage: "scalemass").font(.caption).foregroundStyle(Color.accentColor)
                     } else if let m = line.milk {
@@ -106,6 +138,9 @@ struct IngredientRow: View {
         .padding(.horizontal).padding(.vertical, 10)
         .contentShape(Rectangle())
         .sheet(isPresented: $showAmount) { AmountSheet(recipe: recipe, line: line).environment(user) }
+        .sheet(isPresented: $showNote) {
+            if let n = note { IngredientNoteSheet(title: line.info?.name ?? line.ing.text, note: n) }
+        }
         .contextMenu {
             Button { onSwap() } label: { Label("Swap / I don't have it", systemImage: "arrow.left.arrow.right") }
             if let k = line.ing.key {
@@ -408,6 +443,31 @@ struct AmountSheet: View {
                 }
             }
             .navigationTitle("Amount")
+            .inlineTitle()
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+        }
+        .presentationDetents([.medium])
+    }
+}
+
+/// "What it is" plus a highlighted "For you" tip for an ingredient (display only).
+struct IngredientNoteSheet: View {
+    let title: String
+    let note: IngredientNote
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("What it is") { Text(note.what) }
+                if let tip = note.forYou, !tip.isEmpty {
+                    Section {
+                        Label { Text(tip) } icon: { Image(systemName: "lightbulb.fill").foregroundStyle(.orange) }
+                            .listRowBackground(Color.orange.opacity(0.12))
+                    } header: { Text("For you") }
+                }
+            }
+            .navigationTitle(title)
             .inlineTitle()
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
         }

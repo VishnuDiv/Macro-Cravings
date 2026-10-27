@@ -5356,8 +5356,8 @@
    },
    {
     "name": "Agar powder + sugar + flavor",
-    "key": "agar_powder",
-    "ratio": 0.03,
+    "key": "agar_plus_sugar",
+    "ratio": 1.0,
     "note": "Vegetarian: about 2.5 g agar plus ~75 g sugar and grape flavor per box; sugar not included in the swap macros."
    }
   ],
@@ -5398,8 +5398,8 @@
    },
    {
     "name": "Agar powder + sugar + flavor",
-    "key": "agar_powder",
-    "ratio": 0.03,
+    "key": "agar_plus_sugar",
+    "ratio": 1.0,
     "note": "Vegetarian: about 2.5 g agar plus ~75 g sugar and orange flavor per box; sugar not included in the swap macros."
    }
   ],
@@ -5440,8 +5440,8 @@
    },
    {
     "name": "Agar powder + sugar + flavor",
-    "key": "agar_powder",
-    "ratio": 0.03,
+    "key": "agar_plus_sugar",
+    "ratio": 1.0,
     "note": "Vegetarian: about 2.5 g agar plus ~75 g sugar and strawberry flavor per box; sugar not included in the swap macros."
    }
   ],
@@ -28523,6 +28523,380 @@
   "swaps": [],
   "pantryStaple": true,
   "allergens": [],
+  "vegetarian": true
+ },
+ "agar_plus_sugar": {
+  "name": "Agar powder + sugar (sweetened gelatin mix replacement)",
+  "category": "stabilizer",
+  "per100g": {
+   "calories": 380,
+   "protein": 0.5,
+   "carbs": 93,
+   "fat": 0,
+   "sugar": 90,
+   "fiber": 2
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": null,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": "Agar powder plus the sugar the Jell-O mix would have had.",
+  "homemadeAlternative": null,
+  "swaps": [],
+  "pantryStaple": false,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "aburaage": {
+  "name": "Aburaage (fried tofu pouches)",
+  "category": "dairy",
+  "per100g": {
+   "calories": 270,
+   "protein": 18.8,
+   "carbs": 8.8,
+   "fat": 20.2,
+   "sugar": 0,
+   "fiber": 3.9
+  },
+  "gramsPerCount": 20,
+  "gramsPerMl": null,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [],
+  "pantryStaple": false,
+  "allergens": [
+   "soy"
+  ],
+  "vegetarian": true
+ },
+ "imitation_crab": {
+  "name": "Imitation crab (surimi)",
+  "category": "other",
+  "per100g": {
+   "calories": 95,
+   "protein": 15.2,
+   "carbs": 6.9,
+   "fat": 0.9,
+   "sugar": 0,
+   "fiber": 0
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": null,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [],
+  "pantryStaple": false,
+  "allergens": [
+   "fish"
+  ],
+  "vegetarian": false,
+  "vegNote": "Made from fish (surimi); not vegetarian."
+ },
+ "furikake": {
+  "name": "Furikake (rice seasoning)",
+  "category": "spice",
+  "per100g": {
+   "calories": 390,
+   "protein": 16,
+   "carbs": 45,
+   "fat": 15,
+   "sugar": 8,
+   "fiber": 0
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": null,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [],
+  "pantryStaple": false,
+  "allergens": [],
+  "vegetarian": "check",
+  "vegNote": "Many furikake blends contain bonito (fish) or egg; use a vegan blend."
+ },
+ "gomashio": {
+  "name": "Gomashio (sesame salt)",
+  "category": "spice",
+  "per100g": {
+   "calories": 516,
+   "protein": 17,
+   "carbs": 21,
+   "fat": 45,
+   "sugar": 0,
+   "fiber": 10
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": null,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [],
+  "pantryStaple": false,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "hearts_of_palm": {
+  "name": "Hearts of palm (canned)",
+  "category": "produce",
+  "per100g": {
+   "calories": 28,
+   "protein": 2.5,
+   "carbs": 4.6,
+   "fat": 0.6,
+   "sugar": 0,
+   "fiber": 2.4
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": null,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [],
+  "pantryStaple": false,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "jicama": {
+  "name": "Jicama",
+  "category": "produce",
+  "per100g": {
+   "calories": 38,
+   "protein": 0.7,
+   "carbs": 8.8,
+   "fat": 0.1,
+   "sugar": 1.8,
+   "fiber": 4.9
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": null,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [],
+  "pantryStaple": false,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "natto": {
+  "name": "Natto (fermented soybeans)",
+  "category": "other",
+  "per100g": {
+   "calories": 212,
+   "protein": 17.7,
+   "carbs": 14.4,
+   "fat": 11,
+   "sugar": 0,
+   "fiber": 5.4
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": null,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [],
+  "pantryStaple": false,
+  "allergens": [
+   "soy"
+  ],
+  "vegetarian": true
+ },
+ "parle_g": {
+  "name": "Parle-G biscuits",
+  "category": "mix_in",
+  "per100g": {
+   "calories": 454,
+   "protein": 7,
+   "carbs": 76,
+   "fat": 13,
+   "sugar": 26,
+   "fiber": 0
+  },
+  "gramsPerCount": 3.2,
+  "gramsPerMl": null,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [],
+  "pantryStaple": false,
+  "allergens": [
+   "gluten",
+   "dairy"
+  ],
+  "vegetarian": true
+ },
+ "pickled_ginger": {
+  "name": "Pickled ginger (gari, sushi ginger)",
+  "category": "produce",
+  "per100g": {
+   "calories": 30,
+   "protein": 0.2,
+   "carbs": 7,
+   "fat": 0.1,
+   "sugar": 5,
+   "fiber": 0
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": null,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [],
+  "pantryStaple": false,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "salmon": {
+  "name": "Salmon (raw fillet)",
+  "category": "other",
+  "per100g": {
+   "calories": 208,
+   "protein": 20.4,
+   "carbs": 0,
+   "fat": 13.4,
+   "sugar": 0,
+   "fiber": 0
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": null,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [],
+  "pantryStaple": false,
+  "allergens": [
+   "fish"
+  ],
+  "vegetarian": false,
+  "vegNote": "Fish; not vegetarian."
+ },
+ "wasabi": {
+  "name": "Wasabi",
+  "category": "sauce",
+  "per100g": {
+   "calories": 109,
+   "protein": 4.8,
+   "carbs": 23.5,
+   "fat": 0.6,
+   "sugar": 0,
+   "fiber": 7.8
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": null,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": null,
+  "homemadeAlternative": null,
+  "swaps": [],
+  "pantryStaple": false,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "greek_yogurt_nonfat": {
+  "name": "Greek yogurt 0% (Fage Total 0%)",
+  "category": "dairy",
+  "per100g": {
+   "calories": 54,
+   "protein": 10.3,
+   "carbs": 3.6,
+   "fat": 0,
+   "sugar": 3.6,
+   "fiber": 0
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": null,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": "Fage Total 0%, Chobani nonfat, Oikos or any plain 0% Greek yogurt.",
+  "homemadeAlternative": null,
+  "swaps": [],
+  "pantryStaple": false,
+  "allergens": [
+   "dairy"
+  ],
+  "vegetarian": true
+ },
+ "greek_yogurt_2pct": {
+  "name": "Greek yogurt 2% (Fage Total 2%)",
+  "category": "dairy",
+  "per100g": {
+   "calories": 73,
+   "protein": 9.5,
+   "carbs": 4,
+   "fat": 2,
+   "sugar": 4,
+   "fiber": 0
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": null,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": "Fage Total 2% or any plain 2% Greek yogurt.",
+  "homemadeAlternative": null,
+  "swaps": [],
+  "pantryStaple": false,
+  "allergens": [
+   "dairy"
+  ],
+  "vegetarian": true
+ },
+ "greek_yogurt_full": {
+  "name": "Greek yogurt full-fat 5% (Fage Total 5%)",
+  "category": "dairy",
+  "per100g": {
+   "calories": 97,
+   "protein": 9,
+   "carbs": 3.9,
+   "fat": 5,
+   "sugar": 3.9,
+   "fiber": 0
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": null,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": "Fage Total 5% or any plain full-fat Greek yogurt.",
+  "homemadeAlternative": null,
+  "swaps": [],
+  "pantryStaple": false,
+  "allergens": [
+   "dairy"
+  ],
+  "vegetarian": true
+ },
+ "skyr_full": {
+  "name": "Skyr whole milk (plain)",
+  "category": "dairy",
+  "per100g": {
+   "calories": 91,
+   "protein": 9,
+   "carbs": 4.5,
+   "fat": 4,
+   "sugar": 4.5,
+   "fiber": 0
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": null,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": "Siggi's whole milk or Icelandic Provisions whole milk skyr.",
+  "homemadeAlternative": null,
+  "swaps": [],
+  "pantryStaple": false,
+  "allergens": [
+   "dairy"
+  ],
   "vegetarian": true
  }
 }

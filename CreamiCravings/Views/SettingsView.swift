@@ -36,6 +36,9 @@ struct SettingsView: View {
                         Text("Recipe's own").tag(String?.none)
                         ForEach(user.allLiquids(store.catalog)) { Text($0.name).tag(String?.some($0.id)) }
                     }
+                    Picker("My Greek yogurt", selection: Binding(get: { user.data.greekYogurt }, set: { user.data.greekYogurt = $0 })) {
+                        ForEach(GreekYogurtPref.allCases) { Text($0.title).tag($0) }
+                    }
                     Picker("My protein powder", selection: Binding<String?>(
                         get: { user.data.defaultPowderId }, set: { user.data.defaultPowderId = $0 })) {
                         Text("Recipe's own").tag(String?.none)

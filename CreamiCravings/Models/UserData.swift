@@ -284,6 +284,7 @@ struct UserData: Codable, Equatable {
     var savedMigrated = true                        // false only while decoding an old file
     var ratings: [String: Int] = [:]                // recipeId -> 1...5 stars
     var recipeGoal: [String: Goal] = [:]            // per-recipe version (Cut / Maintain / Bulk); default = the global goal
+    var greekYogurt: GreekYogurtPref = .zero        // "My Greek yogurt": 0% (default), 2%, full-fat or as written
     var useEstimates = true                         // guess amounts for lines that have none
     var lineGrams: [String: [String: Double]] = [:] // recipeId -> lineKey -> grams typed by the user
     var proteinBoosts: [String: Set<String>] = [:]  // recipeId -> chosen "Add protein" boost ids
@@ -326,6 +327,7 @@ struct UserData: Codable, Equatable {
         saved = (try? c.decode([String: Goal].self, forKey: .saved)) ?? [:]
         ratings = (try? c.decode([String: Int].self, forKey: .ratings)) ?? [:]
         recipeGoal = (try? c.decode([String: Goal].self, forKey: .recipeGoal)) ?? [:]
+        greekYogurt = (try? c.decode(GreekYogurtPref.self, forKey: .greekYogurt)) ?? .zero
         useEstimates = (try? c.decode(Bool.self, forKey: .useEstimates)) ?? true
         lineGrams = (try? c.decode([String: [String: Double]].self, forKey: .lineGrams)) ?? [:]
         proteinBoosts = (try? c.decode([String: Set<String>].self, forKey: .proteinBoosts)) ?? [:]

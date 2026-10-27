@@ -112,6 +112,14 @@ struct RecipesView: View {
                     .disabled(list.isEmpty)
                 }
             }
+            #if DEBUG
+            .onChange(of: router.ssSearch, initial: true) { _, q in          // README screenshots (ScreenshotMode.swift)
+                if let q { query = q; router.ssSearch = nil }
+            }
+            .onChange(of: router.ssOpenFilters, initial: true) { _, on in
+                if on { router.ssOpenFilters = false; Task { try? await Task.sleep(nanoseconds: 800_000_000); showFilters = true } }
+            }
+            #endif
             .sheet(isPresented: $showFilters) {
                 FilterSheet(section: mode == .all ? user.data.filterState.section : nil, resultCount: list.count)
                     .environment(store).environment(user)

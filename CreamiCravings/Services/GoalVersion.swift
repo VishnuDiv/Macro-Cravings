@@ -25,6 +25,12 @@ enum GoalVersion {
     static let cutTargets: [String: Double] = ["meal": 450, "dessert": 250, "drink": 250, "creami": 350]
     static let bulkTargets: [String: Double] = ["meal": 750, "dessert": 450, "drink": 450, "creami": 600]
     static let cookingFats: Set<String> = ["olive_oil", "vegetable_oil", "butter", "ghee", "coconut_oil"]
+    /// Lines the swap rules never touch: produce, spices and flavorings (onion, garlic, ginger, scallions, herbs ...) and anything under
+    /// 30 kcal per 100 g. A swap must also save (Cut) or add (Bulk) at least this many kcal per serving to be worth showing.
+    static let skipCategories: Set<String> = ["produce", "spice", "flavoring"]
+    static let skipUnderKcalPer100g = 30.0
+    static let minKcalPerServing = 15.0
+
     static let leanPattern = ["fat_free", "skim", "light", "low_fat", "reduced", "nonfat", "lite", "lean"]
 
     private static func sameFamily(_ a: String, _ b: String) -> Bool {
@@ -49,13 +55,25 @@ enum GoalVersion {
 
         func isOn(_ id: String, _ defaultOn: Bool) -> Bool { toggles[id] ?? defaultOn }
 
+        // In Book mode a change is applied proportionally (min(1, printed / catalog) per macro); the labels show that applied amount.
+        var printedAndCovered: (Nutrition, Nutrition)?
+        if base.source == .book, let m = eff.macros {
+            printedAndCovered = (m, calc.compute(recipe, base).bookCovered)
+        }
+        func applied(_ d: Nutrition) -> Nutrition {
+            guard let (m, c) = printedAndCovered else { return d }
+            return NutritionCalculator.proportional(d, printed: m, catalog: c)
+        }
+
         // a. swaps from the catalog
         for (lk, ing) in eff.allLines {
             if ing.optional && !base.optionalOn.contains(lk) { continue }
             if base.swaps[lk] != nil { continue }                                     // the user chose this line
             if lk == liquidKey && base.milk != nil { continue }
             if lk == powderKey && base.powder != nil { continue }
-            guard let info = catalog.info(ing.key), !info.swaps.isEmpty, !info.pantryStaple, info.per100g.calories > 0 else { continue }
+            if YogurtRules.target(pref: base.yogurtPref, key: ing.key, catalog: catalog) != nil { continue }   // the yogurt picker already decides this line
+            guard let info = catalog.info(ing.key), !info.swaps.isEmpty, !info.pantryStaple, info.per100g.calories > 0,
+                  !skipCategories.contains(info.category), info.per100g.calories >= skipUnderKcalPer100g else { continue }
             let g = calc.effectiveGrams(ing, lineKey: lk, cfg: base)
             guard g >= 5 else { continue }
 
@@ -65,6 +83,7 @@ enum GoalVersion {
                       !vegetarianUser || sinfo.vegetarian != .no else { continue }
                 let oldK = info.per100g.calories * g / 100, newK = sinfo.per100g.calories * g * s.ratio / 100
                 let dProtein = (sinfo.per100g.protein * g * s.ratio - info.per100g.protein * g) / 100
+                if abs(newK - oldK) / divisor < minKcalPerServing { continue }            // not worth a change: under 15 kcal per serving
                 if goal == .cut {
                     guard newK <= 0.8 * oldK else { continue }           // at least 20% fewer calories for this line (ratio included)
                     let score = (oldK - newK) / (max(0, -dProtein) + 1)             // calories saved per gram of protein lost
@@ -80,8 +99,9 @@ enum GoalVersion {
                 let id = "\(prefix):swap:\(lk)"
                 let on = isOn(id, true)
                 let sign: (Double) -> String = { ($0 >= 0 ? "+" : "−") + "\(Int(abs($0).rounded()))" }
+                let shownDelta = applied(Nutrition(calories: b.saved, protein: b.protein))
                 changes.append(GoalChange(id: id, kind: .swap, title: "\(info.name) → \(b.swap.name)",
-                                          detail: "\(sign(b.saved)) kcal, \(sign(b.protein)) g protein", defaultOn: true, enabled: on))
+                                          detail: "\(sign(shownDelta.calories)) kcal, \(sign(shownDelta.protein)) g protein", defaultOn: true, enabled: on))
                 if on { cfg.goalSwaps[lk] = b.idx }
             }
         }

@@ -161,6 +161,12 @@ final class Router {
     var recipesPath: [String] = []
     var favoritesPath: [String] = []
     var cook: CookRequest?
+    #if DEBUG
+    // screenshot mode hooks (see ScreenshotMode.swift)
+    var ssSearch: String?
+    var ssAnchor: String?
+    var ssOpenFilters = false
+    #endif
 
     func open(recipe id: String) {
         tab = .recipes
@@ -265,6 +271,9 @@ enum RemoteImages {
     }()
 
     static func image(url: URL, maxPixel: Int) async -> CGImage? {
+        #if DEBUG
+        if ScreenshotMode.isActive { return nil }          // screenshots never show remote photos
+        #endif
         let key = "\(url.absoluteString)@\(maxPixel)" as NSString
         if let hit = memory.object(forKey: key) { return hit.image }
         guard let (data, response) = try? await session.data(from: url),
@@ -321,7 +330,7 @@ struct RecipePlaceholder: View {
         "cheesecake": ([Color(red: 1.00, green: 0.95, blue: 0.80), Color(red: 0.93, green: 0.80, blue: 0.58)], "birthday.cake"),
         "caramel": ([Color(red: 0.95, green: 0.70, blue: 0.35), Color(red: 0.80, green: 0.50, blue: 0.20)], "drop"),
         "peanut-butter": ([Color(red: 0.88, green: 0.65, blue: 0.35), Color(red: 0.70, green: 0.45, blue: 0.22)], "circle.hexagongrid"),
-        "cookies": ([Color(red: 0.62, green: 0.55, blue: 0.52), Color(red: 0.35, green: 0.30, blue: 0.30)], "circle.dotted"),
+        "cookies": ([Color(red: 0.62, green: 0.55, blue: 0.52), Color(red: 0.35, green: 0.30, blue: 0.30)], "seal.fill"),
         "cake": ([Color(red: 0.98, green: 0.70, blue: 0.80), Color(red: 0.85, green: 0.45, blue: 0.70)], "birthday.cake"),
         "vanilla": ([Color(red: 0.99, green: 0.92, blue: 0.78), Color(red: 0.90, green: 0.76, blue: 0.55)], "snowflake"),
     ]

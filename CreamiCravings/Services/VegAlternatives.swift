@@ -48,6 +48,8 @@ enum VegAlternatives {
             // Book meat weights are raw: the role's meatPer100g wins, the catalog entry is the fallback.
             let meat = role.meatPer100g ?? origInfo?.per100g
             guard origGrams > 0, let meat, meat.protein > 0 else { continue }
+            let keyed = ing.key.map { k in data.keyToRole[k] != nil || data.roles.values.contains { $0.matchKeys.contains(k) } } ?? false
+            guard keyed || (origInfo?.vegetarian == .no && (origInfo?.per100g.protein ?? 0) >= 10) else { continue }
 
             let authoredGrams = calc.grams(swap.with, catalog.info(swap.with.key))
             let defaultIdx = role.alternatives.firstIndex { $0.key == swap.with.key || ($0.aliasKeys.contains(swap.with.key ?? "")) }
@@ -83,7 +85,7 @@ enum VegAlternatives {
             let newIng = Ing(text: "\(Int(opt.grams)) g \(opt.alt.name)", key: opt.alt.key, grams: opt.grams, optional: swap.with.optional)
             if let i = r.base.firstIndex(where: { $0.text == swap.with.text }), lk.hasPrefix("b") { r.base[i] = newIng }
             else if let i = r.mixIns.firstIndex(where: { $0.text == swap.with.text }) { r.mixIns[i] = newIng }
-            if let m = macros { macros = m + (opt.nutrition - defaultMatchedNut) }
+            if let m = macros { macros = m + NutritionCalculator.proportional(opt.nutrition - defaultMatchedNut, printed: m, catalog: defaultMatchedNut) }
 
             var names = [defaultAlt?.name, catalog.ingredients[swap.with.key ?? ""]?.name, stripQuantity(swap.with.text)].compactMap { $0 }
             names = Array(Set(names.filter { $0.count >= 3 })).sorted { $0.count > $1.count }

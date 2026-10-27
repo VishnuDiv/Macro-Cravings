@@ -97,7 +97,7 @@ enum ProteinUpgrades {
             text = "\(g) g \(lower)" + (d.isEmpty ? "" : " (\(d))")
         }
         out.base[c.lineIndex] = Ing(text: text, key: alt.key, grams: opt.grams, optional: r.base[c.lineIndex].optional)
-        if let m = r.macros { out.macros = m + (opt.nutrition - (role.basePer100g * (c.weight / 100))) }   // original - base(weight) + alt
+        if let m = r.macros { let b = role.basePer100g * (c.weight / 100); out.macros = m + NutritionCalculator.proportional(opt.nutrition - b, printed: m, catalog: b) }   // original - base(weight) + alt
         let words = baseWords.first { (k, _) in (r.base[c.lineIndex].key ?? "").contains(k.prefix(7)) }?.value ?? []
         out.name = replace(words, in: r.name, with: short)
         var steps = r.instructions.map { replace(words, in: $0, with: short.lowercased()) }

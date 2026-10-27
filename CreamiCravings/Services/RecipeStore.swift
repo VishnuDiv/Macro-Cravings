@@ -27,6 +27,7 @@ struct Catalog {
     var sourceBrands: [String: String] = [:]
     var guides: [Guide] = []
     var paneer: PaneerModel?
+    var clarity: ClarityNotes?
     var vegAlts: VegAlternativesData? {
         didSet { vegInfo = Catalog.buildVegInfo(vegAlts); rebuildVegan() }
     }
@@ -143,6 +144,7 @@ final class RecipeStore {
 
     func apply(_ d: LoadedData) {
         recipes = d.recipes
+        ClarityRules.shared = ClarityRules(textRules: d.catalog.clarity?.textRules ?? [])
         catalog = d.catalog
         recipeByID = Dictionary(d.recipes.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         index = RecipeStore.buildIndex(d.recipes, d.catalog)
@@ -200,6 +202,9 @@ final class RecipeStore {
         if let u = findResource("paneer_model", ext: "json", in: dir, bundle: bundle), let data = try? Data(contentsOf: u) {
             out.catalog.paneer = try? JSONDecoder().decode(PaneerModel.self, from: data)
         }
+        if let u = findResource("clarity_notes", ext: "json", in: dir, bundle: bundle), let data = try? Data(contentsOf: u) {
+            out.catalog.clarity = try? JSONDecoder().decode(ClarityNotes.self, from: data)
+        }
         if let u = findResource("veg_alternatives", ext: "json", in: dir, bundle: bundle), let data = try? Data(contentsOf: u) {
             out.catalog.vegAlts = try? JSONDecoder().decode(VegAlternativesData.self, from: data)
         }
@@ -227,7 +232,7 @@ final class RecipeStore {
                     if let a = info.affiliate { brands.insert(a.brand) }
                 }
             }
-            let hay = ([r.name] + ings.map { $0.text } + r.tags + [r.source.site ?? "", r.source.title ?? "", r.dessertType ?? "", r.method ?? "", r.isDessert ? "dessert" : "", r.course ?? "", r.cuisine ?? "", r.bookCategory ?? "", (r.vegAdaptation?.swaps.map { $0.with.text }.joined(separator: " ") ?? ""), r.section == "meal" ? "meal" : ""])
+            let hay = ([r.name] + ings.map { $0.text + " " + ClarityRules.shared.annotate($0.text) } + r.tags + [r.source.site ?? "", r.source.title ?? "", r.dessertType ?? "", r.method ?? "", r.isDessert ? "dessert" : "", r.course ?? "", r.cuisine ?? "", r.bookCategory ?? "", (r.vegAdaptation?.swaps.map { $0.with.text }.joined(separator: " ") ?? ""), r.section == "meal" ? "meal" : ""])
                 .joined(separator: " ")
             let (kind, flavor) = cat.baseKind(r)
             out[r.id] = RecipeIndex(

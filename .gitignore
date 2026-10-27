@@ -26,3 +26,9 @@ __pycache__/
 # Catalog merge working files (quote sample recipe lines)
 data/catalog/missing_*.json
 data/catalog/fragment_*.json
+# Cookbook metadata (kept local with the books)
+data/catalog/books.json
+CreamiCravings/Resources/books.json
+# Clarity notes contain line-level fixes quoting recipe text (kept local)
+data/catalog/clarity_notes.json
+CreamiCravings/Resources/clarity_notes.json

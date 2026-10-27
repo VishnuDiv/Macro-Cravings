@@ -20,6 +20,7 @@ struct RecipeConfig {
     var extras: [Ing] = []                   // optional add-ons, whole-recipe amounts, not scaled by the portion
     var portion: Double = 1                  // "eat 0.8 serving" multiplier on the displayed macros
     var boosts: [BoostLine] = []             // chosen "Add protein" boosts (before the goal changes)
+    var yogurtPref: GreekYogurtPref = .asWritten   // "My Greek yogurt"; the user's config sets it from Settings
     var useEstimates = true                  // guess amounts for lines that have none (Calculated numbers and goal deltas only)
     var userGrams: [String: Double] = [:]    // lineKey -> grams typed by the user for a line with no amount
 }
@@ -50,6 +51,8 @@ struct LineResult: Identifiable {
     var lineScale = 1.0                // goal version grams multiplier (1 = unchanged)
     var isExtra = false                // goal version add-on line
     var isBoost = false                // "Add protein" boost line
+    var yogurtKey: String?             // the yogurt the picker shows this line as (same grams)
+    var yogurtLabel: String?
     var amount: AmountKind = .known    // known amount, an estimate, or the user's own amount
     var estimateReason: String?        // why the estimate is what it is
 
@@ -60,7 +63,7 @@ struct LineResult: Identifiable {
         return ing.text
     }
     /// Key to use for shopping/pantry (swap or milk replace the original).
-    var effectiveKey: String? { if let swap { return swap.key }; return milk?.ingredientKey ?? powder?.ingredientKey ?? ing.key }
+    var effectiveKey: String? { if let swap { return swap.key }; if let yogurtKey { return yogurtKey }; return milk?.ingredientKey ?? powder?.ingredientKey ?? ing.key }
 }
 
 struct RecipeNutrition {
@@ -69,6 +72,7 @@ struct RecipeNutrition {
     var book: Nutrition?               // pints applied; nil when recipe has no macros
     var displayed: Nutrition           // with the portion applied
     var displayedFull: Nutrition       // same, but at a full portion (for the whole-recipe view)
+    var bookCovered: Nutrition = .zero // catalog estimate of the lines the printed (Book) numbers cover
     var portion: Double
     var usedSource: CalorieSource
     var estimated: Bool
@@ -120,7 +124,9 @@ struct NutritionCalculator {
         let powderKey = catalog.powderLineKey(r)
         var lines: [LineResult] = []
         var calc = Nutrition.zero
-        var delta = Nutrition.zero
+        var delta = Nutrition.zero          // change to lines the printed totals cover (swap, milk, powder, scale, override)
+        var added = Nutrition.zero          // lines the printed totals do not cover (optional lines turned on, boosts)
+        var covered = Nutrition.zero        // catalog estimate of the lines the printed totals cover
         var uncounted = 0
         var estimatedCount = 0
         let pints = max(1, cfg.pints)
@@ -151,6 +157,7 @@ struct NutritionCalculator {
             var notRecalc = false
             var milkUsed: BaseLiquid?
             var powderUsed: ProteinPowder?
+            var yogurtUsed: String?
 
             let goalSwap = cfg.swaps[lk] == nil && cfg.goalSwaps[lk] != nil
             if let si = cfg.swaps[lk] ?? cfg.goalSwaps[lk], let info, info.swaps.indices.contains(si) {
@@ -162,6 +169,9 @@ struct NutritionCalculator {
                 } else {
                     eff = origEff; notRecalc = true
                 }
+            } else if let yk = YogurtRules.target(pref: cfg.yogurtPref, key: ing.key, catalog: catalog), let yinfo = catalog.info(yk) {
+                eff = per100(yk, yinfo, cfg.overrides) * (g0 / 100)      // same grams, the user's yogurt
+                yogurtUsed = yk
             } else if lk == liquidKey, let m = cfg.milk, m.ingredientKey != ing.key {
                 eff = milkNutrition(ing, info, m)
                 milkUsed = m
@@ -177,7 +187,7 @@ struct NutritionCalculator {
 
             if included {
                 calc += eff
-                delta += eff - (ing.optional ? .zero : plain)
+                if ing.optional { added += eff } else { delta += eff - plain; covered += plain }
                 if g <= 0 || info == nil { uncounted += 1 } else if amountKind != .known { estimatedCount += 1 }
             }
             lines.append(LineResult(
@@ -185,7 +195,8 @@ struct NutritionCalculator {
                 nutrition: eff, swapIndex: swapIdx, swap: swapOpt, swapNotRecalculated: notRecalc, milk: milkUsed, powder: powderUsed, isPowderLine: lk == powderKey,
                 overrideLabel: ing.key.flatMap { cfg.overrides[$0]?.sourceLabel }, isMilkLine: lk == liquidKey,
                 missing: ing.key.map { cfg.missing.contains($0) } ?? false, noData: g0 <= 0 || info == nil,
-                swapFromGoal: goalSwap && swapOpt != nil, lineScale: scale, amount: amountKind, estimateReason: estReason))
+                swapFromGoal: goalSwap && swapOpt != nil, lineScale: scale,
+                yogurtKey: yogurtUsed, yogurtLabel: yogurtUsed == nil ? nil : cfg.yogurtPref.label, amount: amountKind, estimateReason: estReason))
         }
 
         // "Add protein" boosts: real added lines, so they count in Book (source + boost) and Calculated, and scale with portion and pints
@@ -194,7 +205,7 @@ struct NutritionCalculator {
             let g = grams(b.ing, info)
             let n = b.nutrition ?? per100(b.ing.key, info, cfg.overrides) * (g / 100)
             calc += n
-            delta += n
+            added += n
             lines.append(LineResult(
                 lineKey: "p\(i)", ing: b.ing, isBase: false, included: true, info: info, grams: g, scaledGrams: g * Double(pints),
                 nutrition: n, swapIndex: nil, swap: nil, swapNotRecalculated: false, milk: nil, powder: nil, isPowderLine: false,
@@ -219,14 +230,26 @@ struct NutritionCalculator {
         let calcFull = calc * k + extra * k
         let calcScaled = calc * k * p + extra * k
         var bookScaled: Nutrition?, bookFull: Nutrition?
-        if let m = r.macros { bookFull = (m + delta) * k + extra * k; bookScaled = (m + delta) * k * p + extra * k }
+        if let m = r.macros {
+            let book = m + NutritionCalculator.proportional(delta, printed: m, catalog: covered) + added
+            bookFull = book * k + extra * k; bookScaled = book * k * p + extra * k
+        }
         var used = cfg.source
         var estimated = false
         if used == .book && bookScaled == nil { used = .calculated; estimated = true }
         return RecipeNutrition(lines: lines, calculated: calcScaled, book: bookScaled,
                                displayed: used == .book ? (bookScaled ?? calcScaled) : calcScaled,
                                displayedFull: used == .book ? (bookFull ?? calcFull) : calcFull,
-                               portion: p, usedSource: used, estimated: estimated, uncounted: uncounted, estimatedCount: estimatedCount, pints: pints)
+                               bookCovered: covered, portion: p, usedSource: used, estimated: estimated, uncounted: uncounted, estimatedCount: estimatedCount, pints: pints)
+    }
+
+    /// Book-mode delta scaled per macro by min(1, printed / catalog estimate of the covered lines).
+    static func proportional(_ d: Nutrition, printed m: Nutrition, catalog c: Nutrition) -> Nutrition {
+        func f(_ pm: Double, _ cm: Double) -> Double { cm > 0 ? min(1, max(0, pm) / cm) : 1 }
+        var o = d
+        o.calories *= f(m.calories, c.calories); o.protein *= f(m.protein, c.protein); o.carbs *= f(m.carbs, c.carbs)
+        o.fat *= f(m.fat, c.fat); o.sugar *= f(m.sugar, c.sugar); o.fiber *= f(m.fiber, c.fiber)
+        return o
     }
 
     /// Change in displayed macros (one pint basis, same source as cfg) if `swapIndex` were applied to `lineKey`.
@@ -245,7 +268,7 @@ struct NutritionCalculator {
 
     /// "400 g × 3 → 1200 g" style amount text.
     static func amountText(_ l: LineResult) -> String {
-        var t = l.ing.text
+        var t = ClarityRules.shared.annotate(l.ing.text)
         if l.lineScale != 1, l.grams > 0 {
             t += " → \(Int(round(l.grams))) g" + (l.lineScale < 1 ? " (or use cooking spray)" : "")
         }

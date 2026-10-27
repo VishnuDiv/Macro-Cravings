@@ -245,7 +245,7 @@ struct Recipe: Codable, Hashable, Identifiable {
     /// Meal quick-chips: id, title.
     static let mealChips: [(id: String, title: String)] = [
         ("pizza", "Pizza"), ("wings", "Wings"), ("tofu", "Tofu"), ("paneer", "Paneer"), ("pasta", "Pasta"), ("noodles", "Noodles"), ("indian", "Indian"),
-        ("indo-chinese", "Indo-Chinese"), ("chinese", "Chinese"), ("thai", "Thai"), ("korean", "Korean"), ("ramen", "Ramen"),
+        ("indo-chinese", "Indo-Chinese"), ("chinese", "Chinese"), ("thai", "Thai"), ("korean", "Korean"), ("ramen", "Ramen"), ("sushi", "Sushi"),
         ("spicy", "Spicy"), ("breakfast", "Breakfast"), ("cookies", "Cookies"), ("high-fiber", "High Fiber"),
     ]
     static let highFiberGrams = 8.0
@@ -271,6 +271,7 @@ struct Recipe: Codable, Hashable, Identifiable {
             || noodleWords.contains(where: { n.contains($0) }) { out.insert("noodles") }
         for k in ["indian", "indo-chinese", "chinese", "thai", "korean"] where c == k { out.insert(k) }
         if has("ramen") || n.contains("ramen") { out.insert("ramen") }
+        if has("sushi") || ["sushi", "maki", "nigiri", "temaki", "onigiri", "inari", "uramaki", "gunkan", "musubi"].contains(where: { n.contains($0) }) { out.insert("sushi") }
         if has("spicy") { out.insert("spicy") }
         if course == "breakfast" { out.insert("breakfast") }
         if has("cookies") || has("cookie") || dessertType == "cookie" { out.insert("cookies") }

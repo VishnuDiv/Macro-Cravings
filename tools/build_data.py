@@ -83,6 +83,11 @@ def parse_amount(text):
         if q2 is not None:
             q = (q + q2) / 2
     rest = t[m.end():].lstrip()
+    # A size is not an amount: "10 inch tortilla" is one tortilla, "8 6-inch tortillas" is eight.
+    if re.match(r"^[-–]?\s*(?:inch|inches|\")", rest, re.I):
+        return {"count": 1}
+    if re.match(r"^\(?~?\s*\d+(?:\s*[-–]\s*\d+)?\s*[- ]?(?:inch|inches|\")", rest, re.I):
+        return {"count": round(q, 3)}
     for pat, field, factor in _UNITS:
         if re.match(r"(?:%s)(?![A-Za-z])" % pat, rest, re.I):
             return {field: round(q * factor, 2)}
@@ -271,7 +276,9 @@ def main():
 
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import data_fixes
-    out, fix_report = data_fixes.apply(out)
+    catalog_for_fixes = load(os.path.join(DATA, "catalog", "ingredients.json"), {})
+    clarity = load(os.path.join(DATA, "catalog", "clarity_notes.json"), {})
+    out, fix_report = data_fixes.apply(out, catalog_for_fixes, clarity, parse_amount)
     catalog_for_marks = load(os.path.join(DATA, "catalog", "ingredients.json"), {})
     valts = load(os.path.join(DATA, "catalog", "veg_alternatives.json"), {})
     upgraded = data_fixes.mark_protein_upgrades(out, catalog_for_marks, valts)
@@ -297,7 +304,7 @@ def main():
         json.dump(out, f, ensure_ascii=False, indent=1)
 
     copied = []
-    for fn in ("ingredients.json", "base_liquids.json", "protein_powders.json", "source_powder_brands.json", "guides.json", "paneer_model.json", "veg_alternatives.json"):
+    for fn in ("ingredients.json", "base_liquids.json", "protein_powders.json", "source_powder_brands.json", "guides.json", "paneer_model.json", "veg_alternatives.json", "clarity_notes.json"):
         src = os.path.join(DATA, "catalog", fn)
         if os.path.exists(src):
             shutil.copyfile(src, os.path.join(RES, fn))

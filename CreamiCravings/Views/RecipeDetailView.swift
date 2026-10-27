@@ -21,6 +21,18 @@ struct RecipeDetailView: View {
     @State private var servings = 2
     @State private var addedToList = false
     @State private var timerStarted = false
+    #if DEBUG
+    @State private var ssScroll = ScrollPosition()           // README screenshots: scroll to -ssAnchor
+    #endif
+
+    /// Screenshot mode never loads remote photos, so it shows no credit for them either.
+    private var photoCreditHidden: Bool {
+        #if DEBUG
+        return ScreenshotMode.isActive
+        #else
+        return false
+        #endif
+    }
 
     private var vegOn: Bool { user.vegActive(recipe) }
     private var hasVegChoice: Bool { user.data.isVegetarian && recipe.vegAdaptation != nil && recipe.vegetarian != true }
@@ -49,24 +61,33 @@ struct RecipeDetailView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     header
                     if hasVegChoice { vegToggle }
-                    versionSection(goalRes)
-                    if let up = user.upgradeCard(recipe, catalog: store.catalog) { UpgradeCard(card: up) { user.setUpgrade(recipe.id, $0) } }
-                    macroSection(res)
+                    versionSection(goalRes).id("versionCard")
+                    if let up = user.upgradeCard(recipe, catalog: store.catalog) { UpgradeCard(card: up) { user.setUpgrade(recipe.id, $0) }.id("upgrade") }
+                    macroSection(res).id("macros")
                     if let ev = recipe.evidence { EvidenceCard(evidence: ev) }
                     controls(res)
-                    ingredientSection("Base", lines: res.lines.filter { $0.isBase })
+                    ingredientSection("Base", lines: res.lines.filter { $0.isBase }).id("ingredients")
                     if !recipe.mixIns.isEmpty || res.lines.contains(where: { $0.isExtra || $0.isBoost }) { ingredientSection("Mix-ins", lines: res.lines.filter { !$0.isBase }) }
-                    boostCard(res)
+                    boostCard(res).id("boost")
                     instructions
                     if let tip = recipe.proTip(vegMode: user.data.isVegetarian) { proTip(tip) }
                     links
                     madeLog
                 }
+                .scrollTargetLayout()
                 .padding(.horizontal)
                 .padding(.top, 16)
                 .padding(.bottom, 110)
             }
         }
+        #if DEBUG
+        .scrollPosition($ssScroll)
+        .task {
+            guard let a = router.ssAnchor else { return }
+            try? await Task.sleep(nanoseconds: 1_500_000_000)
+            ssScroll.scrollTo(id: a, anchor: .top)
+        }
+        #endif
         .coordinateSpace(name: "detailScroll")
         .ignoresSafeArea(edges: .top)
         .background(Color.screenBackground)
@@ -128,7 +149,7 @@ struct RecipeDetailView: View {
                 Text((user.upgradeChoice(recipe.id) != nil && recipe.proteinUpgrade != nil ? "Protein upgrade of: " : "Veg version of: ") + recipe.name).font(.caption).foregroundStyle(.secondary)
             }
             sourceLine
-            if recipe.photo == nil, let u = recipe.photoURL {
+            if recipe.photo == nil, let u = recipe.photoURL, !photoCreditHidden {
                 Text("Photo: \(recipe.source.site ?? URL(string: u)?.host ?? "source site")").font(.caption2).foregroundStyle(.secondary)
             }
             HStack(spacing: 10) {
@@ -658,3 +679,4 @@ struct MadeLogSheet: View {
         .presentationDetents([.medium])
     }
 }
+

@@ -55,13 +55,16 @@ MainActor.assumeIsolated {
         per.calories += x
         let milk = BaseLiquid(id: "t", name: "Test milk", family: "milk", servingMl: 240, perServing: per, gramsPerMl: gpm, ingredientKey: nil)
         var c = cfg(); c.milk = milk
-        let before = calc.compute(r, cfg()).displayed.calories
+        let beforeRes = calc.compute(r, cfg())
+        let before = beforeRes.displayed.calories
         let after = calc.compute(r, c).displayed.calories
         let expected = x * 400 / (240 * 1.03)
-        check(near(after - before, expected, 1), "\(r.name): +\(x) kcal/240ml -> \(String(format: "%.2f", after - before)) kcal (expected \(String(format: "%.2f", expected)))")
+        // Book mode applies the change proportionally: x min(1, printed kcal / catalog kcal of the lines the printed numbers cover)
+        let fBook = beforeRes.bookCovered.calories > 0 ? min(1, (r.macros?.calories ?? 0) / beforeRes.bookCovered.calories) : 1
+        check(near(after - before, expected * fBook, 1), "\(r.name) (Book): +\(x) kcal/240ml -> \(String(format: "%.2f", after - before)) kcal (expected \(String(format: "%.2f", expected)) x \(String(format: "%.3f", fBook)))")
         c.source = .calculated
         let d2 = calc.compute(r, c).displayed.calories - calc.compute(r, cfg(.calculated)).displayed.calories
-        check(near(d2, expected, 1), "calculated source gives same delta (\(String(format: "%.2f", d2)))")
+        check(near(d2, expected, 1), "calculated source gives the exact delta (\(String(format: "%.2f", d2)))")
     } else {
         check(false, "no book recipe with 400 g \(ffuf) and catalog entry")
     }
@@ -115,10 +118,17 @@ MainActor.assumeIsolated {
                 let g = calc.grams(ing, info)
                 let expected = sinfo.per100g.calories * g * s.ratio / 100 - info.per100g.calories * g / 100
                 if abs(expected) < 1 { continue }   // want a swap that actually moves the numbers
-                let got = calc.compute(r, c).displayed.calories - calc.compute(r, cfg()).displayed.calories
-                check(near(got, expected, 0.01), "\(r.name): \(ing.key ?? "") -> \(sk) x\(s.ratio): \(String(format: "%.2f", got)) kcal (expected \(String(format: "%.2f", expected)))")
+                let baseRes = calc.compute(r, cfg())
+                let fBook = baseRes.bookCovered.calories > 0 ? min(1, (r.macros?.calories ?? 0) / baseRes.bookCovered.calories) : 1
+                let got = calc.compute(r, c).displayed.calories - baseRes.displayed.calories
+                check(near(got, expected * fBook, 0.01), "\(r.name) (Book): \(ing.key ?? "") -> \(sk) x\(s.ratio): \(String(format: "%.2f", got)) kcal (expected \(String(format: "%.2f", expected)) x \(String(format: "%.3f", fBook)))")
                 let impact = calc.swapImpact(r, lineKey: lk, swapIndex: si, cfg: cfg())
-                check(near(impact.delta.calories, expected, 0.01) && impact.recalculated, "swapImpact agrees")
+                check(near(impact.delta.calories, expected * fBook, 0.01) && impact.recalculated, "swapImpact agrees (Book, proportional)")
+                // Calculated mode keeps the exact catalog delta
+                let gotC = calc.compute(r, { var cc = c; cc.source = .calculated; return cc }()).displayed.calories - calc.compute(r, cfg(.calculated)).displayed.calories
+                check(near(gotC, expected, 0.01), "swap in Calculated mode: exact catalog delta (\(String(format: "%.2f", gotC)) vs \(String(format: "%.2f", expected)))")
+                let impactC = calc.swapImpact(r, lineKey: lk, swapIndex: si, cfg: cfg(.calculated))
+                check(near(impactC.delta.calories, expected, 0.01), "swapImpact agrees (Calculated, exact)")
                 swapDone = true
                 break outer
             }
@@ -492,6 +502,10 @@ MainActor.assumeIsolated {
         "nuts": ing("Mixed nuts", "nut", 607, 20),
         "rice_cooked": ing("Cooked rice", "other", 130, 2.7),
     ]
+    gcat.ingredients["onion"] = ing("Onion", "produce", 40, 1.1, swaps: [sw("scallions", "Scallions")])
+    gcat.ingredients["scallions"] = ing("Scallions", "produce", 32, 1.8)
+    gcat.ingredients["sauce_a"] = ing("Sauce A", "sauce", 100, 1, swaps: [sw("sauce_b", "Sauce B")])      // 10 g: 10 kcal -> 6 kcal, saves 4 kcal
+    gcat.ingredients["sauce_b"] = ing("Sauce B", "sauce", 60, 1)
     let gcalc = NutritionCalculator(catalog: gcat)
     func grecipe(_ id: String, servings: Int, kcal: Double, protein: Double, lines: String, section: String = "meal") -> Recipe {
         RecipeStore.decodeRecipes(Data(#"[{"id":"\#(id)","name":"\#(id)","section":"\#(section)","course":"dinner","servings":\#(servings),"macros":{"calories":\#(kcal),"protein":\#(protein),"carbs":50,"fat":30},"base":[\#(lines)],"instructions":["a","b"]}]"#.utf8))[0]
@@ -524,6 +538,13 @@ MainActor.assumeIsolated {
     gu.setSwap("cutme", line: "b0", index: 0)
     check(!gu.goalResolution(gr, catalog: gcat).changes.contains { $0.id == "cut:swap:b0" }, "lines the user swapped are not touched by the goal version")
     gu.setSwap("cutme", line: "b0", index: nil)
+
+    // small and aromatic lines are left alone
+    let tinyRecipe = grecipe("smallswaps", servings: 1, kcal: 400, protein: 20, lines: [gl("150 g onion", "onion", 150), gl("10 g sauce A", "sauce_a", 10), gl("200 g cheddar", "cheddar", 200)].joined(separator: ","))
+    let smallIds = gu.goalResolution(tinyRecipe, catalog: gcat).changes.map(\.id)
+    check(!smallIds.contains("cut:swap:b0"), "an onion line gets no Cut swap (produce, under 30 kcal/100 g rule)")
+    check(!smallIds.contains("cut:swap:b1"), "a 10 g swap saving 4 kcal per serving is not applied (minimum 15 kcal per serving)")
+    check(smallIds.contains("cut:swap:b2"), "the dairy swap (200 g cheddar -> light cheddar) still applies")
 
     // bulk: richer milk, portion rounding up to 0.25, capped at 2.0, optional add-on off by default
     let bu = UserStore(fileURL: nil); bu.data.goal = .bulk
@@ -564,6 +585,149 @@ MainActor.assumeIsolated {
         }
         let ms = Double(DispatchTime.now().uptimeNanoseconds - t0) / 1e6
         check(cutUp == 0 && bulkDown == 0, "real data: cut versions never add calories, bulk versions never remove them (cut changed \(cutChanged), bulk changed \(bulkChanged) of \(store.recipes.count) recipes; \(String(format: "%.0f", ms)) ms for all three versions)")
+    }
+
+    // spot values: Book kcal per serving, Cut / Maintain
+    do {
+        let rc = NutritionCalculator(catalog: store.catalog)
+        let spots: [(String, Double, Double)] = [
+            // Cut values rose a little (reviewer 300.8 / 440.7 / 435.2): Cut no longer swaps onions, aromatics or lines saving under 15 kcal per serving
+            ("web-meal-coconut-curry-ramen-minimalist-baker", 306.4, 528.0), ("bulk-chicken-tikka-and-pilau-rice", 444.6, 913.3),
+            ("web-meal-air-fryer-tortilla-pizza-chicken-nourished-by-nic", 369.4, 464.0),   // reviewer 278.5: "10 inch tortilla" is now ONE tortilla (was count 10)
+            ("web-hot-chocolate-ice-cream", 318.8, 976.0),                                  // reviewer 158.8 / 244.0: printed values were per serving, scaled x4 to the whole pint
+            ("chef-chicken-pad-thai", 446.5, 786.8)]                                       // reviewer 435.2: the noodles line was keyed vegetable_oil, now rice_noodles
+        for (id, wantCut, wantMaint) in spots {
+            guard let r = store.recipes.first(where: { $0.id == id }) else { check(false, "spot recipe \(id) missing"); continue }
+            let vegActive = r.vegAdaptation != nil && r.vegetarian != true
+            var vals: [Goal: Double] = [:]
+            for g in [Goal.cut, .maintain] {
+                var base = RecipeConfig(vegActive: vegActive, preferEasy: true, source: .book); base.useEstimates = true
+                let gr = GoalVersion.resolve(r, catalog: store.catalog, base: base, goal: g, toggles: [:], vegetarianUser: true)
+                vals[g] = (rc.compute(r, gr.cfg).displayed * (1 / r.perServingDivisor)).calories
+            }
+            print("  spot \(id): Cut \(String(format: "%.1f", vals[.cut] ?? 0)) / Maintain \(String(format: "%.1f", vals[.maintain] ?? 0)) (reviewer: \(wantCut) / \(wantMaint))")
+            check(near(vals[.cut] ?? 0, wantCut, 2) && near(vals[.maintain] ?? 0, wantMaint, 2), "spot values \(id)")
+        }
+    }
+
+    do {
+        var lines = 0, recipes = 0
+        for r in store.recipes where r.vegAdaptation != nil {
+            let n = VegAlternatives.resolve(r, catalog: store.catalog, choices: [:], preferEasy: true).lines.count
+            lines += n; if n > 0 { recipes += 1 }
+        }
+        print("  real data: veg-alternative lines \(lines) in \(recipes) recipes (meat-line gate: keyToRole / matchKeys or non-vegetarian protein >= 10 g)")
+    }
+
+    // ---- My Greek yogurt
+    print("(gy) My Greek yogurt")
+    func gyi(_ n: String, _ k: Double, _ p: Double, _ f: Double) -> IngredientInfo { IngredientInfo(name: n, category: "dairy", per100g: Nutrition(calories: k, protein: p, fat: f)) }
+    var gcat2 = Catalog()
+    gcat2.ingredients = ["greek_yogurt_full": gyi("Greek yogurt 5%", 97, 9, 5), "greek_yogurt_2pct": gyi("Greek yogurt 2%", 73, 9.5, 2), "greek_yogurt_nonfat": gyi("Greek yogurt 0%", 54, 10.3, 0),
+                         "greek_yogurt": gyi("Nonfat Greek yogurt", 59, 10.2, 0.4), "plain_yogurt": gyi("Plain whole-milk yogurt", 61, 3.5, 3.3), "hung_curd": gyi("Hung curd", 97, 9, 5),
+                         "labneh": gyi("Labneh", 150, 6, 12), "skyr_full": gyi("Skyr whole milk", 91, 9, 4), "skyr_plain": gyi("Skyr nonfat", 63, 11, 0.2), "quark": gyi("Quark", 67, 12, 0.2)]
+    func yrec(_ lines: String) -> Recipe {
+        RecipeStore.decodeRecipes(Data(#"[{"id":"y1","name":"y","servings":1,"macros":null,"base":[\#(lines)],"instructions":["a","b"]}]"#.utf8))[0]
+    }
+    func yl(_ text: String, _ key: String, _ g: Double) -> String { #"{"text":"\#(text)","key":"\#(key)","grams":\#(g)}"# }
+    let yr = yrec([yl("200 g full-fat Greek yogurt", "greek_yogurt_full", 200), yl("200 g plain yogurt", "plain_yogurt", 200), yl("100 g hung curd", "hung_curd", 100), yl("100 g labneh", "labneh", 100),
+                   yl("100 g skyr whole milk", "skyr_full", 100), yl("100 g quark", "quark", 100), yl("100 g nonfat greek", "greek_yogurt", 100)].joined(separator: ","))
+    let ycalc = NutritionCalculator(catalog: gcat2)
+    let yu = UserStore(fileURL: nil)
+    @MainActor func ycfg() -> RecipeConfig { var c = yu.config(for: yr, catalog: gcat2); c.source = .calculated; return c }
+    check(yu.data.greekYogurt == .zero, "the default is 0% Greek yogurt")
+    let y0 = ycalc.compute(yr, ycfg())
+    check(near(y0.lines[0].nutrition.calories, 54 * 2, 0.01) && y0.lines[0].yogurtKey == "greek_yogurt_nonfat" && y0.lines[0].yogurtLabel == "0% Greek yogurt",
+          "200 g full-fat Greek yogurt shows the 0% nutrition under the default (\(y0.lines[0].nutrition.calories) kcal, note: \(y0.lines[0].yogurtLabel ?? "-"))")
+    check(near(y0.lines[4].nutrition.calories, 63, 0.01) && y0.lines[4].yogurtKey == "skyr_plain", "full-fat skyr shows as nonfat skyr")
+    check(y0.lines[1].yogurtKey == nil && y0.lines[2].yogurtKey == nil && y0.lines[3].yogurtKey == nil && y0.lines[5].yogurtKey == nil && y0.lines[6].yogurtKey == nil
+          && near(y0.lines[1].nutrition.calories, 122, 0.01) && near(y0.lines[3].nutrition.calories, 150, 0.01), "plain yogurt, curd, labneh, quark and nonfat lines are untouched")
+    yu.data.greekYogurt = .asWritten
+    check(near(ycalc.compute(yr, ycfg()).lines[0].nutrition.calories, 97 * 2, 0.01) && ycalc.compute(yr, ycfg()).lines.allSatisfy { $0.yogurtKey == nil }, "\"As written\" restores the original (194 kcal)")
+    yu.data.greekYogurt = .twoPercent
+    check(near(ycalc.compute(yr, ycfg()).lines[0].nutrition.calories, 73 * 2, 0.01), "2% shows the 2% yogurt")
+    yu.data.greekYogurt = .zero
+    // Book mode: printed numbers hold the full-fat yogurt, the picker changes them proportionally (never below zero)
+    let yb = RecipeStore.decodeRecipes(Data(#"[{"id":"y2","name":"y","servings":1,"macros":{"calories":300,"protein":20,"carbs":20,"fat":15},"base":[{"text":"200 g full-fat Greek yogurt","key":"greek_yogurt_full","grams":200}],"instructions":["a","b"]}]"#.utf8))[0]
+    var ybc = yu.config(for: yb, catalog: gcat2); ybc.source = .book
+    let ybRes = ycalc.compute(yb, ybc)
+    check(ybRes.displayed.calories >= 0 && ybRes.displayed.calories < 300 && ybRes.displayed.fat >= 0, "Book mode applies the picker proportionally (no negatives): \(String(format: "%.1f", ybRes.displayed.calories)) kcal")
+    // the Cut version leaves yogurt lines to the picker
+    yu.data.goal = .cut
+    check(!yu.goalResolution(yr, catalog: gcat2).changes.contains { $0.id == "cut:swap:b0" }, "the Cut version's own yogurt swap is a no-op under the picker")
+    check(UserStore.encode(yu.data).flatMap { UserStore.decode($0) }?.greekYogurt == .zero && UserData().greekYogurt == .zero, "the setting persists, default 0%")
+
+    // ---- Sushi chip
+    let sushiRecipes = RecipeStore.decodeRecipes(Data(#"[{"id":"s1","name":"Spicy Tuna Maki","section":"meal","base":[{"text":"x","key":"x"}],"instructions":["a","b"]},{"id":"s2","name":"Rainbow Bowl","tags":["sushi"],"section":"meal","base":[{"text":"x","key":"x"}],"instructions":["a","b"]},{"id":"s3","name":"Onigiri Triangles","section":"meal","base":[{"text":"x","key":"x"}],"instructions":["a","b"]},{"id":"s4","name":"Pasta Salad","section":"meal","base":[{"text":"x","key":"x"}],"instructions":["a","b"]}]"#.utf8))
+    check(sushiRecipes.map { $0.mealChipMatches(keys: []).contains("sushi") } == [true, true, true, false] && Recipe.mealChips.contains { $0.id == "sushi" }, "Sushi chip: tag 'sushi' or maki / nigiri / temaki / onigiri / inari ... in the name")
+    do {
+        let sr = store.recipes.filter { store.index[$0.id]?.chips.contains("sushi") == true }
+        let japanese = store.recipes.filter { $0.tags.contains("sushi") }
+        print("  real data: \(sr.count) recipes match the Sushi chip (\(japanese.count) tagged sushi)")
+        check(japanese.allSatisfy { store.index[$0.id]?.chips.contains("sushi") == true }, "every sushi-tagged recipe is matched by the Sushi chip")
+    }
+
+    // ---- clarity text rules (display only)
+    print("(clarity) text rules and notes")
+    if let cl = store.catalog.clarity {
+        let rules = ClarityRules(textRules: cl.textRules)
+        check(cl.textRules.count > 50 && cl.ingredientNotes.count > 100, "clarity_notes.json loads: \(cl.textRules.count) rules, \(cl.ingredientNotes.count) ingredient notes")
+        let cases: [(String, String)] = [
+            ("2 tbsp tomato puree", "(tomato paste)"), ("1 cup cornflour", "(cornstarch)"), ("200 g plain flour", "(all-purpose flour)"),
+            ("a handful of coriander leaves", "(cilantro)"), ("2 tbsp Coriander", "(cilantro)"),
+        ]
+        for (before, expect) in cases {
+            let after = rules.annotate(before)
+            check(after.contains(expect) && after.hasPrefix(before.prefix(8)), "\"\(before)\" -> \"\(after)\"")
+        }
+        check(rules.annotate("1 tsp ground coriander") == "1 tsp ground coriander" && rules.annotate("1 tsp coriander seeds") == "1 tsp coriander seeds", "ground coriander is NOT turned into cilantro")
+        check(rules.annotate("1 cup salsa see note") == "1 cup salsa", "\"1 cup salsa see note\" -> \"1 cup salsa\"")
+        let nested = "1 tbsp soy sauce ((or tamari (wheat-free soy sauce)))"
+        check(rules.annotate(nested) == nested, "no annotation inside existing parentheses (tamari nesting): \(rules.annotate(nested))")
+        let flax = "1 eggs ((use 'flax' eggs to make vegan. One flax egg = 1 tbsp flax seeds))"
+        check(rules.annotate(flax) == flax, "the flax-egg rule does not fire inside a parenthetical")
+        check(rules.annotate("1 cup all-purpose flour, or plain flour") == "1 cup all-purpose flour, or plain flour", "a rule is skipped when the US term is already on the line")
+        check(rules.annotate("2 tbsp tomato puree") == rules.annotate(rules.annotate("2 tbsp tomato puree")), "annotating twice changes nothing")
+    } else { check(false, "clarity_notes.json not loaded") }
+
+    // ---- negative-macro sweep: no recipe, source (Book / Calculated) or version (Cut / Maintain / Bulk) may show a negative number
+    print("(neg) negative-macro sweep")
+    do {
+        let rc = NutritionCalculator(catalog: store.catalog)
+        var negatives: [String] = []
+        var cutLow: [String] = []
+        for r in store.recipes {
+            let vegActive = r.vegAdaptation != nil && r.vegetarian != true
+            for (src, yp) in [(CalorieSource.book, GreekYogurtPref.asWritten), (.calculated, .asWritten), (.book, .zero), (.calculated, .zero)] {
+                var base = RecipeConfig(vegActive: vegActive, preferEasy: true, source: src)
+                base.useEstimates = true
+                base.yogurtPref = yp
+                var per: [Goal: Nutrition] = [:]
+                for g in [Goal.cut, .maintain, .bulk] {
+                    let gr = GoalVersion.resolve(r, catalog: store.catalog, base: base, goal: g, toggles: [:], vegetarianUser: true)
+                    let ps = rc.compute(r, gr.cfg).displayed * (1 / r.perServingDivisor)      // hidden (missing-flag) fields are checked too
+                    per[g] = ps
+                    for (name, v) in [("kcal", ps.calories), ("protein", ps.protein), ("carbs", ps.carbs), ("fat", ps.fat), ("sugar", ps.sugar), ("fiber", ps.fiber)] where v < -0.05 {
+                        negatives.append("\(r.id) \(src.rawValue)/\(g.rawValue)/\(yp.rawValue) \(name)=\(String(format: "%.1f", v))")
+                    }
+                }
+                if let c = per[.cut], let mt = per[.maintain], mt.calories > 0, c.calories < 0.15 * mt.calories { cutLow.append("\(r.id)") }
+            }
+        }
+        if !negatives.isEmpty { print("    negatives: \(negatives.prefix(12))") }
+        check(negatives.isEmpty, "0 negative fields across \(store.recipes.count) recipes x {Book, Calculated} x {yogurt as written, 0%} x {Cut, Maintain, Bulk} (found \(negatives.count))")
+        // Cut below 15% of Maintain is only allowed for recipes the audit explained (printed numbers or amounts that make the whole recipe tiny)
+        let cutLowAllowed: [String: String] = [
+            "web-pistachio-ice-cream-real-pistachios": "Creami: nuts dominate the maintain total, cut swaps/portion shrink it",
+            "web-hazelnut-praline-gelato": "Creami: very rich pint, cut portion applies",
+            "web-meal-air-fired-spiced-chickpeas-milk-street": "printed per-serving numbers are far above the catalog sum",
+            "web-tt-lemonade-italian-ice": "tiny sorbet where the portion floor dominates",
+            "web-budget-delicious-coconut-ice-cream": "Creami: coconut cream pint, cut portion applies",
+            "web-george-eats-lemon-curd-ice-cream": "Creami: egg yolk and cream pint, cut portion applies",
+            "web-meal-vegetarian-rogan-josh-lentil-littlesugarsnaps": "amount errors in the source (fixed at build time when possible)",
+        ]
+        let unexplained = Set(cutLow).subtracting(cutLowAllowed.keys)
+        check(unexplained.isEmpty, "Cut < 15% of Maintain only for the audited list (\(Set(cutLow).count) rows, unexplained: \(unexplained.sorted()))")
     }
 
     // saved per goal: migration, persistence

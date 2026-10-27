@@ -78,7 +78,7 @@ final class UserStore {
         h.combine(data.isVegetarian); h.combine(data.showOriginal.contains(r.id)); h.combine(data.vegChoice[r.id] ?? [:]); h.combine(data.preferEasyAlternatives)
         h.combine(data.swaps[r.id] ?? [:]); h.combine(data.pints[r.id]); h.combine(calorieSource(for: r.id).rawValue)
         h.combine(data.optionalOn[r.id] ?? []); h.combine(data.nutritionOverrides)
-        h.combine(data.useEstimates); h.combine(data.lineGrams[r.id] ?? [:])
+        h.combine(data.useEstimates); h.combine(data.lineGrams[r.id] ?? [:]); h.combine(data.greekYogurt)
         return h.finalize()
     }
 
@@ -202,6 +202,7 @@ final class UserStore {
                      overrides: data.nutritionOverrides, optionalOn: data.optionalOn[r.id] ?? [],
                      missing: data.pantryMissing)
         base.useEstimates = data.useEstimates
+        base.yogurtPref = data.greekYogurt
         if applyGoal { base.boosts = ProteinBoosts.lines(for: r, selected: data.proteinBoosts[r.id] ?? [], catalog: catalog, powder: powder(for: r.id, catalog: catalog)) }
         base.userGrams = data.lineGrams[r.id] ?? [:]
         guard applyGoal, versionGoal(r.id) != .maintain else { return base }

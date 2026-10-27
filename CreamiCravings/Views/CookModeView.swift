@@ -108,7 +108,7 @@ struct CookModeView: View {
                     Text("Ingredients").font(.largeTitle.bold())
                     if res.pints > 1 { Text("Scaled for \(res.pints) pints").foregroundStyle(.secondary) }
                     VStack(spacing: 0) {
-                        ForEach(res.lines.filter { $0.included }) { l in
+                        ForEach(res.lines.filter { $0.included && !($0.ing.key == "mix_in_choice" && $0.ing.text.hasPrefix("(")) }) { l in
                             Button {
                                 if checked.contains(l.lineKey) { checked.remove(l.lineKey) } else { checked.insert(l.lineKey) }
                             } label: {

@@ -23,7 +23,7 @@ MEAT = re.compile(r"\b(chicken|beef|steak|pork|bacon|ham|turkey|sausages?|fish|s
 # a meat word is fine when the same line or step says it is not real meat
 NOT_MEAT = re.compile(r"vegan|vegetarian|\bveg\b|veggie|plant|meat-free|meatless|faux|imitation|mock|seitan|tofu|tempeh|soy|jackfruit|"
                       r"mushroom|quorn|mycoprotein|beyond|impossible|paneer|chicken[- ]style|chicken-flavou?r|no[- ]chicken|\"chicken\"|'chicken'|"
-                      r"chicken seasoning|chicken spice|steak seasoning|same seasonings?|coconut bacon|egg|noodle soup flavo", I)
+                      r"chicken seasoning|chicken spice|steak seasoning|same seasonings?|same spice blend|steak bites|tomato tuna|salmon-style|'tuna'|pepper tuna|coconut bacon|egg|noodle soup flavo", I)
 SAUCE = [
     ("caesar", re.compile(r"caesar dressing", I)),
     ("worcestershire", re.compile(r"worcestershire", I)),

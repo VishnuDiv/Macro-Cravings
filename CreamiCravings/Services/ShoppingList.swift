@@ -5,11 +5,11 @@ enum ShoppingList {
     static func items(for r: Recipe, cfg: RecipeConfig, catalog: Catalog) -> [ShoppingItem] {
         let result = NutritionCalculator(catalog: catalog).compute(r, cfg)
         var out: [ShoppingItem] = []
-        for l in result.lines where l.included {
+        for l in result.lines where l.included && l.ing.key != "mix_in_choice" {      // "of your choice" / swap-note lines are not purchases
             let key = l.effectiveKey
             let info = catalog.info(key) ?? (l.swap == nil && l.milk == nil && l.powder == nil ? l.info : nil)
             if info?.pantryStaple == true, !(key.map { cfg.missing.contains($0) } ?? false) { continue }
-            let name = (l.swap != nil || l.milk != nil || l.powder != nil) ? l.displayName : (info?.name ?? l.ing.text)
+            let name = (l.swap != nil || l.milk != nil || l.powder != nil) ? l.displayName : (info?.name ?? ClarityRules.shared.annotate(l.ing.text))
             out.append(ShoppingItem(key: key, text: name, category: info?.category ?? l.info?.category ?? "other",
                                     grams: l.scaledGrams > 0 ? l.scaledGrams : nil, estimated: l.amount == .estimated))
         }

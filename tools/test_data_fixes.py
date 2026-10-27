@@ -173,5 +173,76 @@ marked = df.mark_protein_boost([o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11])
 check([x["id"] for x in marked] == ["o1", "o4", "o6", "o11"] and not any("proteinBoost" in x for x in (o2, o3, o5, o7, o8, o9, o10)),
       "protein boost: 12 g overnight oats with milk + chia eligible; 'Protein' in the name, Greek yogurt / whey lines, baked and savory oats are not (%s)" % [x["id"] for x in marked])
 
+# negative-macro fixes: sizes, weights, wrong keys, jello, servings sanity
+sz = rec("s1", base=[ing("10 inch whole wheat tortilla", "tortilla_wrap", count=10), ing("8 6-inch corn tortillas", "tortilla_wrap", count=14),
+                     ing("4 (8-inch) flour tortillas", "tortilla_wrap", count=4), ing("8-10 6-inch tortillas", "tortilla_wrap", count=12), ing("2 tortillas", "tortilla_wrap", count=2)])
+df.fix_size_not_count([sz])
+check([l["count"] for l in sz["base"]] == [1, 8.0, 4.0, 9.0, 2], "size is not a count: 10 inch -> 1, '8 6-inch' -> 8, '(8-inch)' -> 4, '8-10 6-inch' -> 9, plain 2 stays (%s)" % [l["count"] for l in sz["base"]])
+wt = rec("w1", base=[ing("325 g/ 11 1/2 oz Aubergine (eggplant)", "eggplant", count=325), ing("15.5 ounce can chickpeas", "chickpeas", count=15), ing("2 onions", "onion", count=2)])
+df.fix_count_is_weight([wt])
+check(wt["base"][0]["grams"] == 325 and wt["base"][0]["count"] is None and abs(wt["base"][1]["grams"] - 439.43) < 0.1 and wt["base"][2]["count"] == 2, "a count that repeats a weight becomes grams (325 g aubergine, 15.5 oz can); real counts stay")
+wk = rec("k1", base=[ing("150g soaked Pad Thai noodles (soaked 1 hour, or boil them)", "vegetable_oil", 150), ing("20ml boiling water", "vegetable_oil"), ing("1 tbsp olive oill", "olive_oil"),
+                     ing("2 tbsp rice", "sugar"), ing("1 tbsp sugar", "sugar"), ing("280g penne pasta (add boiling water)", "vegetable_oil")])
+cat = {"rice_noodles": {}, "water": {}, "olive_oil": {}, "sugar": {}, "rice": {}, "pasta_dry": {}}
+log = df.fix_wrong_keys([wk], cat)
+check([l["key"] for l in wk["base"]] == ["rice_noodles", "water", "olive_oil", "rice", "sugar", "pasta_dry"] and len(log) == 4, "wrong keys: noodles keyed as oil -> rice_noodles, 'boiling water' not an oil, 'oill' typo kept, sugar key on rice -> rice (%s)" % [l["key"] for l in wk["base"]])
+jl = rec("j1", base=[ing("1 box (85 g) orange Jell-O gelatin mix", "jello_mix_orange", 85), ing("1 packet gelatin", "gelatin"), ing("12 g sugar free jelly sachet", "jelly_sachet_sugar_free", 12)])
+df.fix2_hidden_meat([jl])
+keys = [s["with"]["key"] for s in jl["vegAdaptation"]["swaps"]]
+check(keys == ["agar_plus_sugar", "agar_powder"], "Jell-O mix swaps to agar + sugar (keeps the sugar), plain gelatin to agar (%s)" % keys)
+co = rec("c1", base=[ing("500ml chicken bone broth (extra collagen protein)", "collagen_powder", None), ing("10 g collagen peptides", "collagen", 10)])
+co["base"][0]["ml"] = 500
+df.fix3_collagen([co])
+check(co["base"][0]["key"] == "chicken_stock" and co["base"][1]["key"] == "collagen_powder", "collagen: bone broth is stock, only a real collagen supplement stays collagen")
+sc = {"hot": {"per100g": {"calories": 100}, "gramsPerMl": 1}}
+hot = rec("web-hot", section="creami", macros={"calories": 244, "protein": 4, "carbs": 27, "fat": 14}, servings=None, base=[{"text": "976 ml milk", "key": "hot", "ml": 976}])
+hot["section"] = "creami"
+df.fix_servings_sanity([hot], sc)
+check(hot["macros"]["calories"] == 976 and "scaled" in hot["evidence"]["summary"], "Creami printed per serving (catalog 4x): scaled to the whole pint (x4)")
+big = rec("big", section="meal", servings=4, macros={"calories": 1356, "protein": 90, "carbs": 200, "fat": 8}, base=[{"text": "36000 ml thing", "key": "hot", "ml": 36000}])
+df.fix_servings_sanity([big], sc)
+check(big["macros"] is None and "did not match" in big["evidence"]["summary"], "meal whose catalog total is far above the printed value: printed macros nulled with a note")
+ok = rec("fine", section="meal", servings=2, macros={"calories": 800, "protein": 50, "carbs": 80, "fat": 20}, base=[{"text": "700 ml thing", "key": "hot", "ml": 700}])
+df.fix_servings_sanity([ok], sc)
+check(ok["macros"] is not None, "a consistent recipe is untouched")
+
+# clarity lineFixes
+cc = {"cilantro": {"name": "Cilantro", "category": "produce", "per100g": {"calories": 23}}, "ground_coriander": {"name": "Ground coriander", "category": "spice", "per100g": {"calories": 298}},
+      "eggs": {"name": "Eggs", "category": "dairy", "per100g": {"calories": 143}, "gramsPerCount": 50}, "mix_in_choice": {"name": "x", "category": "mix_in", "per100g": {"calories": 0}}}
+cr = rec("cr1", base=[ing("3 tbsp fresh chopped coriander", "ground_coriander", None), ing("1 eggs ((use 'flax' eggs to make vegan))", "eggs", None),
+                      ing("1 batch tofu scramble", "mix_in_choice"), ing("1 batch tofu scramble", "mix_in_choice"), ing("1 batch tofu scramble", "mix_in_choice"),
+                      ing("Dressing:", "mix_in_choice"), ing("1/2 tsp salt", "salt"), ing("1/2 tsp salt", "salt"), ing("Per taco: 1/4 kebab mix", "beef_mince_5pct", count=0.25),
+                      ing("1 can chickpeas", "chickpeas", count=1)])
+cr["base"][0]["ml"] = 45
+notes = {"lineFixes": [
+    {"recipeId": "cr1", "lineText": "3 tbsp fresh chopped coriander", "suggestedText": "3 tbsp fresh chopped coriander", "suggestedKey": "cilantro", "reason": "(c) wrong key"},
+    {"recipeId": "cr1", "lineText": "1 eggs ((use 'flax' eggs to make vegan))", "suggestedText": "1 eggs (", "suggestedKey": "eggs", "reason": "(a) flax egg"},
+    {"recipeId": "cr1", "lineText": "1 batch tofu scramble", "suggestedText": "", "suggestedKey": None, "reason": "(c) duplicate: appears 3 times"},
+    {"recipeId": "cr1", "lineText": "Dressing:", "suggestedText": "", "suggestedKey": None, "reason": "(c) parse junk: a section heading"},
+    {"recipeId": "cr1", "lineText": "1/2 tsp salt", "suggestedText": "", "suggestedKey": None, "reason": "(c) duplicate: appears 2 times"},
+    {"recipeId": "cr1", "lineText": "Per taco: 1/4 kebab mix", "suggestedText": "Per taco: 1/4 of the kebab mix (the Kebab mix lines above)", "suggestedKey": None, "reason": "(b) fraction of a sub-recipe"},
+    {"recipeId": "cr1", "lineText": "1 can chickpeas", "suggestedText": "1 can (15 oz / 425 g) chickpeas", "suggestedKey": None, "reason": "(e) can with no size"},
+    {"recipeId": "nope", "lineText": "x", "suggestedText": "y", "suggestedKey": None, "reason": "(b)"},
+    {"recipeId": "cr1", "lineText": "not a line", "suggestedText": "y", "suggestedKey": None, "reason": "(b)"}]}
+res = df.fix_clarity_lines([cr], notes, cc, lambda t: {"grams": 425.25} if "15 oz" in t else None)
+lines = {l["text"]: l for l in cr["base"]}
+check(cr["base"][0]["key"] == "cilantro" and cr["base"][1]["text"] == "1 eggs" and cr["base"][1]["key"] == "eggs", "clarity: wrong key fixed (cilantro), dangling '(' removed from the flax-egg line")
+check(sum(1 for l in cr["base"] if l["text"] == "1/2 tsp salt") == 2 and "1/2 tsp salt" in " ".join(res["duplicates_logged"]), "clarity: ordinary duplicate lines are logged, never deleted")
+check([l["key"] for l in cr["base"] if l["text"].startswith("1 batch tofu scramble")] == ["mix_in_choice"] * 3 and [l["text"] for l in cr["base"] if "made above" in l["text"]] == ["1 batch tofu scramble (made above)"] * 2,
+      "clarity: a repeated sub-recipe is counted once (the repeats are 0 kcal '... (made above)')")
+check("Dressing:" not in [l["text"] for l in cr["base"]] and len(res["removed"]) == 1, "clarity: a parse-junk heading is removed")
+pt = next(l for l in cr["base"] if l["text"].startswith("Per taco"))
+check(pt["key"] == "mix_in_choice" and pt["count"] is None, "clarity: 'Per taco: 1/4 kebab mix' no longer double-counts the beef")
+ch = next(l for l in cr["base"] if "chickpeas" in l["text"])
+check(ch["grams"] == 425.25 and ch["count"] is None, "clarity: a clarified can size is re-read as grams")
+check(len(res["unmatched"]) == 2 and res["applied"] >= 6, "clarity: unmatched fixes are logged and skipped (%s)" % res["unmatched"])
+
+# yogurt fat-level keys
+yg = rec("y1", base=[ing("150 g 5% greek yoghurt", "greek_yogurt", 150), ing("1 cup 2% Greek yogurt", "greek_yogurt"), ing("1 cup nonfat Greek yogurt", "greek_yogurt"), ing("1 cup Greek yogurt", "greek_yogurt"),
+                     ing("250g natural yoghurt", "plain_yogurt"), ing("2 cups whole milk skyr", "skyr"), ing("100 g 0% skyr", "skyr"), ing("1 cup full-fat labneh", "labneh")])
+df.fix_yogurt_fat_keys([yg])
+check([l["key"] for l in yg["base"]] == ["greek_yogurt_full", "greek_yogurt_2pct", "greek_yogurt", "greek_yogurt", "plain_yogurt", "skyr_full", "skyr", "labneh"],
+      "yogurt keys carry the fat level (five-percent -> full, two-percent -> 2pct, nonfat / regular yogurt / zero-percent skyr / labneh untouched): " + str([l["key"] for l in yg["base"]]))
+
 print("data fixes: %d checks, %d failed" % (n, bad))
 sys.exit(1 if bad else 0)

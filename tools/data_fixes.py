@@ -57,6 +57,347 @@ def like_for_like(line, text, key):
             "optional": bool(line.get("optional"))}
 
 
+# ---------------------------------------------------------------- amount / key / servings sanity (negative-macro fixes)
+
+_FR = "½⅓⅔¼¾⅛"
+_NUM_RE = r"(?:\d+\s*&\s*[%s]|\d+\s+\d+/\d+|\d+\s*[%s]|\d+/\d+|\d*\.\d+|\d+|[%s])" % (_FR, _FR, _FR)
+_SIZE_FIRST = re.compile(r"^\s*%s\s*[-–]?\s*(?:inch|inches|\"|”)" % _NUM_RE, re.I)
+_COUNT_THEN_SIZE = re.compile(r"^\s*(\d+(?:\s*[-–]\s*\d+)?)\s*\(?~?\s*\d+\s*[-–]?\s*(?:inch|inches|\"|”)", re.I)
+_WEIGHT_FIRST = re.compile(r"^\s*(%s)\s*(g|gm|gms|gram|grams|kg|ml|oz|ounce|ounces|lb|lbs|pound|pounds)\b" % _NUM_RE, re.I)
+_WEIGHT_FACTOR = {"g": ("grams", 1), "gm": ("grams", 1), "gms": ("grams", 1), "gram": ("grams", 1), "grams": ("grams", 1), "kg": ("grams", 1000),
+                  "ml": ("ml", 1), "oz": ("grams", 28.35), "ounce": ("grams", 28.35), "ounces": ("grams", 28.35),
+                  "lb": ("grams", 453.6), "lbs": ("grams", 453.6), "pound": ("grams", 453.6), "pounds": ("grams", 453.6)}
+
+
+def _to_float(tok):
+    t = tok.strip()
+    uni = {"½": .5, "⅓": 1 / 3, "⅔": 2 / 3, "¼": .25, "¾": .75, "⅛": .125}
+    m = re.fullmatch(r"(\d+)\s*&?\s*([%s])" % _FR, t)
+    if m:
+        return int(m.group(1)) + uni[m.group(2)]
+    if t in uni:
+        return uni[t]
+    m = re.fullmatch(r"(\d+)\s+(\d+)/(\d+)", t)
+    if m:
+        return int(m.group(1)) + int(m.group(2)) / int(m.group(3))
+    m = re.fullmatch(r"(\d+)/(\d+)", t)
+    if m:
+        return int(m.group(1)) / int(m.group(2))
+    try:
+        return float(t)
+    except ValueError:
+        return None
+
+
+def fix_size_not_count(recipes):
+    """"10 inch tortilla", "8-inch", 6\" are sizes, not counts: the count is the number BEFORE the size, else 1."""
+    log = []
+    for r in recipes:
+        for ing in all_lines(r):
+            t = ing.get("text") or ""
+            if ing.get("grams") is not None or ing.get("ml") is not None:
+                continue
+            new = None
+            if _SIZE_FIRST.match(t):
+                new = 1
+            else:
+                m = _COUNT_THEN_SIZE.match(t)
+                if m:
+                    parts = [float(x) for x in re.split(r"\s*[-–]\s*", m.group(1).strip())]
+                    new = sum(parts) / len(parts)
+            if new is not None and ing.get("count") != new:
+                log.append("%s: %r count %s -> %s" % (r.get("id"), t[:50], ing.get("count"), new))
+                ing["count"] = new
+    return log
+
+
+def fix_count_is_weight(recipes):
+    """A line like "325 g/ 11 oz aubergine" or "15.5 ounce can chickpeas" whose count repeats the weight number (so 325 aubergines)
+    gets the amount as grams / ml instead."""
+    log = []
+    for r in recipes:
+        for ing in all_lines(r):
+            if ing.get("count") is None or ing.get("grams") is not None or ing.get("ml") is not None:
+                continue
+            m = _WEIGHT_FIRST.match(ing.get("text") or "")
+            if not m:
+                continue
+            qty = _to_float(m.group(1))
+            if qty is None or abs(ing["count"] - qty) >= 1:
+                continue
+            field, factor = _WEIGHT_FACTOR[m.group(2).lower()]
+            ing[field] = round(qty * factor, 2)
+            log.append("%s: %r count %s -> %s %s" % (r.get("id"), (ing.get("text") or "")[:40], ing["count"], field, ing[field]))
+            ing["count"] = None
+    return log
+
+
+_OIL_WORDS = re.compile(r"\boil+s?\b|spray|ghee|butter|\bfat\b|lard|shortening|margarine", re.I)       # not "boil"
+_SWEET_WORDS = re.compile(r"sugar|sweeten|stevia|monk|erythritol|allulose|honey|syrup|swerve|splenda|jaggery|maple|agave|molasses|xylitol|truvia|lakanto|nectar|treacle", re.I)
+_SUGAR_KEYS = {"sugar", "brown_sugar", "powdered_sugar", "coconut_sugar", "white_sugar", "caster_sugar", "granulated_sugar", "icing_sugar"}
+_STOP = set("a an and or of the with for to in on fresh dried chopped diced sliced minced finely roughly cup cups tbsp tsp tablespoon tablespoons teaspoon teaspoons large small medium g ml oz".split())
+
+
+def _tokens(text):
+    return [re.sub(r"s$", "", w) for w in re.findall(r"[a-z]{3,}", (text or "").lower()) if w not in _STOP]
+
+
+# phrase -> catalog key, tried before the generic token match
+_KEY_HINTS = [(r"pasta|penne|spaghetti|macaroni|rigatoni|fusilli|linguine|fettuccine|orzo", "pasta_dry"),
+              (r"sweet ?corn", "sweetcorn"), (r"boiling water|hot water|cold water|ice water|\bwater\b", "water")]
+
+
+def _best_catalog_key(text, catalog):
+    """Catalog key for what the line names: a hint phrase, else the key whose name tokens all appear in the line (most tokens first)."""
+    head = re.sub(r"\([^)]*\)", " ", text)                      # ignore parentheticals ("(boiling water ...)")
+    for pat, key in _KEY_HINTS:
+        if re.search(pat, head, re.I) and (catalog is None or key in catalog):
+            return key
+    toks = set(_tokens(head))
+    best, best_n = None, 0
+    for k in catalog or {}:
+        kt = [re.sub(r"s$", "", w) for w in k.split("_") if len(w) >= 3]
+        if kt and all(w in toks for w in kt) and len(kt) > best_n:
+            best, best_n = k, len(kt)
+    return best
+
+
+def fix_wrong_keys(recipes, catalog=None):
+    """Lines whose text names a different food than their key: an oil key on a line with no oil word (noodles keyed vegetable_oil),
+    a sugar key on a line with no sweetener word. Re-keys by text; every change is logged."""
+    log = []
+    for r in recipes:
+        for ing in all_lines(r):
+            k, t = ing.get("key") or "", ing.get("text") or ""
+            is_oil_key = k.endswith("_oil") or k == "oil"
+            if not (is_oil_key and not _OIL_WORDS.search(t)) and not (k in _SUGAR_KEYS and not _SWEET_WORDS.search(t)):
+                continue
+            new = None
+            if re.search(r"noodle|vermicelli|pad thai", t, re.I):
+                new = "rice_noodles" if re.search(r"rice|pad thai|vermicelli", t, re.I) else "noodles"
+            if new is None:
+                new = _best_catalog_key(t, catalog)
+            if new and new != k and (catalog is None or new in catalog):
+                log.append("%s: %r key %s -> %s" % (r.get("id"), t[:50], k, new))
+                ing["key"] = new
+            else:
+                log.append("%s: %r key %s looks wrong, no replacement found" % (r.get("id"), t[:50], k))
+    return log
+
+
+NOTE_SCALED = "Source nutrition was per serving; scaled to the whole recipe (x%d) to match the ingredient amounts."
+NOTE_MISMATCH = "Source nutrition did not match the ingredient amounts; showing calculated estimate."
+
+
+def _catalog_kcal(r, catalog):
+    tot = 0.0
+    for i in all_lines(r):
+        if i.get("optional"):
+            continue
+        info = (catalog or {}).get(i.get("key") or "")
+        if info:
+            tot += (info.get("per100g") or {}).get("calories", 0) * line_grams(i, info) / 100
+    return tot
+
+
+def _evidence_note(r, note):
+    ev = r.get("evidence")
+    if isinstance(ev, dict):
+        if note not in (ev.get("summary") or ""):
+            ev["summary"] = " ".join(x for x in [ev.get("summary") or "", note] if x)
+    else:
+        r["evidence"] = {"verdict": "unverified", "rating": None, "ratingCount": None, "summary": note, "commonFixes": []}
+
+
+def fix_servings_sanity(recipes, catalog):
+    """Printed macros that cannot belong to the ingredient list: a meal above 2500 kcal per serving, or a catalog total per serving more
+    than 4x the printed value while the printed value looks like one portion. Creami recipes whose printed values are per serving are
+    scaled to the whole pint when the catalog / printed ratio is close to a whole number of servings; anything else is nulled with a note."""
+    log = []
+    for r in recipes:
+        m = r.get("macros")
+        if not m or not isinstance(m.get("calories"), (int, float)) or m["calories"] <= 0:
+            continue
+        s = max(1, r.get("servings") or 1)
+        printed_ps = m["calories"] / s
+        cat_ps = _catalog_kcal(r, catalog) / s
+        if cat_ps <= 0:
+            continue
+        creami = is_creami(r)
+        ratio = _catalog_kcal(r, catalog) / m["calories"]
+        n = round(ratio)
+        too_big = (not creami) and printed_ps > 2500
+        mismatch = printed_ps <= 1200 and cat_ps > 4 * printed_ps
+        # a Creami recipe whose catalog total is almost exactly 3-8 times the printed value: the printed numbers are per serving
+        per_serving_pint = creami and (r.get("servings") or 1) == 1 and 3 <= n <= 8 and abs(ratio - n) / n < 0.08
+        if not (too_big or mismatch or per_serving_pint):
+            continue
+        if creami and 2 <= n <= 8 and abs(ratio - n) / n < 0.2 and (r.get("servings") or 1) == 1:
+            for k, v in list(m.items()):
+                if isinstance(v, (int, float)):
+                    m[k] = round(v * n, 1)
+            _evidence_note(r, NOTE_SCALED % n)
+            log.append("%s: scaled printed macros x%d (catalog %d kcal vs printed %d)" % (r.get("id"), n, round(_catalog_kcal(r, catalog)), round(printed_ps)))
+        else:
+            r["macros"] = None
+            _evidence_note(r, NOTE_MISMATCH)
+            log.append("%s: nulled printed macros (printed %d kcal/serving, catalog %d kcal/serving)" % (r.get("id"), round(printed_ps), round(cat_ps)))
+    return log
+
+
+# ---------------------------------------------------------------- clarity notes: line fixes (data/catalog/clarity_notes.json)
+
+SUB_RECIPE_ONCE = [re.compile(r"^1 batch tofu scramble$", re.I), re.compile(r"^per taco: 1/4 kebab mix$", re.I)]
+
+
+def fix_clarity_lines(recipes, notes, catalog=None, parse=None):
+    """Applies the audit's lineFixes: match recipeId + exact lineText, then suggestedText and / or suggestedKey.
+    Duplicate lines are only logged (they may be legitimate repeats in different sub-sections), except a sub-recipe that would be
+    counted twice ("1 batch tofu scramble" repeated, "Per taco: 1/4 kebab mix"): those repeats become mix_in_choice (0 kcal) with
+    "... (made above)". A line the audit calls parse junk (a heading) is removed. Unmatched fixes are logged and skipped.
+    `parse(text)` (optional) re-reads the amount of a line whose text changed. Returns a dict of counts and log lines."""
+    fixes = (notes or {}).get("lineFixes") or []
+    by_id = {r.get("id"): r for r in recipes}
+    out = {"applied": 0, "skipped": 0, "unmatched": [], "duplicates_logged": [], "removed": [], "changed_over_10pct": [], "once": []}
+    before = {}
+    for f in fixes:
+        r = by_id.get(f.get("recipeId"))
+        text = f.get("lineText")
+        if not r:
+            out["unmatched"].append("%s: recipe not found" % f.get("recipeId"))
+            continue
+        before.setdefault(r["id"], _catalog_kcal(r, catalog))
+        pools = [r.get("base") or [], r.get("mixIns") or []]
+        hit = None
+        for pool in pools:
+            for i, ing in enumerate(pool):
+                if ing.get("text") == text:
+                    hit = (pool, i)
+                    break
+            if hit:
+                break
+        swap_with = None
+        if not hit:
+            for sw in (r.get("vegAdaptation") or {}).get("swaps") or []:
+                if (sw.get("with") or {}).get("text") == text:
+                    swap_with = sw["with"]
+                    break
+        if not hit and not swap_with:
+            out["unmatched"].append("%s: %r" % (r["id"], (text or "")[:50]))
+            continue
+        sug, key = f.get("suggestedText"), f.get("suggestedKey")
+        reason = (f.get("reason") or "").lower()
+        if sug == "":
+            if "duplicate" in reason:
+                same = [ing for pool in pools for ing in pool if ing.get("text") == text]
+                if hit and any(p.match(text.strip()) for p in SUB_RECIPE_ONCE) and len(same) > 1:
+                    for ing in same[1:]:                                   # count the sub-recipe once
+                        ing["key"] = "mix_in_choice"
+                        ing["text"] = text + " (made above)"
+                        ing["grams"] = ing["ml"] = ing["count"] = None
+                        out["once"].append("%s: %r" % (r["id"], text[:40]))
+                    out["applied"] += 1
+                else:
+                    out["duplicates_logged"].append("%s: %r" % (r["id"], text[:50]))
+                    out["skipped"] += 1
+            elif hit:
+                pool, i = hit
+                pool.pop(i)
+                out["removed"].append("%s: %r" % (r["id"], text[:50]))
+                out["applied"] += 1
+            else:
+                out["skipped"] += 1
+            continue
+        ing = hit[0][hit[1]] if hit else swap_with
+        if any(p.match(text.strip()) for p in SUB_RECIPE_ONCE):          # "Per taco: 1/4 kebab mix": the beef is already counted above
+            key = "mix_in_choice"
+            ing["grams"] = ing["ml"] = ing["count"] = None
+        if sug:
+            new = re.sub(r"\s*\($", "", sug.strip())                      # the audit sometimes leaves a dangling "("
+            if new != ing.get("text"):
+                ing["text"] = new
+                if parse and key != "mix_in_choice":
+                    a = parse(new)
+                    if a and (a.get("grams") or a.get("ml")) and ing.get("grams") is None and ing.get("ml") is None:
+                        ing.update({k: v for k, v in a.items() if k in ("grams", "ml")})
+                        ing["count"] = None
+        if key and key != ing.get("key"):
+            ing["key"] = key
+            if key == "mix_in_choice":
+                ing["grams"] = ing["ml"] = ing["count"] = None
+        out["applied"] += 1
+    for rid, kb in before.items():
+        ka = _catalog_kcal(by_id[rid], catalog)
+        if kb > 0 and abs(ka - kb) / kb > 0.10:
+            out["changed_over_10pct"].append("%s %d->%d" % (rid, round(kb), round(ka)))
+    return out
+
+
+# ---------------------------------------------------------------- veg macros from the catalog (when the source gave none)
+
+_MACRO_KEYS = ("calories", "protein", "carbs", "fat", "sugar", "fiber")
+
+
+def fix_veg_macros_from_catalog(recipes, catalog):
+    """A vegAdaptation with macrosPerServing = null gets: printed per serving - replaced line(s) + substitute(s), both from the catalog at
+    the same weights. Negative results are clamped at 0 and logged. Skips recipes with no printed macros."""
+    log = []
+    for r in recipes:
+        va = r.get("vegAdaptation")
+        m = r.get("macros")
+        if not va or va.get("macrosPerServing") is not None or not m or not va.get("swaps"):
+            continue
+        s = max(1, r.get("servings") or 1)
+        out = {k: (m.get(k) / s if isinstance(m.get(k), (int, float)) else None) for k in _MACRO_KEYS}
+        lines = {l.get("text"): l for l in all_lines(r)}
+        used = 0
+        for sw in va["swaps"]:
+            orig = lines.get(sw.get("replaces"))
+            with_ing = sw.get("with") or {}
+            oi, wi = (catalog or {}).get((orig or {}).get("key") or ""), (catalog or {}).get(with_ing.get("key") or "")
+            if not orig or not oi or not wi:
+                continue
+            og, wg = line_grams(orig, oi), line_grams(with_ing, wi)
+            used += 1
+            for k in _MACRO_KEYS:
+                if out[k] is None:
+                    continue
+                out[k] += ((wi.get("per100g") or {}).get(k, 0) * wg - (oi.get("per100g") or {}).get(k, 0) * og) / 100 / s
+        if not used:
+            continue
+        clamped = [k for k, v in out.items() if v is not None and v < 0]
+        va["macrosPerServing"] = {k: (None if v is None else round(max(0.0, v))) for k, v in out.items()}
+        log.append("%s: %s%s" % (r.get("id"), va["macrosPerServing"], " (clamped: %s)" % ",".join(clamped) if clamped else ""))
+    return log
+
+
+# ---------------------------------------------------------------- Greek yogurt / skyr fat level (for the "My Greek yogurt" picker)
+
+_NONFAT_TEXT = re.compile(r"\b0\s?%|non[- ]?fat|fat[- ]?free|zero fat", re.I)
+_FULL_TEXT = re.compile(r"\b(?:4|5|10)\s?%|full[- ]?fat|whole[- ]?milk", re.I)
+_TWO_TEXT = re.compile(r"\b(?:2|3)\s?%", re.I)
+
+
+def fix_yogurt_fat_keys(recipes):
+    """Greek yogurt and skyr lines that say how fat they are (2%, 5%, full-fat, whole milk) get a key that carries that fat level, so the
+    app can show them as the user's chosen yogurt. Regular yogurt, curd, labneh and quark are never touched."""
+    log = []
+    for r in recipes:
+        for ing in all_lines(r):
+            k, t = ing.get("key") or "", ing.get("text") or ""
+            if k not in ("greek_yogurt", "skyr") or _NONFAT_TEXT.search(t):
+                continue
+            new = None
+            if _FULL_TEXT.search(t):
+                new = "greek_yogurt_full" if k == "greek_yogurt" else "skyr_full"
+            elif _TWO_TEXT.search(t) and k == "greek_yogurt":
+                new = "greek_yogurt_2pct"
+            if new:
+                ing["key"] = new
+                log.append("%s: %r %s -> %s" % (r.get("id"), t[:40], k, new))
+    return log
+
+
 # ---------------------------------------------------------------- D. keys (10, 11)
 
 def fix10_rekey(recipes):
@@ -263,6 +604,10 @@ HIDDEN = [
      "Vegetarian pesto (rennet-free cheese; e.g. Trader Joe's Vegan Kale Cashew Basil Pesto, or homemade)", "vegetarian_pesto",
      {"pesto": "vegetarian pesto"}, "Pesto → vegetarian pesto"),
     ("meat stock", STOCK_RE, None, "Vegetable stock/broth (same amount)", "vegetable_stock", STOCK_STEPS, "Meat stock → vegetable stock"),
+    ("gelatin (sweetened mix)", r"jell-?o|gelatin (dessert|mix)|jelly (crystals|mix)|gelatin packet",
+     lambda t: not re.search(r"sugar[- ]free|unflavou?red|plain|sachet|pots", t),
+     "Agar powder + sugar (replaces the sweetened gelatin mix: 1 tsp agar ≈ 1 tbsp gelatin, plus the sugar)", "agar_plus_sugar",
+     {"gelatine": "agar powder", "gelatin": "agar powder"}, "Gelatin mix → agar + sugar"),
     ("gelatin", r"gelatin|gelatine", None, "Agar powder (1 tsp agar ≈ 1 tbsp gelatin)", "agar_powder",
      {"gelatine": "agar powder", "gelatin": "agar powder"}, "Gelatin → agar powder"),
     ("marshmallow", r"marshmallow", lambda t: "vegan" not in t, "Vegan marshmallows (Dandies)", "vegan_marshmallows",
@@ -292,7 +637,12 @@ def fix3_collagen(recipes):
     n = 0
     for r in recipes:
         for line in all_lines(r):
-            if "collagen" in (line.get("text") or "").lower():
+            t = (line.get("text") or "").lower()
+            if "collagen" in t and re.search(r"broth|stock|bouillon", t):
+                if (line.get("key") or "").startswith("collagen"):
+                    line["key"] = "chicken_stock"               # bone broth, not a collagen supplement
+                continue
+            if "collagen" in t:
                 line["key"] = "collagen_powder"
                 n += 1
                 if not is_creami(r):
@@ -547,10 +897,33 @@ def mark_protein_boost(recipes):
 
 # ---------------------------------------------------------------- entry point
 
-def apply(recipes):
-    """Runs every fix. Returns (recipes, report) where report maps a fix label to its count."""
+def apply(recipes, catalog=None, clarity=None, parse=None):
+    """Runs every fix. Returns (recipes, report) where report maps a fix label to its count. `catalog` (key -> entry) enables the
+    catalog-aware fixes (wrong keys, servings sanity)."""
     rep = {}
+    l_size = fix_size_not_count(recipes)
+    rep["a size-not-count lines"] = len(l_size)
+    rep["a detail"] = "; ".join(l_size[:6])
+    l_w = fix_count_is_weight(recipes)
+    rep["a2 count-was-a-weight lines"] = len(l_w)
+    rep["a2 detail"] = "; ".join(l_w[:6])
     rep["10 re-keyed lines"] = fix10_rekey(recipes)
+    l_y = fix_yogurt_fat_keys(recipes)
+    rep["yogurt fat-level keys"] = len(l_y)
+    rep["yogurt detail"] = "; ".join(l_y[:5])
+    l_k = fix_wrong_keys(recipes, catalog)
+    rep["b wrong-key lines"] = len(l_k)
+    rep["b detail"] = "; ".join(l_k)
+    if clarity:
+        c = fix_clarity_lines(recipes, clarity, catalog, parse)
+        rep["clarity lineFixes applied"] = c["applied"]
+        rep["clarity lineFixes skipped (duplicates logged)"] = c["skipped"]
+        rep["clarity unmatched"] = len(c["unmatched"])
+        rep["clarity unmatched detail"] = "; ".join(c["unmatched"][:8])
+        rep["clarity sub-recipes counted once"] = len(c["once"])
+        rep["clarity lines removed"] = len(c["removed"])
+        rep["clarity recipes whose calculated kcal moved > 10%"] = len(c["changed_over_10pct"])
+        rep["clarity > 10% detail"] = "; ".join(c["changed_over_10pct"][:10])
     rep["11 canonical swap keys"] = fix11_swap_keys(recipes)
     recipes, d12 = fix12_dedupe_urls(recipes)
     rep["12 duplicate source URLs dropped"] = len(d12)
@@ -565,12 +938,18 @@ def apply(recipes):
     rep["3 collagen lines"] = fix3_collagen(recipes)
     rep["4 crunchwrap swaps"] = fix4_crunchwraps(recipes)
     rep["8 seitan baking-soda swaps"] = fix8_seitan_baking_soda(recipes)
+    l_vm = fix_veg_macros_from_catalog(recipes, catalog)
+    rep["veg macros computed from the catalog"] = len(l_vm)
+    rep["veg macros detail"] = "; ".join(l_vm[:6])
     c5 = fix5_fat(recipes)
     rep["5 veg macros adjusted (fat/kcal)"] = len(c5)
     rep["5 detail"] = ", ".join("%s %s->%s" % c for c in c5[:12])
     n6 = fix6_web_macros(recipes)
     rep["6 web macros nulled"] = len(n6)
     rep["7 per-piece servings"] = fix7_pieces(recipes)
+    l_s = fix_servings_sanity(recipes, catalog)
+    rep["d servings sanity (scaled or nulled)"] = len(l_s)
+    rep["d detail"] = "; ".join(l_s)
     return recipes, rep
 
 
@@ -579,4 +958,4 @@ FIX_KEYS = sorted({"caesar_dressing_vegetarian", "vegetarian_worcestershire", "s
                    "vegetarian_pesto", "vegetable_stock", "agar_powder", "vegan_marshmallows", "collagen_powder", "protein_powder_unflavored",
                    "tortilla_wrap", "instant_ramen", "rice_vinegar", "sesame_oil", "rice_noodles", "tamarind_paste", "paneer_low_fat", "olive_oil",
                    "salt", "black_pepper", "flour", "eggs", "cabbage", "pickles", "mix_in_choice", "tofu_super_firm", "veggie_sausage",
-                   "soy_chunks", "plant_based_mince", "veggie_bacon", "veggie_pepperoni"})
+                   "soy_chunks", "plant_based_mince", "veggie_bacon", "veggie_pepperoni", "agar_plus_sugar", "chicken_stock", "greek_yogurt_full", "greek_yogurt_2pct", "skyr_full"})

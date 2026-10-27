@@ -41,7 +41,9 @@ enum ProteinBoosts {
             let ing = Ing(text: "\(Int(scoop)) g \(name) per serving (boost)", key: powder?.ingredientKey ?? d.key, grams: scoop * s)
             return BoostLine(id: d.id, ing: ing, nutrition: powder.map { $0.perScoop * s })
         }
-        let ing = Ing(text: "\(Int(d.gramsPerServing)) g \(d.line) per serving (boost)", key: d.key, grams: d.gramsPerServing * s)
+        // the yogurt boosts are 0% Greek yogurt when the catalog has it
+        let key = (d.id == "greek_yogurt" && catalog.info("greek_yogurt_nonfat") != nil) ? "greek_yogurt_nonfat" : d.key
+        let ing = Ing(text: "\(Int(d.gramsPerServing)) g \(d.line) per serving (boost)", key: key, grams: d.gramsPerServing * s)
         return BoostLine(id: d.id, ing: ing, nutrition: nil)
     }
 
