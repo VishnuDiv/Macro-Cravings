@@ -55,7 +55,8 @@ struct RecipeDetailView: View {
                     if let ev = recipe.evidence { EvidenceCard(evidence: ev) }
                     controls(res)
                     ingredientSection("Base", lines: res.lines.filter { $0.isBase })
-                    if !recipe.mixIns.isEmpty || res.lines.contains(where: \.isExtra) { ingredientSection("Mix-ins", lines: res.lines.filter { !$0.isBase }) }
+                    if !recipe.mixIns.isEmpty || res.lines.contains(where: { $0.isExtra || $0.isBoost }) { ingredientSection("Mix-ins", lines: res.lines.filter { !$0.isBase }) }
+                    boostCard(res)
                     instructions
                     if let tip = recipe.proTip(vegMode: user.data.isVegetarian) { proTip(tip) }
                     links
@@ -171,6 +172,18 @@ struct RecipeDetailView: View {
                 if recipe.pintSize == "deluxe" { Label("Deluxe pint", systemImage: "cylinder") }
             }
             .font(.caption).foregroundStyle(.secondary)
+        }
+    }
+
+    /// "Add protein" for low-protein overnight oats (eligible = flagged by the build and under 20 g protein per serving as written).
+    @ViewBuilder private func boostCard(_ res: RecipeNutrition) -> some View {
+        let d = user.display(for: recipe, catalog: store.catalog)
+        if ProteinBoosts.isEligible(recipe, proteinPerServing: d.displayed.protein / recipe.perServingDivisor) {
+            ProteinBoostCard(recipe: recipe,
+                             options: ProteinBoosts.options(for: shown, catalog: store.catalog, powder: user.powder(for: recipe.id, catalog: store.catalog)),
+                             totalProteinPerServing: res.displayedFull.protein / recipe.perServingDivisor,
+                             isOn: { user.boostSelected(recipe.id, $0) },
+                             toggle: { user.setBoost(recipe.id, $0, $1) })
         }
     }
 

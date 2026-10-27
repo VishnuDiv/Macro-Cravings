@@ -275,6 +275,7 @@ def main():
     catalog_for_marks = load(os.path.join(DATA, "catalog", "ingredients.json"), {})
     valts = load(os.path.join(DATA, "catalog", "veg_alternatives.json"), {})
     upgraded = data_fixes.mark_protein_upgrades(out, catalog_for_marks, valts)
+    boostable = data_fixes.mark_protein_boost(out)
 
     # Photos: bundled Resources/Photos/<id>.jpg first (books), else a remote photoURL for web recipes (data/web_images.json).
     web_images = load(os.path.join(DATA, "web_images.json"), {})
@@ -318,6 +319,11 @@ def main():
     print("protein upgrade (wing_base): %d recipes" % len(upgraded))
     for r in upgraded[:15]:
         print("    - %s [%s, line %d: %s]" % (r["name"], r.get("course") or r.get("section"), r["proteinUpgrade"]["lineIndex"], r["base"][r["proteinUpgrade"]["lineIndex"]]["text"][:40]))
+    known_low = [r for r in boostable if r.get("macros")]
+    print("protein boost (overnight oats): %d recipes (%d with printed protein < 20 g, %d without printed macros: checked at runtime)" % (len(boostable), len(known_low), len(boostable) - len(known_low)))
+    for r in boostable[:10]:
+        m = r.get("macros")
+        print("    - %s [%s]" % (r["name"], ("%d g P/serving" % round(m["protein"] / max(1, r.get("servings") or 1))) if m else "no printed macros"))
     print("key aliases: %d loaded, %d ingredient keys rewritten" % (len(aliases), aliased))
     print("catalog files copied: %s" % (", ".join(copied) or "none"))
     cat = load(os.path.join(RES, "ingredients.json"))

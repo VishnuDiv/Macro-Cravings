@@ -28440,5 +28440,36 @@
   "pantryStaple": false,
   "allergens": [],
   "vegetarian": true
+ },
+ "skyr_plain": {
+  "name": "Skyr (plain, nonfat)",
+  "category": "dairy",
+  "per100g": {
+   "calories": 63,
+   "protein": 11,
+   "carbs": 4,
+   "fat": 0.2,
+   "sugar": 4,
+   "fiber": 0
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": null,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": "Icelandic Provisions, Siggi's or any plain nonfat skyr; nonfat Greek yogurt is close.",
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Nonfat Greek yogurt",
+    "key": "greek_yogurt",
+    "ratio": 1.0,
+    "note": "Slightly less protein"
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [
+   "dairy"
+  ],
+  "vegetarian": true
  }
 }

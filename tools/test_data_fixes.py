@@ -155,5 +155,23 @@ out, dropped = df.fix13_book_dupes([c1, b1, b2, b3])
 check(len(dropped) == 2 and c1["source"]["alsoIn"] == "The Ultimate Guide to Lean Bulking p.33" and [x["id"] for x in out] == ["chef-pizza-bagels", "bulk-different"],
       "fix 13: identical normalized names merge whatever the calories; a different name stays (%s)" % dropped)
 
+# overnight oats protein boost: only overnight oats that are not already protein recipes
+oat = lambda id, name, p, extra=None, **k: rec(id, name, servings=1, macros={"calories": 300, "protein": p, "carbs": 40, "fat": 6}, course="breakfast",
+                                              base=[ing("50 g rolled oats", "rolled_oats", 50), ing("150 ml milk", "whole_milk", 150), ing("10 g chia", "chia_seeds", 10)] + (extra or []), **k)
+o1 = oat("o1", "Overnight Oats with Chia", 12)                                              # milk + chia at 12 g: eligible
+o2 = oat("o2", "Protein Overnight Oats", 26)                                                # "protein" in the name: not
+o3 = oat("o3", "Protein Baked Oats", 9)                                                     # baked: not
+o4 = oat("o4", "Chocolate Chia Pudding", 5, tags=["overnight"])                             # breakfast + overnight tag + oats: eligible
+o5 = oat("o5", "Oats Upma", 10)                                                             # savory, no overnight: not
+o6 = rec("o6", "Banana Bread Overnight Oats", servings=2, macros=None, course="breakfast", base=[ing("80 g oats", "oats", 80)])   # no macros: runtime check
+o7 = rec("o7", "Overnight Chia Seed Pudding", course="breakfast", macros={"calories": 200, "protein": 5, "carbs": 20, "fat": 9}, base=[ing("30 g chia", "chia_seeds", 30)], tags=["overnight"])
+o8 = oat("o8", "Overnight Oats", 18, extra=[ing("150 g Greek yogurt", "greek_yogurt", 150)])  # already has a protein ingredient: not
+o9 = oat("o9", "Overnight Oats (Vanilla)", 11, extra=[ing("1 scoop whey", "protein_powder_vanilla", 30)])
+o10 = oat("o10", "High-Protein Overnight Oats", 12, tags=["high-protein"])
+o11 = oat("o11", "Overnight Oats", 12, tags=["high-protein"])                               # the tag alone does not exclude
+marked = df.mark_protein_boost([o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11])
+check([x["id"] for x in marked] == ["o1", "o4", "o6", "o11"] and not any("proteinBoost" in x for x in (o2, o3, o5, o7, o8, o9, o10)),
+      "protein boost: 12 g overnight oats with milk + chia eligible; 'Protein' in the name, Greek yogurt / whey lines, baked and savory oats are not (%s)" % [x["id"] for x in marked])
+
 print("data fixes: %d checks, %d failed" % (n, bad))
 sys.exit(1 if bad else 0)

@@ -19,6 +19,7 @@ struct RecipeConfig {
     var lineScale: [String: Double] = [:]    // lineKey -> grams multiplier (halved cooking fat)
     var extras: [Ing] = []                   // optional add-ons, whole-recipe amounts, not scaled by the portion
     var portion: Double = 1                  // "eat 0.8 serving" multiplier on the displayed macros
+    var boosts: [BoostLine] = []             // chosen "Add protein" boosts (before the goal changes)
     var useEstimates = true                  // guess amounts for lines that have none (Calculated numbers and goal deltas only)
     var userGrams: [String: Double] = [:]    // lineKey -> grams typed by the user for a line with no amount
 }
@@ -48,6 +49,7 @@ struct LineResult: Identifiable {
     var swapFromGoal = false           // the swap comes from the goal version, not the user
     var lineScale = 1.0                // goal version grams multiplier (1 = unchanged)
     var isExtra = false                // goal version add-on line
+    var isBoost = false                // "Add protein" boost line
     var amount: AmountKind = .known    // known amount, an estimate, or the user's own amount
     var estimateReason: String?        // why the estimate is what it is
 
@@ -184,6 +186,19 @@ struct NutritionCalculator {
                 overrideLabel: ing.key.flatMap { cfg.overrides[$0]?.sourceLabel }, isMilkLine: lk == liquidKey,
                 missing: ing.key.map { cfg.missing.contains($0) } ?? false, noData: g0 <= 0 || info == nil,
                 swapFromGoal: goalSwap && swapOpt != nil, lineScale: scale, amount: amountKind, estimateReason: estReason))
+        }
+
+        // "Add protein" boosts: real added lines, so they count in Book (source + boost) and Calculated, and scale with portion and pints
+        for (i, b) in cfg.boosts.enumerated() {
+            let info = catalog.info(b.ing.key)
+            let g = grams(b.ing, info)
+            let n = b.nutrition ?? per100(b.ing.key, info, cfg.overrides) * (g / 100)
+            calc += n
+            delta += n
+            lines.append(LineResult(
+                lineKey: "p\(i)", ing: b.ing, isBase: false, included: true, info: info, grams: g, scaledGrams: g * Double(pints),
+                nutrition: n, swapIndex: nil, swap: nil, swapNotRecalculated: false, milk: nil, powder: nil, isPowderLine: false,
+                overrideLabel: nil, isMilkLine: false, missing: false, noData: false, isBoost: true))
         }
 
         // Goal add-ons: whole-recipe amounts, shown as extra lines, never scaled by the portion

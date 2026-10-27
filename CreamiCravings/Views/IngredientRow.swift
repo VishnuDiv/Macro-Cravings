@@ -27,6 +27,10 @@ struct IngredientRow: View {
                         Label("Using \(m.name)", systemImage: "cup.and.saucer").font(.caption).foregroundStyle(Color.accentColor)
                     }
                     HStack(spacing: 6) {
+                        if line.isBoost {
+                            Text("+ boost").font(.caption2.weight(.bold)).padding(.horizontal, 6).padding(.vertical, 2)
+                                .background(Color.green.opacity(0.18), in: Capsule()).foregroundStyle(.green)
+                        }
                         if line.ing.optional {
                             Button {
                                 user.toggleOptional(recipe.id, line: line.lineKey)
@@ -71,7 +75,9 @@ struct IngredientRow: View {
                     }
                 }
                 Spacer(minLength: 4)
-                if line.isExtra {
+                if line.isBoost {
+                    Label("Boost", systemImage: "plus.circle.fill").labelStyle(.iconOnly).foregroundStyle(.green)
+                } else if line.isExtra {
                     Label("Add-on", systemImage: "plus.circle.fill").labelStyle(.iconOnly).foregroundStyle(.orange)
                 } else {
                 Button(action: onSwap) {

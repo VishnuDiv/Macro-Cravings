@@ -266,6 +266,63 @@ MainActor.assumeIsolated {
         check(back == many && back.activePills() == pills, "pill list round-trips with FilterState through JSON")
     } else { check(false, "FilterState encode/decode failed") }
 
+    // ---- "Add protein" boosts for low-protein overnight oats
+    print("(pb) add protein")
+    func pbi(_ n: String, _ c: String, _ k: Double, _ p: Double) -> IngredientInfo { IngredientInfo(name: n, category: c, per100g: Nutrition(calories: k, protein: p)) }
+    var bcat = Catalog()
+    bcat.ingredients = ["rolled_oats": pbi("Rolled oats", "other", 380, 13), "whole_milk": pbi("Whole milk", "milk", 61, 3.2),
+                        "protein_powder_vanilla": pbi("Vanilla whey protein powder", "protein_powder", 387, 77.4), "greek_yogurt": pbi("Nonfat Greek yogurt", "dairy", 59, 10.2),
+                        "skyr_plain": pbi("Skyr (plain, nonfat)", "dairy", 63, 11), "cottage_cheese": pbi("Cottage cheese", "dairy", 81, 10.5)]
+    func oatRecipe(_ id: String, name: String = "Overnight Oats", proteinWhole: Double, flag: Bool = true, extraLine: String = "") -> Recipe {
+        RecipeStore.decodeRecipes(Data(#"[{"id":"\#(id)","name":"\#(name)","section":"meal","course":"breakfast","servings":2,"proteinBoost":\#(flag),"macros":{"calories":700,"protein":\#(proteinWhole),"carbs":100,"fat":20},"base":[{"text":"100 g oats","key":"rolled_oats","grams":100},{"text":"300 g milk","key":"whole_milk","grams":300}\#(extraLine)],"instructions":["Mix everything in a jar.","Refrigerate overnight.","Eat cold."]}]"#.utf8))[0]
+    }
+    let boats = oatRecipe("oats12", proteinWhole: 24)                // 12 g per serving
+    check(ProteinBoosts.isEligible(boats, proteinPerServing: 12) && !ProteinBoosts.isEligible(oatRecipe("oats26", proteinWhole: 52), proteinPerServing: 26)
+          && !ProteinBoosts.isEligible(oatRecipe("baked", name: "Baked Oats", proteinWhole: 18, flag: false), proteinPerServing: 9), "eligible: 12 g overnight oats yes; 26 g no; an unflagged (baked) recipe no")
+    let bcalc = NutritionCalculator(catalog: bcat)
+    let pbu = UserStore(fileURL: nil)
+    let base0 = bcalc.compute(boats, pbu.config(for: boats, catalog: bcat))
+    check(base0.displayed.protein == 24 && base0.lines.allSatisfy { !$0.isBoost }, "nothing is added by default (boosts are OFF)")
+    pbu.setBoost("oats12", "powder", true)
+    let withVanilla = bcalc.compute(boats, pbu.config(for: boats, catalog: bcat))
+    check(near(withVanilla.displayed.protein - 24, 77.4 * 0.30 * 2, 0.01) && withVanilla.lines.contains { $0.isBoost && $0.ing.key == "protein_powder_vanilla" }, "scoop with no chosen powder uses protein_powder_vanilla (30 g x 2 servings: +\(String(format: "%.1f", withVanilla.displayed.protein - 24)) g)")
+    // the chosen powder from "My protein powder" is used
+    let chosen = try! JSONDecoder().decode(ProteinPowder.self, from: Data(#"{"id":"mine","name":"My casein","type":"casein","scoopGrams":30,"perScoop":{"calories":120,"protein":25}}"#.utf8))
+    pbu.data.customPowders = [chosen]; pbu.data.defaultPowderId = "mine"
+    let withChosen = bcalc.compute(boats, pbu.config(for: boats, catalog: bcat))
+    check(near(withChosen.displayed.protein - 24, 25 * 2, 0.01) && near(withChosen.displayed.calories - 700, 120 * 2, 0.01), "the scoop boost uses the chosen powder's nutrition (+25 g P, +120 kcal per serving)")
+    // combined boosts sum
+    pbu.setBoost("oats12", "greek_yogurt", true); pbu.setBoost("oats12", "skyr", true); pbu.setBoost("oats12", "cottage_cheese", true)
+    let combo = bcalc.compute(boats, pbu.config(for: boats, catalog: bcat))
+    let expectProtein = (25 + 10.2 * 1.5 + 11 * 1.5 + 10.5) * 2
+    check(near(combo.displayed.protein - 24, expectProtein, 0.01) && combo.lines.filter(\.isBoost).count == 4, "combined boosts sum: +\(String(format: "%.1f", combo.displayed.protein - 24)) g (expected \(String(format: "%.1f", expectProtein)))")
+    let calcSrc = bcalc.compute(boats, { var c = pbu.config(for: boats, catalog: bcat); c.source = .calculated; return c }())
+    let calcBase = bcalc.compute(boats, { var c = RecipeConfig(source: .calculated); c.milk = nil; return c }())
+    check(near(calcSrc.displayed.protein - calcBase.displayed.protein, expectProtein, 0.01), "Calculated macros include the boosts as well")
+    // options text and labels
+    let opts = ProteinBoosts.options(for: boats, catalog: bcat, powder: chosen)
+    check(opts.map(\.id) == ["powder", "greek_yogurt", "skyr", "cottage_cheese"] && opts[0].title == "+1 scoop protein powder (30 g)" && near(opts[0].deltaPerServing.protein, 25, 0.01) && near(opts[1].deltaPerServing.protein, 15.3, 0.01), "options: scoop / Greek yogurt / skyr / cottage cheese with per-serving gains")
+    let hasPowder = oatRecipe("oatsp", proteinWhole: 24, extraLine: #",{"text":"30 g whey","key":"protein_powder_vanilla","grams":30}"#)
+    check(ProteinBoosts.options(for: hasPowder, catalog: bcat, powder: nil)[0].title == "+1 more scoop (30 g)", "'+1 more scoop' when the recipe already has a powder line")
+    // cook mode step, shopping, persistence, Cut composition
+    let eff = pbu.effectiveRecipe(boats, catalog: bcat)
+    check(eff.instructions[1].hasPrefix("Stir in the boosts before refrigerating") && eff.instructions[2] == "Refrigerate overnight.", "cook mode: 'Stir in the boosts before refrigerating' comes before the fridge step")
+    check(ShoppingList.items(for: boats, cfg: pbu.config(for: boats, catalog: bcat), catalog: bcat).contains { $0.key == "greek_yogurt" && ($0.grams ?? 0) == 300 }, "shopping list includes the boosts (150 g x 2 servings of yogurt)")
+    if let back = UserStore.encode(pbu.data).flatMap({ UserStore.decode($0) }) { check(back.proteinBoosts["oats12"] == ["powder", "greek_yogurt", "skyr", "cottage_cheese"], "boost choices persist per recipe") }
+    pbu.data.goal = .cut
+    let cutBoost = bcalc.compute(boats, pbu.config(for: boats, catalog: bcat))
+    check(cutBoost.lines.filter(\.isBoost).count == 4 && cutBoost.displayedFull.protein >= combo.displayedFull.protein - 0.01, "Cut version composes: boosts apply first, then the goal changes")
+    pbu.setBoost("oats12", "powder", false)
+    check(pbu.data.proteinBoosts["oats12"]?.contains("powder") == false, "a boost can be switched off again")
+
+    do {
+        let ru = UserStore(fileURL: nil)
+        let elig = store.recipes.filter { r in
+            r.proteinBoost == true && ProteinBoosts.isEligible(r, proteinPerServing: ru.display(for: r, catalog: store.catalog).displayed.protein / r.perServingDivisor)
+        }
+        print("  real data: \(store.recipes.filter { $0.proteinBoost == true }.count) flagged, \(elig.count) eligible at runtime: \(elig.map(\.name))")
+    }
+
     // ---- vegan
     print("(vegan) vegan badge and filter")
     func vi(_ name: String, _ cat: String = "other", veg: String = "true", allergens: [String] = []) -> IngredientInfo {

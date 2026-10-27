@@ -286,6 +286,7 @@ struct UserData: Codable, Equatable {
     var recipeGoal: [String: Goal] = [:]            // per-recipe version (Cut / Maintain / Bulk); default = the global goal
     var useEstimates = true                         // guess amounts for lines that have none
     var lineGrams: [String: [String: Double]] = [:] // recipeId -> lineKey -> grams typed by the user
+    var proteinBoosts: [String: Set<String>] = [:]  // recipeId -> chosen "Add protein" boost ids
     var upgradeChoice: [String: String] = [:]       // recipeId -> protein upgrade alternative key (absent = original)
     var goalToggles: [String: [String: Bool]] = [:] // recipeId -> change id -> on/off (overrides the default)
     var isVegetarian = true
@@ -327,6 +328,7 @@ struct UserData: Codable, Equatable {
         recipeGoal = (try? c.decode([String: Goal].self, forKey: .recipeGoal)) ?? [:]
         useEstimates = (try? c.decode(Bool.self, forKey: .useEstimates)) ?? true
         lineGrams = (try? c.decode([String: [String: Double]].self, forKey: .lineGrams)) ?? [:]
+        proteinBoosts = (try? c.decode([String: Set<String>].self, forKey: .proteinBoosts)) ?? [:]
         upgradeChoice = (try? c.decode([String: String].self, forKey: .upgradeChoice)) ?? [:]
         goalToggles = (try? c.decode([String: [String: Bool]].self, forKey: .goalToggles)) ?? [:]
         // One-time migration: old stars become "Saved for Maintain", and are kept.

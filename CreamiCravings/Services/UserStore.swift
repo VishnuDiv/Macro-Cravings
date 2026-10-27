@@ -161,8 +161,20 @@ final class UserStore {
 
     /// The recipe as shown: vegetarian version first, then the protein upgrade (title, lines, steps, macros).
     func effectiveRecipe(_ r: Recipe, catalog: Catalog) -> Recipe {
-        ProteinUpgrades.effective(r, catalog: catalog, vegActive: vegActive(r), vegChoices: data.vegChoice[r.id] ?? [:],
+        var out = ProteinUpgrades.effective(r, catalog: catalog, vegActive: vegActive(r), vegChoices: data.vegChoice[r.id] ?? [:],
                                   preferEasy: data.preferEasyAlternatives, upgradeKey: data.upgradeChoice[r.id])
+        let picked = ProteinBoosts.lines(for: r, selected: data.proteinBoosts[r.id] ?? [], catalog: catalog, powder: powder(for: r.id, catalog: catalog))
+        if !picked.isEmpty {
+            out.instructions = ProteinBoosts.addStep(to: out.instructions, names: picked.map { b in ProteinBoosts.defs.first { $0.id == b.id }?.line ?? "protein" })
+        }
+        return out
+    }
+
+    func boostSelected(_ recipeId: String, _ boostId: String) -> Bool { data.proteinBoosts[recipeId]?.contains(boostId) ?? false }
+    func setBoost(_ recipeId: String, _ boostId: String, _ on: Bool) {
+        var s = data.proteinBoosts[recipeId] ?? []
+        if on { s.insert(boostId) } else { s.remove(boostId) }
+        data.proteinBoosts[recipeId] = s.isEmpty ? nil : s
     }
 
     /// The "Protein upgrade" card data (wings / crispy bites), built on the vegetarian version of the recipe.
@@ -190,6 +202,7 @@ final class UserStore {
                      overrides: data.nutritionOverrides, optionalOn: data.optionalOn[r.id] ?? [],
                      missing: data.pantryMissing)
         base.useEstimates = data.useEstimates
+        if applyGoal { base.boosts = ProteinBoosts.lines(for: r, selected: data.proteinBoosts[r.id] ?? [], catalog: catalog, powder: powder(for: r.id, catalog: catalog)) }
         base.userGrams = data.lineGrams[r.id] ?? [:]
         guard applyGoal, versionGoal(r.id) != .maintain else { return base }
         return GoalVersion.resolve(r, catalog: catalog, base: base, goal: versionGoal(r.id),

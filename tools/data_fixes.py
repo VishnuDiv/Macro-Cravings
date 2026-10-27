@@ -508,6 +508,43 @@ def mark_protein_upgrades(recipes, catalog, valts):
     return marked
 
 
+# ---------------------------------------------------------------- "Add protein" boost (low-protein overnight oats only)
+
+OVERNIGHT_NAME = re.compile(r"overnight oat|overnight oats|overnight protein oats", re.I)
+OAT_KEYS = ("rolled_oats", "oats", "steel_cut_oats")
+# ingredients that already make an oats recipe a protein recipe (no boost offered)
+PROTEIN_KEY_RE = re.compile(r"protein_powder|casein|whey|pea_protein|greek_yogurt|skyr|quark|cottage_cheese|egg_white|tofu|peanut_butter_powder|pb2|collagen")
+
+
+def mark_protein_boost(recipes):
+    """Marks overnight oats that are NOT already protein recipes with proteinBoost = True: no "protein" in the name, no protein-boosting
+    ingredient (powder, Greek yogurt, skyr, quark, cottage cheese, egg whites, tofu, PB2, collagen), printed protein under 20 g per
+    serving. Never baked or savory oats.
+
+    A recipe with no printed macros is marked too; the app checks the displayed (calculated) protein at runtime."""
+    marked = []
+    for r in recipes:
+        r.pop("proteinBoost", None)
+        if (r.get("section") or "creami") != "meal":
+            continue
+        name = r.get("name") or ""
+        if re.search(r"baked", name, re.I) or re.search(r"protein", name, re.I):       # already a protein recipe by name
+            continue
+        if any(PROTEIN_KEY_RE.search(i.get("key") or "") for i in (r.get("base") or []) + (r.get("mixIns") or [])):
+            continue
+        by_name = bool(OVERNIGHT_NAME.search(name))
+        has_oats = any((i.get("key") or "") in OAT_KEYS for i in r.get("base") or [])
+        overnight_tag = "overnight" in (name + " " + " ".join(r.get("tags") or [])).lower()
+        if not (by_name or (r.get("course") == "breakfast" and overnight_tag and has_oats)):
+            continue
+        m = r.get("macros")
+        if m and isinstance(m.get("protein"), (int, float)) and m["protein"] / max(1, r.get("servings") or 1) >= 20:
+            continue
+        r["proteinBoost"] = True
+        marked.append(r)
+    return marked
+
+
 # ---------------------------------------------------------------- entry point
 
 def apply(recipes):
