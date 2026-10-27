@@ -1,0 +1,2 @@
+[{"id": "paneer-guide", "title": "Paneer at home", "subtitle": "High-protein cheese", "icon": "drop.fill",
+  "sections": [{"heading": "Why", "body": "Line one\nLine two", "bullets": ["a", "b"], "table": {"columns": ["Milk", "Yield"], "rows": [["Whole", "180 g"]]}}]}]

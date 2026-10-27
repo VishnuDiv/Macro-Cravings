@@ -1,0 +1,2077 @@
+{
+ "version": 1,
+ "updated": "2026-10-27",
+ "notes": "Ranked vegetarian (egg and dairy OK) alternatives for every meat/fish role in the book and web recipes. meatPer100g is RAW weight (book amounts are raw) except chicken_cooked and deli_chicken. Alternative per100g is as sold (dry weight for TVP and soy chunks). availability is for typical US supermarkets in 2026: everywhere = Walmart/Target/Kroger-level ubiquity, most_stores = most large chains, specialty = Indian/Asian groceries, online or homemade. aliasKeys list the keys existing vegAdaptation swaps use for the same product. Stocks, oyster/fish sauce, Worcestershire, gelatin and Parmesan are handled by vegAdaptation swaps, not here.",
+ "roles": {
+  "chicken_strips": {
+   "label": "Chicken (strips / crispy / shredded / tenders / wings)",
+   "meatPer100g": {
+    "calories": 120,
+    "protein": 23,
+    "carbs": 0,
+    "fat": 3,
+    "sugar": 0,
+    "fiber": 0,
+    "source": "Raw chicken breast, USDA"
+   },
+   "keywords": [
+    "chicken tender",
+    "crispy chicken",
+    "popcorn chicken",
+    "nugget",
+    "shredded chicken",
+    "pulled chicken",
+    "chicken strip",
+    "wings",
+    "drumstick",
+    "chicken breast"
+   ],
+   "matchKeys": [
+    "chicken_breast",
+    "chicken_tenders",
+    "chicken_wings",
+    "chicken_drumsticks",
+    "popcorn_chicken",
+    "chicken_nuggets",
+    "crispy_chicken_portion"
+   ],
+   "alternatives": [
+    {
+     "key": "seitan",
+     "name": "Seitan (wheat gluten)",
+     "availability": "most_stores",
+     "whereToBuy": "Whole Foods, Sprouts, Kroger family, Safeway/Albertsons, H-E-B (refrigerated tofu case); or make it from Bob's Red Mill vital wheat gluten (Walmart, Target, Kroger)",
+     "brands": "Upton's Naturals Traditional Seitan, Sweet Earth Traditional Seitan; homemade from vital wheat gluten",
+     "per100g": {
+      "calories": 158,
+      "protein": 31.6,
+      "carbs": 8.8,
+      "fat": 0.9,
+      "sugar": 0,
+      "fiber": 0.5
+     },
+     "prep": "Tear or slice into strips, simmer 5 min in seasoned stock, pat dry, then use the recipe's coating and air-fry 200 °C / 400 °F for 8-10 min",
+     "textureMatch": 5,
+     "why": "Closest chew and the most protein per calorie; crisps and shreds like chicken breast",
+     "nutritionSource": "Upton's Naturals Traditional Seitan label: 57 g = 90 kcal, 18 g P, 5 g C, 0.5 g F"
+    },
+    {
+     "key": "tofu_extra_firm",
+     "name": "Extra-firm tofu",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Costco, Aldi, Trader Joe's, Safeway (produce or refrigerated case)",
+     "brands": "Nasoya, House Foods, Trader Joe's Organic, Aldi Simply Nature, Great Value",
+     "per100g": {
+      "calories": 145,
+      "protein": 16,
+      "carbs": 3,
+      "fat": 8,
+      "sugar": 1,
+      "fiber": 2
+     },
+     "prep": "Press 15-20 min (or freeze, thaw and squeeze for a chewier, shreddable texture), cut into strips, toss in cornstarch, air-fry 200 °C / 400 °F for 12-15 min",
+     "textureMatch": 3,
+     "why": "Cheap and in every store; crisps well, but softer and less protein than chicken",
+     "nutritionSource": "Typical US extra-firm tofu label / USDA firm tofu"
+    },
+    {
+     "key": "vegan_chicken_pieces",
+     "name": "Plant-based chicken pieces",
+     "availability": "most_stores",
+     "whereToBuy": "Kroger, Safeway/Albertsons, Stop & Shop, Giant, Food Lion, H-E-B, Whole Foods, Target",
+     "brands": "Daring Original Plant Chicken Pieces, Tofurky Plant-Based Chick'n, Gardein Chick'n Strips",
+     "per100g": {
+      "calories": 129,
+      "protein": 20,
+      "carbs": 7.1,
+      "fat": 2.9,
+      "sugar": 0,
+      "fiber": 7.1
+     },
+     "prep": "Pan-fry from chilled 5-6 min, or coat and air-fry 8 min; shreds easily for tacos and wraps",
+     "textureMatch": 4,
+     "why": "Fibrous, chicken-like pieces ready to cook; lean and protein-dense",
+     "nutritionSource": "Daring Original label: 70 g = 90 kcal, 14 g P, 5 g C, 2 g F"
+    },
+    {
+     "key": "vegan_crispy_tenders",
+     "name": "Breaded plant-based tenders",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Safeway, Stop & Shop (freezer)",
+     "brands": "Gardein Seven Grain Crispy Tenders, MorningStar Farms Chik'n Strips/Nuggets, Simulate Nuggs",
+     "per100g": {
+      "calories": 205,
+      "protein": 13.7,
+      "carbs": 15,
+      "fat": 9.6,
+      "sugar": 1,
+      "fiber": 2
+     },
+     "prep": "Air-fry from frozen 200 °C / 400 °F for 10-12 min, then toss in the recipe's sauce (skip the recipe's breading)",
+     "textureMatch": 4,
+     "why": "Ready-breaded crispy tenders for sandwiches, wraps and hot-honey or buffalo tenders; less protein and more carbs",
+     "nutritionSource": "Gardein Seven Grain Crispy Tenders label: ~73 g (3 pieces) = 150 kcal, 10 g P, 11 g C, 7 g F"
+    },
+    {
+     "key": "soy_chunks",
+     "name": "Soy chunks (dry)",
+     "availability": "specialty",
+     "whereToBuy": "Indian groceries (Patel Brothers), Amazon, some Walmart Marketplace listings",
+     "brands": "Nutrela, Fortune",
+     "per100g": {
+      "calories": 345,
+      "protein": 52,
+      "carbs": 33,
+      "fat": 0.5,
+      "sugar": 0,
+      "fiber": 13
+     },
+     "prep": "Boil 5 min in salted stock, squeeze very dry, marinate, then coat and air-fry; weigh dry (rehydrates about 3x)",
+     "textureMatch": 3,
+     "why": "Highest protein for the money and very chewy; best in sauced or popcorn-style dishes",
+     "aliasKeys": [
+      "soy_chunks_dry"
+     ],
+     "nutritionSource": "Nutrela soya chunks label (dry)"
+    }
+   ]
+  },
+  "chicken_curry": {
+   "label": "Chicken chunks in curry / tikka / tandoori / kebabs",
+   "meatPer100g": {
+    "calories": 120,
+    "protein": 23,
+    "carbs": 0,
+    "fat": 3,
+    "sugar": 0,
+    "fiber": 0,
+    "source": "Raw chicken breast, USDA"
+   },
+   "keywords": [
+    "tikka",
+    "tandoori",
+    "butter chicken",
+    "curry",
+    "masala",
+    "korma",
+    "kebab",
+    "skewer",
+    "shawarma"
+   ],
+   "matchKeys": [
+    "chicken_tikka",
+    "chicken_curry_pieces"
+   ],
+   "alternatives": [
+    {
+     "key": "paneer",
+     "name": "Paneer",
+     "availability": "most_stores",
+     "whereToBuy": "Trader Joe's, Costco, Whole Foods, many Kroger/H-E-B stores, every Indian grocery (Patel Brothers, Apna Bazar)",
+     "brands": "Trader Joe's Paneer, Nanak, Gopi, Amul",
+     "per100g": {
+      "calories": 300,
+      "protein": 20,
+      "carbs": 3,
+      "fat": 23,
+      "sugar": 2,
+      "fiber": 0
+     },
+     "prep": "Cube, marinate in the recipe's yogurt-spice marinade 20 min, sear or air-fry 200 °C / 400 °F for 8 min, add to the sauce in the last 3-5 min",
+     "textureMatch": 4,
+     "why": "The classic Indian swap: holds its shape on skewers and in sauce; richer than chicken",
+     "nutritionSource": "Nanak paneer label: 30 g = 90 kcal, 6 g P, 7 g F"
+    },
+    {
+     "key": "tofu_super_firm",
+     "name": "Super-firm high-protein tofu",
+     "availability": "most_stores",
+     "whereToBuy": "Trader Joe's, Walmart, Kroger, Whole Foods, Sprouts",
+     "brands": "Trader Joe's High Protein Organic Super Firm, Nasoya Super Firm, Wildwood/Pulmuone High Protein",
+     "per100g": {
+      "calories": 155,
+      "protein": 16.7,
+      "carbs": 2.4,
+      "fat": 8.3,
+      "sugar": 0,
+      "fiber": 1
+     },
+     "prep": "No pressing needed; cube, marinate, air-fry or grill 10-12 min, then add to the sauce",
+     "textureMatch": 4,
+     "why": "Dense and meaty, takes marinade well, fewer calories than paneer",
+     "aliasKeys": [
+      "supertofu",
+      "tofu_high_protein"
+     ],
+     "nutritionSource": "Trader Joe's Super Firm label: 84 g = 130 kcal, 14 g P, 7 g F"
+    },
+    {
+     "key": "tofu_extra_firm",
+     "name": "Extra-firm tofu",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Costco, Aldi, Trader Joe's, Safeway (produce or refrigerated case)",
+     "brands": "Nasoya, House Foods, Trader Joe's Organic, Aldi Simply Nature, Great Value",
+     "per100g": {
+      "calories": 145,
+      "protein": 16,
+      "carbs": 3,
+      "fat": 8,
+      "sugar": 1,
+      "fiber": 2
+     },
+     "prep": "Press 20 min, cube, marinate in the yogurt-spice mix, air-fry 200 °C / 400 °F for 12-15 min before adding to the sauce",
+     "textureMatch": 3,
+     "why": "Available everywhere and lighter than paneer; a bit softer",
+     "nutritionSource": "Typical US extra-firm tofu label / USDA firm tofu"
+    },
+    {
+     "key": "paneer_low_fat",
+     "name": "Low-fat paneer",
+     "availability": "specialty",
+     "whereToBuy": "Indian groceries (Patel Brothers), Amazon; or make it from skim or Fairlife milk (see the paneer guide)",
+     "brands": "Homemade from skim/ultra-filtered milk; some Indian-grocery 'lite' paneer",
+     "per100g": {
+      "calories": 200,
+      "protein": 24,
+      "carbs": 5,
+      "fat": 9.5,
+      "sugar": 3,
+      "fiber": 0
+     },
+     "prep": "Same as paneer; cook gently, as low-fat paneer firms up faster",
+     "textureMatch": 4,
+     "why": "Paneer texture with about a third fewer calories and more protein",
+     "nutritionSource": "Low-fat (skim-milk) paneer, typical values"
+    },
+    {
+     "key": "soy_chunks",
+     "name": "Soy chunks (dry)",
+     "availability": "specialty",
+     "whereToBuy": "Indian groceries (Patel Brothers), Amazon, some Walmart Marketplace listings",
+     "brands": "Nutrela, Fortune",
+     "per100g": {
+      "calories": 345,
+      "protein": 52,
+      "carbs": 33,
+      "fat": 0.5,
+      "sugar": 0,
+      "fiber": 13
+     },
+     "prep": "Boil 5 min, squeeze dry, marinate overnight if possible, then simmer in the curry 10 min; weigh dry",
+     "textureMatch": 4,
+     "why": "Soya-chunk curry is a staple; spongy pieces soak up sauce, very high protein",
+     "aliasKeys": [
+      "soy_chunks_dry"
+     ],
+     "nutritionSource": "Nutrela soya chunks label (dry)"
+    }
+   ]
+  },
+  "chicken_thighs": {
+   "label": "Chicken thighs (BBQ, Korean, Nando's, shawarma)",
+   "meatPer100g": {
+    "calories": 145,
+    "protein": 19,
+    "carbs": 0,
+    "fat": 7.7,
+    "sugar": 0,
+    "fiber": 0,
+    "source": "Raw boneless skinless chicken thigh, USDA"
+   },
+   "keywords": [
+    "chicken thigh",
+    "thighs"
+   ],
+   "matchKeys": [
+    "chicken_thigh",
+    "chicken_thighs"
+   ],
+   "alternatives": [
+    {
+     "key": "seitan",
+     "name": "Seitan (wheat gluten)",
+     "availability": "most_stores",
+     "whereToBuy": "Whole Foods, Sprouts, Kroger family, Safeway/Albertsons, H-E-B (refrigerated tofu case); or make it from Bob's Red Mill vital wheat gluten (Walmart, Target, Kroger)",
+     "brands": "Upton's Naturals Traditional Seitan, Sweet Earth Traditional Seitan; homemade from vital wheat gluten",
+     "per100g": {
+      "calories": 158,
+      "protein": 31.6,
+      "carbs": 8.8,
+      "fat": 0.9,
+      "sugar": 0,
+      "fiber": 0.5
+     },
+     "prep": "Slice into thick pieces, brown in a little oil, then glaze or marinate as in the recipe; add 1 tsp oil per 100 g for juiciness",
+     "textureMatch": 4,
+     "why": "Chewy, meaty and takes glazes well; leaner than thigh, so add a little oil",
+     "nutritionSource": "Upton's Naturals Traditional Seitan label: 57 g = 90 kcal, 18 g P, 5 g C, 0.5 g F"
+    },
+    {
+     "key": "tofu_extra_firm",
+     "name": "Extra-firm tofu",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Costco, Aldi, Trader Joe's, Safeway (produce or refrigerated case)",
+     "brands": "Nasoya, House Foods, Trader Joe's Organic, Aldi Simply Nature, Great Value",
+     "per100g": {
+      "calories": 145,
+      "protein": 16,
+      "carbs": 3,
+      "fat": 8,
+      "sugar": 1,
+      "fiber": 2
+     },
+     "prep": "Freeze, thaw and squeeze for a spongy, thigh-like chew; tear into pieces, marinate, air-fry 12-15 min",
+     "textureMatch": 3,
+     "why": "Everywhere and absorbs sticky sauces; softer bite",
+     "nutritionSource": "Typical US extra-firm tofu label / USDA firm tofu"
+    },
+    {
+     "key": "vegan_chicken_pieces",
+     "name": "Plant-based chicken pieces",
+     "availability": "most_stores",
+     "whereToBuy": "Kroger, Safeway/Albertsons, Stop & Shop, Giant, Food Lion, H-E-B, Whole Foods, Target",
+     "brands": "Daring Original Plant Chicken Pieces, Tofurky Plant-Based Chick'n, Gardein Chick'n Strips",
+     "per100g": {
+      "calories": 129,
+      "protein": 20,
+      "carbs": 7.1,
+      "fat": 2.9,
+      "sugar": 0,
+      "fiber": 7.1
+     },
+     "prep": "Marinate 15 min, pan-fry or air-fry 6-8 min, then glaze",
+     "textureMatch": 4,
+     "why": "Fibrous, juicy pieces that pull apart like thigh meat",
+     "nutritionSource": "Daring Original label: 70 g = 90 kcal, 14 g P, 5 g C, 2 g F"
+    },
+    {
+     "key": "paneer",
+     "name": "Paneer",
+     "availability": "most_stores",
+     "whereToBuy": "Trader Joe's, Costco, Whole Foods, many Kroger/H-E-B stores, every Indian grocery (Patel Brothers, Apna Bazar)",
+     "brands": "Trader Joe's Paneer, Nanak, Gopi, Amul",
+     "per100g": {
+      "calories": 300,
+      "protein": 20,
+      "carbs": 3,
+      "fat": 23,
+      "sugar": 2,
+      "fiber": 0
+     },
+     "prep": "Cube or slab, marinate, grill or air-fry 8 min (best for tandoori/shawarma-style thighs)",
+     "textureMatch": 4,
+     "why": "Rich and juicy like thigh meat; higher in calories",
+     "nutritionSource": "Nanak paneer label: 30 g = 90 kcal, 6 g P, 7 g F"
+    }
+   ]
+  },
+  "ground_poultry": {
+   "label": "Ground chicken / turkey",
+   "meatPer100g": {
+    "calories": 150,
+    "protein": 18,
+    "carbs": 0,
+    "fat": 8.7,
+    "sugar": 0,
+    "fiber": 0,
+    "source": "Raw ground chicken or turkey (~93% lean), USDA"
+   },
+   "keywords": [
+    "ground chicken",
+    "ground turkey",
+    "chicken mince",
+    "turkey mince"
+   ],
+   "matchKeys": [
+    "ground_chicken",
+    "chicken_mince",
+    "chicken_breast_ground",
+    "ground_turkey",
+    "turkey_mince"
+   ],
+   "alternatives": [
+    {
+     "key": "plant_based_mince",
+     "name": "Impossible / Beyond mince",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Costco, Safeway, Whole Foods (meat case or freezer)",
+     "brands": "Impossible Beef, Beyond Beef, Trader Joe's Beef-less Ground Beef",
+     "per100g": {
+      "calories": 212,
+      "protein": 16.8,
+      "carbs": 8,
+      "fat": 12.4,
+      "sugar": 0.9,
+      "fiber": 2.7
+     },
+     "prep": "Use like raw mince: brown it, or mix with seasoning and form patties/meatballs (it binds without egg)",
+     "textureMatch": 4,
+     "why": "Binds into patties and arayes like ground poultry; richer, beefier flavor",
+     "aliasKeys": [
+      "plant_mince",
+      "beyond_mince",
+      "impossible_mince"
+     ],
+     "nutritionSource": "Impossible Beef label: 113 g = 240 kcal, 19 g P, 9 g C, 14 g F"
+    },
+    {
+     "key": "tofu_extra_firm",
+     "name": "Extra-firm tofu",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Costco, Aldi, Trader Joe's, Safeway (produce or refrigerated case)",
+     "brands": "Nasoya, House Foods, Trader Joe's Organic, Aldi Simply Nature, Great Value",
+     "per100g": {
+      "calories": 145,
+      "protein": 16,
+      "carbs": 3,
+      "fat": 8,
+      "sugar": 1,
+      "fiber": 2
+     },
+     "prep": "Press, crumble by hand, brown in a dry non-stick pan 8-10 min with the recipe's seasoning; for patties add 1 egg + 30 g breadcrumbs per 400 g",
+     "textureMatch": 3,
+     "why": "Everywhere and neutral like ground chicken; needs a binder for patties",
+     "nutritionSource": "Typical US extra-firm tofu label / USDA firm tofu"
+    },
+    {
+     "key": "tvp",
+     "name": "TVP / soy mince (dry)",
+     "availability": "most_stores",
+     "whereToBuy": "Kroger, Whole Foods, Sprouts, Walmart.com, Amazon (baking or bulk aisle); Nutrela granules at Indian groceries",
+     "brands": "Bob's Red Mill TVP, Anthony's, Nutrela Soya Granules",
+     "per100g": {
+      "calories": 333,
+      "protein": 50,
+      "carbs": 29,
+      "fat": 1,
+      "sugar": 7,
+      "fiber": 17
+     },
+     "prep": "Rehydrate 1:1 by weight in hot stock 10 min, squeeze, then brown; weigh dry",
+     "textureMatch": 4,
+     "why": "Lean, very high protein and cheap; perfect crumble texture",
+     "aliasKeys": [
+      "soy_mince_dry",
+      "tvp_dry",
+      "soy_mince"
+     ],
+     "nutritionSource": "Bob's Red Mill TVP label: 24 g = 80 kcal, 12 g P, 7 g C, 0 g F"
+    },
+    {
+     "key": "veggie_crumbles",
+     "name": "Frozen veggie crumbles",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Safeway (freezer)",
+     "brands": "MorningStar Farms Grillers Crumbles, Great Value Meatless Crumbles, Boca Ground Crumbles",
+     "per100g": {
+      "calories": 145,
+      "protein": 20,
+      "carbs": 7,
+      "fat": 4.5,
+      "sugar": 1,
+      "fiber": 5
+     },
+     "prep": "Add frozen crumbles straight to the pan and heat 5-6 min with the sauce",
+     "textureMatch": 4,
+     "why": "Pre-cooked crumbles for tacos and fillings; can't be shaped into patties",
+     "nutritionSource": "MorningStar Grillers Crumbles label: 55 g = 80 kcal, 10-13 g P (approx.)"
+    },
+    {
+     "key": "soy_chunks",
+     "name": "Soy chunks (dry)",
+     "availability": "specialty",
+     "whereToBuy": "Indian groceries (Patel Brothers), Amazon, some Walmart Marketplace listings",
+     "brands": "Nutrela, Fortune",
+     "per100g": {
+      "calories": 345,
+      "protein": 52,
+      "carbs": 33,
+      "fat": 0.5,
+      "sugar": 0,
+      "fiber": 13
+     },
+     "prep": "Rehydrate, squeeze dry, pulse in a food processor to mince, then brown; weigh dry",
+     "textureMatch": 3,
+     "why": "Highest protein; good mince texture after pulsing",
+     "aliasKeys": [
+      "soy_chunks_dry"
+     ],
+     "nutritionSource": "Nutrela soya chunks label (dry)"
+    }
+   ]
+  },
+  "beef_mince": {
+   "label": "Beef mince (tacos, bolognese, burritos, fillings)",
+   "meatPer100g": {
+    "calories": 137,
+    "protein": 21,
+    "carbs": 0,
+    "fat": 5.9,
+    "sugar": 0,
+    "fiber": 0,
+    "source": "Raw 95% lean ground beef, USDA"
+   },
+   "keywords": [
+    "ground beef",
+    "beef mince",
+    "ground steak",
+    "minced beef",
+    "meat filling",
+    "beef mix",
+    "kebab mix"
+   ],
+   "matchKeys": [
+    "beef_mince",
+    "beef_mince_5pct",
+    "beef_mince_10pct",
+    "beef_mince_15pct",
+    "beef_filling_portion",
+    "beef_mix_portion",
+    "beef_tortilla_portion",
+    "kebab_mix_portion"
+   ],
+   "alternatives": [
+    {
+     "key": "plant_based_mince",
+     "name": "Impossible / Beyond mince",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Costco, Safeway, Whole Foods (meat case or freezer)",
+     "brands": "Impossible Beef, Beyond Beef, Trader Joe's Beef-less Ground Beef",
+     "per100g": {
+      "calories": 212,
+      "protein": 16.8,
+      "carbs": 8,
+      "fat": 12.4,
+      "sugar": 0.9,
+      "fiber": 2.7
+     },
+     "prep": "Cook exactly like beef mince: brown 5-7 min, breaking it up, then add the seasoning and sauce",
+     "textureMatch": 5,
+     "why": "Looks, browns and tastes most like beef; higher fat than 5% beef",
+     "aliasKeys": [
+      "plant_mince",
+      "beyond_mince",
+      "impossible_mince"
+     ],
+     "nutritionSource": "Impossible Beef label: 113 g = 240 kcal, 19 g P, 9 g C, 14 g F"
+    },
+    {
+     "key": "veggie_crumbles",
+     "name": "Frozen veggie crumbles",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Safeway (freezer)",
+     "brands": "MorningStar Farms Grillers Crumbles, Great Value Meatless Crumbles, Boca Ground Crumbles",
+     "per100g": {
+      "calories": 145,
+      "protein": 20,
+      "carbs": 7,
+      "fat": 4.5,
+      "sugar": 1,
+      "fiber": 5
+     },
+     "prep": "Add frozen to the pan with the onions and seasoning, heat 5-6 min",
+     "textureMatch": 4,
+     "why": "Lean, cheap and in every freezer aisle; ideal for tacos and sauces",
+     "nutritionSource": "MorningStar Grillers Crumbles label: 55 g = 80 kcal, 10-13 g P (approx.)"
+    },
+    {
+     "key": "tvp",
+     "name": "TVP / soy mince (dry)",
+     "availability": "most_stores",
+     "whereToBuy": "Kroger, Whole Foods, Sprouts, Walmart.com, Amazon (baking or bulk aisle); Nutrela granules at Indian groceries",
+     "brands": "Bob's Red Mill TVP, Anthony's, Nutrela Soya Granules",
+     "per100g": {
+      "calories": 333,
+      "protein": 50,
+      "carbs": 29,
+      "fat": 1,
+      "sugar": 7,
+      "fiber": 17
+     },
+     "prep": "Rehydrate 1:1 by weight in hot stock (add 1 tsp soy sauce) 10 min, squeeze, brown 3-4 min; weigh dry",
+     "textureMatch": 4,
+     "why": "Lean, very high protein, shelf-stable; the existing book swaps use this",
+     "aliasKeys": [
+      "soy_mince_dry",
+      "tvp_dry",
+      "soy_mince"
+     ],
+     "nutritionSource": "Bob's Red Mill TVP label: 24 g = 80 kcal, 12 g P, 7 g C, 0 g F"
+    },
+    {
+     "key": "soy_chunks",
+     "name": "Soy chunks (dry)",
+     "availability": "specialty",
+     "whereToBuy": "Indian groceries (Patel Brothers), Amazon, some Walmart Marketplace listings",
+     "brands": "Nutrela, Fortune",
+     "per100g": {
+      "calories": 345,
+      "protein": 52,
+      "carbs": 33,
+      "fat": 0.5,
+      "sugar": 0,
+      "fiber": 13
+     },
+     "prep": "Use Nutrela granules, or rehydrate chunks and pulse to mince; brown 3-4 min; weigh dry",
+     "textureMatch": 4,
+     "why": "Same as TVP, from Indian groceries; highest protein per calorie",
+     "aliasKeys": [
+      "soy_chunks_dry"
+     ],
+     "nutritionSource": "Nutrela soya chunks label (dry)"
+    },
+    {
+     "key": "tempeh",
+     "name": "Tempeh",
+     "availability": "most_stores",
+     "whereToBuy": "Kroger, Whole Foods, Trader Joe's, Sprouts, many Walmart and Target stores",
+     "brands": "Lightlife Original Tempeh, Trader Joe's Organic 3 Grain Tempeh, Tofurky Tempeh",
+     "per100g": {
+      "calories": 192,
+      "protein": 20.3,
+      "carbs": 7.6,
+      "fat": 10.8,
+      "sugar": 0,
+      "fiber": 5
+     },
+     "prep": "Crumble, steam 5 min to remove bitterness, then brown with soy sauce and the seasoning",
+     "textureMatch": 3,
+     "why": "Whole-food, nutty crumble; firmer and grainier than beef",
+     "nutritionSource": "USDA tempeh"
+    }
+   ]
+  },
+  "steak_strips": {
+   "label": "Steak strips / steak bites (stir-fry, crispy beef, tacos)",
+   "meatPer100g": {
+    "calories": 160,
+    "protein": 22,
+    "carbs": 0,
+    "fat": 8,
+    "sugar": 0,
+    "fiber": 0,
+    "source": "Raw lean beef steak (flank/sirloin), USDA"
+   },
+   "keywords": [
+    "steak",
+    "flank",
+    "sirloin",
+    "crispy beef",
+    "beef strips",
+    "steak bites"
+   ],
+   "matchKeys": [
+    "beef_steak",
+    "beef_steak_lean",
+    "beef_sirloin",
+    "steak",
+    "steak_lean",
+    "flank_steak",
+    "steak_portion"
+   ],
+   "alternatives": [
+    {
+     "key": "seitan",
+     "name": "Seitan (wheat gluten)",
+     "availability": "most_stores",
+     "whereToBuy": "Whole Foods, Sprouts, Kroger family, Safeway/Albertsons, H-E-B (refrigerated tofu case); or make it from Bob's Red Mill vital wheat gluten (Walmart, Target, Kroger)",
+     "brands": "Upton's Naturals Traditional Seitan, Sweet Earth Traditional Seitan; homemade from vital wheat gluten",
+     "per100g": {
+      "calories": 158,
+      "protein": 31.6,
+      "carbs": 8.8,
+      "fat": 0.9,
+      "sugar": 0,
+      "fiber": 0.5
+     },
+     "prep": "Slice thin across the grain, toss in cornstarch, air-fry or pan-fry until crisp (8-10 min), then glaze",
+     "textureMatch": 5,
+     "why": "The best steak-strip chew; crisps for Mongolian/Beijing beef and sears for steak bites",
+     "nutritionSource": "Upton's Naturals Traditional Seitan label: 57 g = 90 kcal, 18 g P, 5 g C, 0.5 g F"
+    },
+    {
+     "key": "tofu_extra_firm",
+     "name": "Extra-firm tofu",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Costco, Aldi, Trader Joe's, Safeway (produce or refrigerated case)",
+     "brands": "Nasoya, House Foods, Trader Joe's Organic, Aldi Simply Nature, Great Value",
+     "per100g": {
+      "calories": 145,
+      "protein": 16,
+      "carbs": 3,
+      "fat": 8,
+      "sugar": 1,
+      "fiber": 2
+     },
+     "prep": "Freeze, thaw and squeeze, slice thin, toss in cornstarch and air-fry 200 °C / 400 °F for 15 min",
+     "textureMatch": 3,
+     "why": "Everywhere; the freeze-thaw trick makes it chewy enough for crispy beef dishes",
+     "nutritionSource": "Typical US extra-firm tofu label / USDA firm tofu"
+    },
+    {
+     "key": "soy_chunks",
+     "name": "Soy chunks (dry)",
+     "availability": "specialty",
+     "whereToBuy": "Indian groceries (Patel Brothers), Amazon, some Walmart Marketplace listings",
+     "brands": "Nutrela, Fortune",
+     "per100g": {
+      "calories": 345,
+      "protein": 52,
+      "carbs": 33,
+      "fat": 0.5,
+      "sugar": 0,
+      "fiber": 13
+     },
+     "prep": "Boil 5 min, squeeze dry, marinate in soy sauce and garlic, coat in cornstarch and air-fry 10-12 min; weigh dry",
+     "textureMatch": 4,
+     "why": "Chewy, beefy bite and very high protein",
+     "aliasKeys": [
+      "soy_chunks_dry"
+     ],
+     "nutritionSource": "Nutrela soya chunks label (dry)"
+    },
+    {
+     "key": "tempeh",
+     "name": "Tempeh",
+     "availability": "most_stores",
+     "whereToBuy": "Kroger, Whole Foods, Trader Joe's, Sprouts, many Walmart and Target stores",
+     "brands": "Lightlife Original Tempeh, Trader Joe's Organic 3 Grain Tempeh, Tofurky Tempeh",
+     "per100g": {
+      "calories": 192,
+      "protein": 20.3,
+      "carbs": 7.6,
+      "fat": 10.8,
+      "sugar": 0,
+      "fiber": 5
+     },
+     "prep": "Slice thin, steam 5 min, marinate 15 min, pan-fry until browned",
+     "textureMatch": 3,
+     "why": "Firm, hearty strips; nuttier flavor",
+     "nutritionSource": "USDA tempeh"
+    }
+   ]
+  },
+  "burger_patty": {
+   "label": "Burger patty / smash burger",
+   "meatPer100g": {
+    "calories": 176,
+    "protein": 20,
+    "carbs": 0,
+    "fat": 10,
+    "sugar": 0,
+    "fiber": 0,
+    "source": "Raw 90% lean ground beef, USDA"
+   },
+   "keywords": [
+    "burger",
+    "patty",
+    "patties",
+    "smash"
+   ],
+   "matchKeys": [
+    "burger_patty",
+    "beef_burger",
+    "beef_patty"
+   ],
+   "alternatives": [
+    {
+     "key": "plant_based_patty",
+     "name": "Beyond / Impossible burger patty",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Costco, Safeway, Whole Foods",
+     "brands": "Beyond Burger, Impossible Burger patties",
+     "per100g": {
+      "calories": 204,
+      "protein": 17.7,
+      "carbs": 5.3,
+      "fat": 12.4,
+      "sugar": 0,
+      "fiber": 1.8
+     },
+     "prep": "Cook 3 min per side on a hot pan or grill; cheese goes on in the last minute",
+     "textureMatch": 5,
+     "why": "The closest thing to a beef burger, sold everywhere",
+     "nutritionSource": "Beyond Burger label: 113 g = 230 kcal, 20 g P, 14 g F"
+    },
+    {
+     "key": "plant_based_mince",
+     "name": "Impossible / Beyond mince",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Costco, Safeway, Whole Foods (meat case or freezer)",
+     "brands": "Impossible Beef, Beyond Beef, Trader Joe's Beef-less Ground Beef",
+     "per100g": {
+      "calories": 212,
+      "protein": 16.8,
+      "carbs": 8,
+      "fat": 12.4,
+      "sugar": 0.9,
+      "fiber": 2.7
+     },
+     "prep": "Roll into balls and smash thin on a very hot pan, 2 min per side",
+     "textureMatch": 5,
+     "why": "Best for smash burgers and custom-size patties",
+     "aliasKeys": [
+      "plant_mince",
+      "beyond_mince",
+      "impossible_mince"
+     ],
+     "nutritionSource": "Impossible Beef label: 113 g = 240 kcal, 19 g P, 9 g C, 14 g F"
+    },
+    {
+     "key": "seitan",
+     "name": "Seitan (wheat gluten)",
+     "availability": "most_stores",
+     "whereToBuy": "Whole Foods, Sprouts, Kroger family, Safeway/Albertsons, H-E-B (refrigerated tofu case); or make it from Bob's Red Mill vital wheat gluten (Walmart, Target, Kroger)",
+     "brands": "Upton's Naturals Traditional Seitan, Sweet Earth Traditional Seitan; homemade from vital wheat gluten",
+     "per100g": {
+      "calories": 158,
+      "protein": 31.6,
+      "carbs": 8.8,
+      "fat": 0.9,
+      "sugar": 0,
+      "fiber": 0.5
+     },
+     "prep": "Blend vital-wheat-gluten seitan with TVP and seasoning, shape, steam 20 min, then sear",
+     "textureMatch": 4,
+     "why": "Very high protein, firm meaty patty; takes some prep",
+     "nutritionSource": "Upton's Naturals Traditional Seitan label: 57 g = 90 kcal, 18 g P, 5 g C, 0.5 g F"
+    },
+    {
+     "key": "tempeh",
+     "name": "Tempeh",
+     "availability": "most_stores",
+     "whereToBuy": "Kroger, Whole Foods, Trader Joe's, Sprouts, many Walmart and Target stores",
+     "brands": "Lightlife Original Tempeh, Trader Joe's Organic 3 Grain Tempeh, Tofurky Tempeh",
+     "per100g": {
+      "calories": 192,
+      "protein": 20.3,
+      "carbs": 7.6,
+      "fat": 10.8,
+      "sugar": 0,
+      "fiber": 5
+     },
+     "prep": "Steam a whole block 10 min, slice into slabs, marinate in BBQ or burger seasoning, pan-fry",
+     "textureMatch": 3,
+     "why": "Whole-food, firm patty; not beef-like but hearty",
+     "nutritionSource": "USDA tempeh"
+    }
+   ]
+  },
+  "meatballs": {
+   "label": "Meatballs",
+   "meatPer100g": {
+    "calories": 150,
+    "protein": 20,
+    "carbs": 2,
+    "fat": 6.8,
+    "sugar": 0,
+    "fiber": 0,
+    "source": "Lean raw beef meatballs (estimate from 5-10% beef mince)"
+   },
+   "keywords": [
+    "meatball"
+   ],
+   "matchKeys": [
+    "beef_meatballs",
+    "meatballs",
+    "chicken_meatballs"
+   ],
+   "alternatives": [
+    {
+     "key": "plant_based_mince",
+     "name": "Impossible / Beyond mince",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Costco, Safeway, Whole Foods (meat case or freezer)",
+     "brands": "Impossible Beef, Beyond Beef, Trader Joe's Beef-less Ground Beef",
+     "per100g": {
+      "calories": 212,
+      "protein": 16.8,
+      "carbs": 8,
+      "fat": 12.4,
+      "sugar": 0.9,
+      "fiber": 2.7
+     },
+     "prep": "Mix with the recipe's seasoning, roll, bake 200 °C / 400 °F for 15 min or pan-fry, then add to the sauce",
+     "textureMatch": 5,
+     "why": "Makes the most meat-like meatballs; binds without egg",
+     "aliasKeys": [
+      "plant_mince",
+      "beyond_mince",
+      "impossible_mince"
+     ],
+     "nutritionSource": "Impossible Beef label: 113 g = 240 kcal, 19 g P, 9 g C, 14 g F"
+    },
+    {
+     "key": "plant_meatballs",
+     "name": "Ready-made plant meatballs",
+     "availability": "most_stores",
+     "whereToBuy": "Walmart, Target, Kroger, Stop & Shop, Food Lion (freezer)",
+     "brands": "Impossible Homestyle Meatballs, Gardein Classic Meatless Meatballs",
+     "per100g": {
+      "calories": 247,
+      "protein": 14.1,
+      "carbs": 10.6,
+      "fat": 16.5,
+      "sugar": 1,
+      "fiber": 2.9
+     },
+     "prep": "Bake or simmer from frozen in the sauce 12-15 min",
+     "textureMatch": 4,
+     "why": "Ready-made, no rolling; less protein, more fat",
+     "nutritionSource": "Impossible Meatballs label: 85 g = 210 kcal, 12 g P, 9 g C, 14 g F"
+    },
+    {
+     "key": "tvp",
+     "name": "TVP / soy mince (dry)",
+     "availability": "most_stores",
+     "whereToBuy": "Kroger, Whole Foods, Sprouts, Walmart.com, Amazon (baking or bulk aisle); Nutrela granules at Indian groceries",
+     "brands": "Bob's Red Mill TVP, Anthony's, Nutrela Soya Granules",
+     "per100g": {
+      "calories": 333,
+      "protein": 50,
+      "carbs": 29,
+      "fat": 1,
+      "sugar": 7,
+      "fiber": 17
+     },
+     "prep": "Rehydrate, squeeze, mix with 1 egg + 30 g breadcrumbs + seasoning per 100 g dry TVP, roll and bake 20 min; weigh dry",
+     "textureMatch": 4,
+     "why": "Lean and very high protein; needs a binder",
+     "aliasKeys": [
+      "soy_mince_dry",
+      "tvp_dry",
+      "soy_mince"
+     ],
+     "nutritionSource": "Bob's Red Mill TVP label: 24 g = 80 kcal, 12 g P, 7 g C, 0 g F"
+    },
+    {
+     "key": "tofu_extra_firm",
+     "name": "Extra-firm tofu",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Costco, Aldi, Trader Joe's, Safeway (produce or refrigerated case)",
+     "brands": "Nasoya, House Foods, Trader Joe's Organic, Aldi Simply Nature, Great Value",
+     "per100g": {
+      "calories": 145,
+      "protein": 16,
+      "carbs": 3,
+      "fat": 8,
+      "sugar": 1,
+      "fiber": 2
+     },
+     "prep": "Mash pressed tofu with breadcrumbs, 1 egg and Italian seasoning, roll, bake 25 min at 200 °C / 400 °F",
+     "textureMatch": 3,
+     "why": "Everywhere; softer, best simmered gently in sauce",
+     "nutritionSource": "Typical US extra-firm tofu label / USDA firm tofu"
+    }
+   ]
+  },
+  "bacon": {
+   "label": "Bacon (medallions, back bacon, turkey bacon)",
+   "meatPer100g": {
+    "calories": 120,
+    "protein": 20,
+    "carbs": 0.5,
+    "fat": 4.4,
+    "sugar": 0,
+    "fiber": 0,
+    "source": "Raw back bacon / bacon medallions (UK) ~ Canadian bacon; streaky bacon would be 12 g P / 420 kcal"
+   },
+   "keywords": [
+    "bacon",
+    "rasher",
+    "pancetta",
+    "lardon"
+   ],
+   "matchKeys": [
+    "bacon",
+    "turkey_bacon",
+    "bacon_medallions",
+    "streaky_bacon"
+   ],
+   "alternatives": [
+    {
+     "key": "veggie_bacon",
+     "name": "Plant-based bacon strips",
+     "availability": "most_stores",
+     "whereToBuy": "Kroger, Safeway/Albertsons, H-E-B, Stop & Shop, Whole Foods, many Walmarts",
+     "brands": "Lightlife Smart Bacon; MorningStar Farms Veggie Bacon Strips (less protein)",
+     "per100g": {
+      "calories": 200,
+      "protein": 25,
+      "carbs": 5,
+      "fat": 10,
+      "sugar": 0,
+      "fiber": 0
+     },
+     "prep": "Pan-fry 1-2 min per side in a little oil until crisp; dice after cooking for carbonara and mac and cheese",
+     "textureMatch": 3,
+     "why": "Smoky and crisp, protein-dense; thinner than back bacon",
+     "aliasKeys": [
+      "smoky_veg_rashers"
+     ],
+     "nutritionSource": "Lightlife Smart Bacon label: 2 slices (20 g) = 40 kcal, 5 g P, 1 g C, 2 g F"
+    },
+    {
+     "key": "tempeh",
+     "name": "Tempeh",
+     "availability": "most_stores",
+     "whereToBuy": "Kroger, Whole Foods, Trader Joe's, Sprouts, many Walmart and Target stores",
+     "brands": "Lightlife Original Tempeh, Trader Joe's Organic 3 Grain Tempeh, Tofurky Tempeh",
+     "per100g": {
+      "calories": 192,
+      "protein": 20.3,
+      "carbs": 7.6,
+      "fat": 10.8,
+      "sugar": 0,
+      "fiber": 5
+     },
+     "prep": "Slice into thin strips, marinate in soy sauce, maple, liquid smoke and smoked paprika 15 min, pan-fry until crisp",
+     "textureMatch": 4,
+     "why": "Chewy, smoky strips with real bite (Lightlife also sells ready Fakin' Bacon tempeh strips)",
+     "nutritionSource": "USDA tempeh"
+    },
+    {
+     "key": "tofu_extra_firm",
+     "name": "Extra-firm tofu",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Costco, Aldi, Trader Joe's, Safeway (produce or refrigerated case)",
+     "brands": "Nasoya, House Foods, Trader Joe's Organic, Aldi Simply Nature, Great Value",
+     "per100g": {
+      "calories": 145,
+      "protein": 16,
+      "carbs": 3,
+      "fat": 8,
+      "sugar": 1,
+      "fiber": 2
+     },
+     "prep": "Slice very thin (3 mm), marinate as for tempeh bacon, air-fry 200 °C / 400 °F for 12-15 min",
+     "textureMatch": 3,
+     "why": "Everywhere; crisp edges, softer middle",
+     "nutritionSource": "Typical US extra-firm tofu label / USDA firm tofu"
+    },
+    {
+     "key": "seitan",
+     "name": "Seitan (wheat gluten)",
+     "availability": "most_stores",
+     "whereToBuy": "Whole Foods, Sprouts, Kroger family, Safeway/Albertsons, H-E-B (refrigerated tofu case); or make it from Bob's Red Mill vital wheat gluten (Walmart, Target, Kroger)",
+     "brands": "Upton's Naturals Traditional Seitan, Sweet Earth Traditional Seitan; homemade from vital wheat gluten",
+     "per100g": {
+      "calories": 158,
+      "protein": 31.6,
+      "carbs": 8.8,
+      "fat": 0.9,
+      "sugar": 0,
+      "fiber": 0.5
+     },
+     "prep": "Slice paper-thin, marinate in smoky soy marinade, pan-fry until crisp",
+     "textureMatch": 3,
+     "why": "Chewy and very high protein; good diced in pasta",
+     "nutritionSource": "Upton's Naturals Traditional Seitan label: 57 g = 90 kcal, 18 g P, 5 g C, 0.5 g F"
+    }
+   ]
+  },
+  "deli_chicken": {
+   "label": "Deli chicken / turkey / ham slices",
+   "meatPer100g": {
+    "calories": 100,
+    "protein": 18,
+    "carbs": 3,
+    "fat": 1.8,
+    "sugar": 0,
+    "fiber": 0,
+    "source": "Deli chicken/turkey breast slices, USDA"
+   },
+   "keywords": [
+    "deli",
+    "slices",
+    "ham",
+    "fridge raiders",
+    "lunch meat",
+    "cold cut"
+   ],
+   "matchKeys": [
+    "chicken_slices",
+    "chicken_fridge_raiders",
+    "ham",
+    "deli_ham",
+    "deli_turkey",
+    "turkey_slices"
+   ],
+   "alternatives": [
+    {
+     "key": "veggie_deli_slices",
+     "name": "Plant-based deli slices",
+     "availability": "most_stores",
+     "whereToBuy": "Kroger, Safeway, Publix, Harris Teeter, Food Lion, H-E-B, Whole Foods",
+     "brands": "Tofurky Deli Slices (Oven Roasted, Hickory Smoked, Ham Style), Lightlife Smart Deli; Yves (mostly Canada)",
+     "per100g": {
+      "calories": 212,
+      "protein": 28.8,
+      "carbs": 9.6,
+      "fat": 6.7,
+      "sugar": 2,
+      "fiber": 2
+     },
+     "prep": "Use straight from the pack in wraps, bagels and sandwiches",
+     "textureMatch": 4,
+     "why": "Same format as deli meat with similar protein",
+     "nutritionSource": "Tofurky Oven Roasted label: 5 slices (52 g) = 110 kcal, 15 g P, 3.5 g F"
+    },
+    {
+     "key": "seitan",
+     "name": "Seitan (wheat gluten)",
+     "availability": "most_stores",
+     "whereToBuy": "Whole Foods, Sprouts, Kroger family, Safeway/Albertsons, H-E-B (refrigerated tofu case); or make it from Bob's Red Mill vital wheat gluten (Walmart, Target, Kroger)",
+     "brands": "Upton's Naturals Traditional Seitan, Sweet Earth Traditional Seitan; homemade from vital wheat gluten",
+     "per100g": {
+      "calories": 158,
+      "protein": 31.6,
+      "carbs": 8.8,
+      "fat": 0.9,
+      "sugar": 0,
+      "fiber": 0.5
+     },
+     "prep": "Slice thin, sear 1 min per side with a pinch of salt and pepper",
+     "textureMatch": 4,
+     "why": "High protein and meaty; chunkier than deli slices",
+     "nutritionSource": "Upton's Naturals Traditional Seitan label: 57 g = 90 kcal, 18 g P, 5 g C, 0.5 g F"
+    },
+    {
+     "key": "eggs",
+     "name": "Eggs",
+     "availability": "everywhere",
+     "whereToBuy": "Every US supermarket",
+     "brands": "Any",
+     "per100g": {
+      "calories": 143,
+      "protein": 12.6,
+      "carbs": 0.7,
+      "fat": 9.5,
+      "sugar": 0.4,
+      "fiber": 0
+     },
+     "prep": "Hard-boil 10 min, slice, and layer in the sandwich or wrap",
+     "textureMatch": 2,
+     "why": "Everywhere and cheap; different texture but a classic sandwich protein",
+     "nutritionSource": "USDA whole egg, raw"
+    },
+    {
+     "key": "tofu_extra_firm",
+     "name": "Extra-firm tofu",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Costco, Aldi, Trader Joe's, Safeway (produce or refrigerated case)",
+     "brands": "Nasoya, House Foods, Trader Joe's Organic, Aldi Simply Nature, Great Value",
+     "per100g": {
+      "calories": 145,
+      "protein": 16,
+      "carbs": 3,
+      "fat": 8,
+      "sugar": 1,
+      "fiber": 2
+     },
+     "prep": "Slice thin, marinate in soy sauce and smoked paprika, bake 200 °C / 400 °F for 20 min; slice when cool",
+     "textureMatch": 2,
+     "why": "Everywhere; makes a decent sliced-sandwich filling",
+     "nutritionSource": "Typical US extra-firm tofu label / USDA firm tofu"
+    }
+   ]
+  },
+  "chicken_cooked": {
+   "label": "Cooked / rotisserie chicken (ready to eat)",
+   "meatPer100g": {
+    "calories": 165,
+    "protein": 31,
+    "carbs": 0,
+    "fat": 3.6,
+    "sugar": 0,
+    "fiber": 0,
+    "source": "Cooked roasted chicken breast, USDA"
+   },
+   "keywords": [
+    "cooked chicken",
+    "rotisserie",
+    "leftover chicken",
+    "grilled chicken"
+   ],
+   "matchKeys": [
+    "chicken_breast_cooked",
+    "rotisserie_chicken",
+    "cooked_chicken"
+   ],
+   "alternatives": [
+    {
+     "key": "vegan_chicken_pieces",
+     "name": "Plant-based chicken pieces",
+     "availability": "most_stores",
+     "whereToBuy": "Kroger, Safeway/Albertsons, Stop & Shop, Giant, Food Lion, H-E-B, Whole Foods, Target",
+     "brands": "Daring Original Plant Chicken Pieces, Tofurky Plant-Based Chick'n, Gardein Chick'n Strips",
+     "per100g": {
+      "calories": 129,
+      "protein": 20,
+      "carbs": 7.1,
+      "fat": 2.9,
+      "sugar": 0,
+      "fiber": 7.1
+     },
+     "prep": "Warm in a pan 4-5 min (or eat chilled); shred for salads and wraps",
+     "textureMatch": 4,
+     "why": "Ready-to-use chicken-style pieces; lean",
+     "nutritionSource": "Daring Original label: 70 g = 90 kcal, 14 g P, 5 g C, 2 g F"
+    },
+    {
+     "key": "seitan",
+     "name": "Seitan (wheat gluten)",
+     "availability": "most_stores",
+     "whereToBuy": "Whole Foods, Sprouts, Kroger family, Safeway/Albertsons, H-E-B (refrigerated tofu case); or make it from Bob's Red Mill vital wheat gluten (Walmart, Target, Kroger)",
+     "brands": "Upton's Naturals Traditional Seitan, Sweet Earth Traditional Seitan; homemade from vital wheat gluten",
+     "per100g": {
+      "calories": 158,
+      "protein": 31.6,
+      "carbs": 8.8,
+      "fat": 0.9,
+      "sugar": 0,
+      "fiber": 0.5
+     },
+     "prep": "Use straight from the pack, sliced or torn; sear 2 min for color",
+     "textureMatch": 4,
+     "why": "Ready-cooked and the most protein per calorie",
+     "nutritionSource": "Upton's Naturals Traditional Seitan label: 57 g = 90 kcal, 18 g P, 5 g C, 0.5 g F"
+    },
+    {
+     "key": "tofu_extra_firm",
+     "name": "Extra-firm tofu",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Costco, Aldi, Trader Joe's, Safeway (produce or refrigerated case)",
+     "brands": "Nasoya, House Foods, Trader Joe's Organic, Aldi Simply Nature, Great Value",
+     "per100g": {
+      "calories": 145,
+      "protein": 16,
+      "carbs": 3,
+      "fat": 8,
+      "sugar": 1,
+      "fiber": 2
+     },
+     "prep": "Press, cube or slice, bake 200 °C / 400 °F for 20 min with salt and pepper; keeps 4 days in the fridge",
+     "textureMatch": 3,
+     "why": "Everywhere; batch-bake once and use like cooked chicken",
+     "nutritionSource": "Typical US extra-firm tofu label / USDA firm tofu"
+    },
+    {
+     "key": "vegan_crispy_tenders",
+     "name": "Breaded plant-based tenders",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Safeway, Stop & Shop (freezer)",
+     "brands": "Gardein Seven Grain Crispy Tenders, MorningStar Farms Chik'n Strips/Nuggets, Simulate Nuggs",
+     "per100g": {
+      "calories": 205,
+      "protein": 13.7,
+      "carbs": 15,
+      "fat": 9.6,
+      "sugar": 1,
+      "fiber": 2
+     },
+     "prep": "Air-fry from frozen 10-12 min, then slice",
+     "textureMatch": 3,
+     "why": "Everywhere, ready in minutes; breaded, so more carbs",
+     "nutritionSource": "Gardein Seven Grain Crispy Tenders label: ~73 g (3 pieces) = 150 kcal, 10 g P, 11 g C, 7 g F"
+    }
+   ]
+  },
+  "pepperoni": {
+   "label": "Pepperoni (turkey or beef)",
+   "meatPer100g": {
+    "calories": 230,
+    "protein": 30,
+    "carbs": 0,
+    "fat": 12.2,
+    "sugar": 0,
+    "fiber": 0,
+    "source": "Turkey pepperoni label (Hormel)"
+   },
+   "keywords": [
+    "pepperoni",
+    "salami"
+   ],
+   "matchKeys": [
+    "pepperoni",
+    "turkey_pepperoni",
+    "turkey_or_beef_pepperoni"
+   ],
+   "alternatives": [
+    {
+     "key": "veggie_pepperoni",
+     "name": "Plant-based pepperoni",
+     "availability": "most_stores",
+     "whereToBuy": "Kroger family, Whole Foods, Stop & Shop, ShopRite, H-E-B",
+     "brands": "Field Roast Classic Pizzeria Pepperoni, Lightlife Smart Deli Pepperoni",
+     "per100g": {
+      "calories": 259,
+      "protein": 13,
+      "carbs": 9.3,
+      "fat": 20.4,
+      "sugar": 0,
+      "fiber": 1
+     },
+     "prep": "Use as-is on pizza, bagels and rolls; it crisps in the oven",
+     "textureMatch": 5,
+     "why": "Looks and tastes like pepperoni; much less protein than turkey pepperoni",
+     "aliasKeys": [
+      "vegetarian_pepperoni",
+      "veggie_pepperoni_slices"
+     ],
+     "nutritionSource": "Field Roast Pizzeria Pepperoni label: 54 g = 140 kcal, 7 g P, 5 g C, 11 g F"
+    },
+    {
+     "key": "veggie_bacon",
+     "name": "Plant-based bacon strips",
+     "availability": "most_stores",
+     "whereToBuy": "Kroger, Safeway/Albertsons, H-E-B, Stop & Shop, Whole Foods, many Walmarts",
+     "brands": "Lightlife Smart Bacon; MorningStar Farms Veggie Bacon Strips (less protein)",
+     "per100g": {
+      "calories": 200,
+      "protein": 25,
+      "carbs": 5,
+      "fat": 10,
+      "sugar": 0,
+      "fiber": 0
+     },
+     "prep": "Cut into squares, sprinkle with smoked paprika and fennel, crisp in a pan 1 min",
+     "textureMatch": 3,
+     "why": "Smoky, crispy and protein-dense",
+     "aliasKeys": [
+      "smoky_veg_rashers"
+     ],
+     "nutritionSource": "Lightlife Smart Bacon label: 2 slices (20 g) = 40 kcal, 5 g P, 1 g C, 2 g F"
+    },
+    {
+     "key": "seitan",
+     "name": "Seitan (wheat gluten)",
+     "availability": "most_stores",
+     "whereToBuy": "Whole Foods, Sprouts, Kroger family, Safeway/Albertsons, H-E-B (refrigerated tofu case); or make it from Bob's Red Mill vital wheat gluten (Walmart, Target, Kroger)",
+     "brands": "Upton's Naturals Traditional Seitan, Sweet Earth Traditional Seitan; homemade from vital wheat gluten",
+     "per100g": {
+      "calories": 158,
+      "protein": 31.6,
+      "carbs": 8.8,
+      "fat": 0.9,
+      "sugar": 0,
+      "fiber": 0.5
+     },
+     "prep": "Slice paper-thin, toss with smoked paprika, chili flakes, fennel and a little oil, bake 8 min",
+     "textureMatch": 3,
+     "why": "Very high protein; pepperoni flavor from the spice mix",
+     "nutritionSource": "Upton's Naturals Traditional Seitan label: 57 g = 90 kcal, 18 g P, 5 g C, 0.5 g F"
+    },
+    {
+     "key": "tofu_extra_firm",
+     "name": "Extra-firm tofu",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Costco, Aldi, Trader Joe's, Safeway (produce or refrigerated case)",
+     "brands": "Nasoya, House Foods, Trader Joe's Organic, Aldi Simply Nature, Great Value",
+     "per100g": {
+      "calories": 145,
+      "protein": 16,
+      "carbs": 3,
+      "fat": 8,
+      "sugar": 1,
+      "fiber": 2
+     },
+     "prep": "Slice 2 mm rounds, toss with smoked paprika, fennel, garlic, chili and soy sauce, air-fry 10-12 min until crisp",
+     "textureMatch": 2,
+     "why": "Everywhere and cheap; a decent crisp topping",
+     "nutritionSource": "Typical US extra-firm tofu label / USDA firm tofu"
+    }
+   ]
+  },
+  "sausage": {
+   "label": "Sausage / chorizo (breakfast, pork, chicken)",
+   "meatPer100g": {
+    "calories": 300,
+    "protein": 14,
+    "carbs": 2,
+    "fat": 26.9,
+    "sugar": 0,
+    "fiber": 0,
+    "source": "Raw pork sausage, USDA (lean chicken sausages are about 16 g P / 165 kcal)"
+   },
+   "keywords": [
+    "sausage",
+    "chorizo",
+    "banger",
+    "links"
+   ],
+   "matchKeys": [
+    "chicken_sausage",
+    "pork_sausages",
+    "chorizo",
+    "sausage",
+    "pork_sausage"
+   ],
+   "alternatives": [
+    {
+     "key": "veggie_breakfast_sausage",
+     "name": "Veggie breakfast sausage patties",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Safeway, Food Lion (freezer)",
+     "brands": "MorningStar Farms Original Sausage Patties/Links, Great Value Meatless Patties",
+     "per100g": {
+      "calories": 210,
+      "protein": 23.7,
+      "carbs": 10.5,
+      "fat": 7.9,
+      "sugar": 2,
+      "fiber": 4
+     },
+     "prep": "Microwave or pan-fry from frozen 4-6 min; crumble for burritos and egg muffins",
+     "textureMatch": 4,
+     "why": "Lean, high protein, in every freezer aisle; matches lean chicken breakfast sausages",
+     "nutritionSource": "MorningStar Original Sausage Patty label: 38 g = 80 kcal, 9 g P, 3 g F"
+    },
+    {
+     "key": "veggie_sausage",
+     "name": "Plant-based sausage links",
+     "availability": "most_stores",
+     "whereToBuy": "Walmart, Target, Kroger, Safeway, Whole Foods",
+     "brands": "Beyond Sausage, Field Roast Sausages",
+     "per100g": {
+      "calories": 212,
+      "protein": 16.2,
+      "carbs": 7,
+      "fat": 13.1,
+      "sugar": 1,
+      "fiber": 2
+     },
+     "prep": "Pan-fry or grill 8-10 min, turning; slice or remove the casing and crumble",
+     "textureMatch": 5,
+     "why": "Juicy, snappy links closest to pork sausages",
+     "aliasKeys": [
+      "veg_sausage"
+     ],
+     "nutritionSource": "Beyond Sausage Brat Original label: 1 link = 210 kcal, 16 g P, 13 g F"
+    },
+    {
+     "key": "soy_chorizo",
+     "name": "Soy chorizo",
+     "availability": "most_stores",
+     "whereToBuy": "Trader Joe's, Walmart, Kroger, many Hispanic groceries",
+     "brands": "Trader Joe's Soy Chorizo, El Burrito Soyrizo, Upton's Naturals Chorizo Seitan",
+     "per100g": {
+      "calories": 232,
+      "protein": 14.3,
+      "carbs": 14.3,
+      "fat": 12.5,
+      "sugar": 1,
+      "fiber": 5
+     },
+     "prep": "Squeeze out of the casing and fry 4-5 min until crisp",
+     "textureMatch": 5,
+     "why": "The go-to swap for chorizo: same spice and crumble",
+     "nutritionSource": "Trader Joe's Soy Chorizo: 56 g = 130 kcal, 8 g P, 8 g C, 7 g F"
+    },
+    {
+     "key": "tvp",
+     "name": "TVP / soy mince (dry)",
+     "availability": "most_stores",
+     "whereToBuy": "Kroger, Whole Foods, Sprouts, Walmart.com, Amazon (baking or bulk aisle); Nutrela granules at Indian groceries",
+     "brands": "Bob's Red Mill TVP, Anthony's, Nutrela Soya Granules",
+     "per100g": {
+      "calories": 333,
+      "protein": 50,
+      "carbs": 29,
+      "fat": 1,
+      "sugar": 7,
+      "fiber": 17
+     },
+     "prep": "Rehydrate in stock, squeeze, then brown with fennel, sage, smoked paprika, garlic and a little oil; weigh dry",
+     "textureMatch": 3,
+     "why": "Lean, very high protein homemade sausage crumble",
+     "aliasKeys": [
+      "soy_mince_dry",
+      "tvp_dry",
+      "soy_mince"
+     ],
+     "nutritionSource": "Bob's Red Mill TVP label: 24 g = 80 kcal, 12 g P, 7 g C, 0 g F"
+    },
+    {
+     "key": "tempeh",
+     "name": "Tempeh",
+     "availability": "most_stores",
+     "whereToBuy": "Kroger, Whole Foods, Trader Joe's, Sprouts, many Walmart and Target stores",
+     "brands": "Lightlife Original Tempeh, Trader Joe's Organic 3 Grain Tempeh, Tofurky Tempeh",
+     "per100g": {
+      "calories": 192,
+      "protein": 20.3,
+      "carbs": 7.6,
+      "fat": 10.8,
+      "sugar": 0,
+      "fiber": 5
+     },
+     "prep": "Crumble and brown with fennel, sage, smoked paprika and soy sauce",
+     "textureMatch": 3,
+     "why": "Whole-food sausage crumble; nutty",
+     "nutritionSource": "USDA tempeh"
+    }
+   ]
+  },
+  "pulled_pork": {
+   "label": "Pulled pork / BBQ shredded meat",
+   "meatPer100g": {
+    "calories": 230,
+    "protein": 25,
+    "carbs": 0,
+    "fat": 14,
+    "sugar": 0,
+    "fiber": 0,
+    "source": "Braised pork shoulder, cooked, USDA"
+   },
+   "keywords": [
+    "pulled pork",
+    "carnitas",
+    "bbq pork",
+    "shredded pork"
+   ],
+   "matchKeys": [
+    "pulled_pork",
+    "pork_shoulder",
+    "carnitas"
+   ],
+   "alternatives": [
+    {
+     "key": "jackfruit",
+     "name": "Young green jackfruit",
+     "availability": "most_stores",
+     "whereToBuy": "Trader Joe's, Whole Foods, Kroger, Sprouts, Asian groceries, Walmart.com (canned)",
+     "brands": "Trader Joe's Green Jackfruit in Brine, Native Forest, Upton's Naturals Jackfruit",
+     "per100g": {
+      "calories": 30,
+      "protein": 1,
+      "carbs": 6.5,
+      "fat": 0.2,
+      "sugar": 0,
+      "fiber": 3
+     },
+     "prep": "Drain, rinse, squeeze, shred with forks, simmer in BBQ sauce 15 min, then roast or air-fry 10 min for crispy edges",
+     "textureMatch": 5,
+     "why": "The classic pulled-pork texture, but almost no protein (about 1 g per 100 g): pair with beans or add seitan",
+     "nutritionSource": "Canned young jackfruit in brine, drained (approx. label)"
+    },
+    {
+     "key": "tofu_extra_firm",
+     "name": "Extra-firm tofu",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Costco, Aldi, Trader Joe's, Safeway (produce or refrigerated case)",
+     "brands": "Nasoya, House Foods, Trader Joe's Organic, Aldi Simply Nature, Great Value",
+     "per100g": {
+      "calories": 145,
+      "protein": 16,
+      "carbs": 3,
+      "fat": 8,
+      "sugar": 1,
+      "fiber": 2
+     },
+     "prep": "Freeze, thaw, squeeze and grate on a box grater, then cook in BBQ sauce 10 min",
+     "textureMatch": 3,
+     "why": "Everywhere and adds real protein; finer shreds than pork",
+     "nutritionSource": "Typical US extra-firm tofu label / USDA firm tofu"
+    },
+    {
+     "key": "seitan",
+     "name": "Seitan (wheat gluten)",
+     "availability": "most_stores",
+     "whereToBuy": "Whole Foods, Sprouts, Kroger family, Safeway/Albertsons, H-E-B (refrigerated tofu case); or make it from Bob's Red Mill vital wheat gluten (Walmart, Target, Kroger)",
+     "brands": "Upton's Naturals Traditional Seitan, Sweet Earth Traditional Seitan; homemade from vital wheat gluten",
+     "per100g": {
+      "calories": 158,
+      "protein": 31.6,
+      "carbs": 8.8,
+      "fat": 0.9,
+      "sugar": 0,
+      "fiber": 0.5
+     },
+     "prep": "Shred by hand or pull with forks, simmer in BBQ sauce 10 min",
+     "textureMatch": 4,
+     "why": "Stringy, chewy and very high protein",
+     "nutritionSource": "Upton's Naturals Traditional Seitan label: 57 g = 90 kcal, 18 g P, 5 g C, 0.5 g F"
+    },
+    {
+     "key": "vegan_chicken_pieces",
+     "name": "Plant-based chicken pieces",
+     "availability": "most_stores",
+     "whereToBuy": "Kroger, Safeway/Albertsons, Stop & Shop, Giant, Food Lion, H-E-B, Whole Foods, Target",
+     "brands": "Daring Original Plant Chicken Pieces, Tofurky Plant-Based Chick'n, Gardein Chick'n Strips",
+     "per100g": {
+      "calories": 129,
+      "protein": 20,
+      "carbs": 7.1,
+      "fat": 2.9,
+      "sugar": 0,
+      "fiber": 7.1
+     },
+     "prep": "Shred with forks, simmer in BBQ sauce 8-10 min",
+     "textureMatch": 4,
+     "why": "Pulls apart into realistic shreds; lean protein",
+     "nutritionSource": "Daring Original label: 70 g = 90 kcal, 14 g P, 5 g C, 2 g F"
+    }
+   ]
+  },
+  "fish_fillet": {
+   "label": "Fish fillet (cod, white fish)",
+   "meatPer100g": {
+    "calories": 82,
+    "protein": 18,
+    "carbs": 0,
+    "fat": 0.7,
+    "sugar": 0,
+    "fiber": 0,
+    "source": "Raw cod, USDA"
+   },
+   "keywords": [
+    "fish",
+    "cod",
+    "haddock",
+    "tilapia",
+    "pollock",
+    "fillet"
+   ],
+   "matchKeys": [
+    "cod",
+    "white_fish",
+    "fish_fillet",
+    "tilapia",
+    "haddock"
+   ],
+   "alternatives": [
+    {
+     "key": "tofu_extra_firm",
+     "name": "Extra-firm tofu",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Costco, Aldi, Trader Joe's, Safeway (produce or refrigerated case)",
+     "brands": "Nasoya, House Foods, Trader Joe's Organic, Aldi Simply Nature, Great Value",
+     "per100g": {
+      "calories": 145,
+      "protein": 16,
+      "carbs": 3,
+      "fat": 8,
+      "sugar": 1,
+      "fiber": 2
+     },
+     "prep": "Press, slice into fillets, wrap a strip of nori on one side, season with Old Bay and lemon, coat and air-fry or pan-fry 10-12 min",
+     "textureMatch": 3,
+     "why": "Everywhere; nori gives the sea flavor and it flakes gently",
+     "nutritionSource": "Typical US extra-firm tofu label / USDA firm tofu"
+    },
+    {
+     "key": "vegan_fish_fillet",
+     "name": "Plant-based fish fillets",
+     "availability": "most_stores",
+     "whereToBuy": "Walmart, Kroger, Safeway, Stop & Shop, H-E-B, Whole Foods (freezer)",
+     "brands": "Gardein Golden Fishless Filets",
+     "per100g": {
+      "calories": 198,
+      "protein": 9.4,
+      "carbs": 12.5,
+      "fat": 13,
+      "sugar": 1,
+      "fiber": 2
+     },
+     "prep": "Bake or air-fry from frozen 200 °C / 400 °F for 12-15 min",
+     "textureMatch": 4,
+     "why": "Ready-made breaded fillets for fish tacos and sandwiches; less protein",
+     "nutritionSource": "Gardein Golden Fishless Filets label: 96 g = 190 kcal, 9 g P, 12 g C, 12.5 g F"
+    },
+    {
+     "key": "hearts_of_palm",
+     "name": "Hearts of palm (canned)",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Trader Joe's, Aldi (canned vegetable aisle)",
+     "brands": "Reese, Native Forest, Trader Joe's, Great Value",
+     "per100g": {
+      "calories": 28,
+      "protein": 2.5,
+      "carbs": 4.6,
+      "fat": 0.6,
+      "sugar": 0,
+      "fiber": 2.4
+     },
+     "prep": "Drain, pull apart into flakes, season with lemon, Old Bay and a little nori, pan-sear 3-4 min",
+     "textureMatch": 3,
+     "why": "Flaky texture, mild sea-like taste; very low protein",
+     "nutritionSource": "USDA hearts of palm, canned"
+    },
+    {
+     "key": "paneer",
+     "name": "Paneer",
+     "availability": "most_stores",
+     "whereToBuy": "Trader Joe's, Costco, Whole Foods, many Kroger/H-E-B stores, every Indian grocery (Patel Brothers, Apna Bazar)",
+     "brands": "Trader Joe's Paneer, Nanak, Gopi, Amul",
+     "per100g": {
+      "calories": 300,
+      "protein": 20,
+      "carbs": 3,
+      "fat": 23,
+      "sugar": 2,
+      "fiber": 0
+     },
+     "prep": "Slice into slabs, marinate in lemon, garlic and Old Bay, pan-fry 2-3 min per side",
+     "textureMatch": 3,
+     "why": "Firm fillet-like slabs that hold together in tacos and curries",
+     "nutritionSource": "Nanak paneer label: 30 g = 90 kcal, 6 g P, 7 g F"
+    }
+   ]
+  },
+  "tuna_canned": {
+   "label": "Tuna (canned)",
+   "meatPer100g": {
+    "calories": 115,
+    "protein": 25,
+    "carbs": 0,
+    "fat": 1.7,
+    "sugar": 0,
+    "fiber": 0,
+    "source": "Canned light tuna in water, drained, USDA"
+   },
+   "keywords": [
+    "tuna"
+   ],
+   "matchKeys": [
+    "tuna",
+    "tuna_canned"
+   ],
+   "alternatives": [
+    {
+     "key": "chickpeas",
+     "name": "Chickpeas (canned)",
+     "availability": "everywhere",
+     "whereToBuy": "Every US supermarket (canned beans aisle)",
+     "brands": "Goya, Bush's, Great Value, any store brand",
+     "per100g": {
+      "calories": 138,
+      "protein": 7,
+      "carbs": 22.5,
+      "fat": 2.5,
+      "sugar": 4,
+      "fiber": 7.6
+     },
+     "prep": "Mash drained chickpeas with a fork, add light mayo, lemon, a pinch of crumbled nori or kelp flakes, celery and pepper",
+     "textureMatch": 4,
+     "why": "The classic 'chickpea tuna' salad with a flaky bite; much less protein, so add egg whites or Greek yogurt",
+     "nutritionSource": "USDA chickpeas, canned, drained"
+    },
+    {
+     "key": "eggs",
+     "name": "Eggs",
+     "availability": "everywhere",
+     "whereToBuy": "Every US supermarket",
+     "brands": "Any",
+     "per100g": {
+      "calories": 143,
+      "protein": 12.6,
+      "carbs": 0.7,
+      "fat": 9.5,
+      "sugar": 0.4,
+      "fiber": 0
+     },
+     "prep": "Hard-boil 10 min, chop, mix with the recipe's mayo and seasoning (egg salad)",
+     "textureMatch": 3,
+     "why": "Everywhere and high in protein; a different but classic sandwich salad",
+     "nutritionSource": "USDA whole egg, raw"
+    },
+    {
+     "key": "tofu_extra_firm",
+     "name": "Extra-firm tofu",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Costco, Aldi, Trader Joe's, Safeway (produce or refrigerated case)",
+     "brands": "Nasoya, House Foods, Trader Joe's Organic, Aldi Simply Nature, Great Value",
+     "per100g": {
+      "calories": 145,
+      "protein": 16,
+      "carbs": 3,
+      "fat": 8,
+      "sugar": 1,
+      "fiber": 2
+     },
+     "prep": "Press, crumble finely, mix with mayo, lemon, nori flakes and seasoning",
+     "textureMatch": 3,
+     "why": "Everywhere and more protein than chickpeas; flaky crumble",
+     "nutritionSource": "Typical US extra-firm tofu label / USDA firm tofu"
+    },
+    {
+     "key": "egg_whites",
+     "name": "Liquid egg whites",
+     "availability": "everywhere",
+     "whereToBuy": "Every US supermarket (egg case)",
+     "brands": "Egg Beaters 100% Egg Whites, Kirkland, Great Value, Trader Joe's",
+     "per100g": {
+      "calories": 52,
+      "protein": 10.9,
+      "carbs": 0.7,
+      "fat": 0.2,
+      "sugar": 0.7,
+      "fiber": 0
+     },
+     "prep": "Cook as a thin omelette or scramble, chop finely and fold into the salad with chopped whole eggs",
+     "textureMatch": 3,
+     "why": "Adds almost pure protein to egg or chickpea 'tuna' salads",
+     "nutritionSource": "USDA egg white, raw"
+    }
+   ]
+  },
+  "salmon": {
+   "label": "Salmon (smoked or fillet)",
+   "meatPer100g": {
+    "calories": 210,
+    "protein": 20,
+    "carbs": 0,
+    "fat": 14.4,
+    "sugar": 0,
+    "fiber": 0,
+    "source": "Raw farmed Atlantic salmon, USDA"
+   },
+   "keywords": [
+    "salmon",
+    "lox"
+   ],
+   "matchKeys": [
+    "smoked_salmon",
+    "salmon",
+    "salmon_fillet"
+   ],
+   "alternatives": [
+    {
+     "key": "tofu_extra_firm",
+     "name": "Extra-firm tofu",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Costco, Aldi, Trader Joe's, Safeway (produce or refrigerated case)",
+     "brands": "Nasoya, House Foods, Trader Joe's Organic, Aldi Simply Nature, Great Value",
+     "per100g": {
+      "calories": 145,
+      "protein": 16,
+      "carbs": 3,
+      "fat": 8,
+      "sugar": 1,
+      "fiber": 2
+     },
+     "prep": "Press, slice into thin slabs, marinate in soy sauce, liquid smoke, lemon and nori for 30 min; sear 2 min per side (or serve raw-marinated for lox-style)",
+     "textureMatch": 3,
+     "why": "Everywhere and protein-rich; takes on smoky, salty flavor",
+     "nutritionSource": "Typical US extra-firm tofu label / USDA firm tofu"
+    },
+    {
+     "key": "carrot_lox",
+     "name": "Carrot 'lox'",
+     "availability": "everywhere",
+     "whereToBuy": "Every US supermarket (carrots)",
+     "brands": "Homemade (large carrots, salt-baked, marinated in liquid smoke, nori, lemon)",
+     "per100g": {
+      "calories": 41,
+      "protein": 0.9,
+      "carbs": 9.6,
+      "fat": 0.2,
+      "sugar": 4.7,
+      "fiber": 2.8
+     },
+     "prep": "Salt-bake whole carrots 60-90 min, peel into thin ribbons, marinate overnight in oil, liquid smoke, lemon and nori",
+     "textureMatch": 4,
+     "why": "Looks and drapes like lox on bagels; almost no protein",
+     "nutritionSource": "USDA carrots, raw"
+    },
+    {
+     "key": "paneer",
+     "name": "Paneer",
+     "availability": "most_stores",
+     "whereToBuy": "Trader Joe's, Costco, Whole Foods, many Kroger/H-E-B stores, every Indian grocery (Patel Brothers, Apna Bazar)",
+     "brands": "Trader Joe's Paneer, Nanak, Gopi, Amul",
+     "per100g": {
+      "calories": 300,
+      "protein": 20,
+      "carbs": 3,
+      "fat": 23,
+      "sugar": 2,
+      "fiber": 0
+     },
+     "prep": "Slice into slabs, marinate in lemon, dill and smoked paprika, pan-fry 2-3 min per side",
+     "textureMatch": 3,
+     "why": "Rich and fatty like salmon; high protein",
+     "nutritionSource": "Nanak paneer label: 30 g = 90 kcal, 6 g P, 7 g F"
+    }
+   ]
+  },
+  "shrimp": {
+   "label": "Shrimp / prawns",
+   "meatPer100g": {
+    "calories": 85,
+    "protein": 20,
+    "carbs": 0,
+    "fat": 0.5,
+    "sugar": 0,
+    "fiber": 0,
+    "source": "Raw shrimp, USDA"
+   },
+   "keywords": [
+    "shrimp",
+    "prawn"
+   ],
+   "matchKeys": [
+    "shrimp",
+    "shrimp_cooked",
+    "prawns",
+    "king_prawns"
+   ],
+   "alternatives": [
+    {
+     "key": "tofu_extra_firm",
+     "name": "Extra-firm tofu",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Costco, Aldi, Trader Joe's, Safeway (produce or refrigerated case)",
+     "brands": "Nasoya, House Foods, Trader Joe's Organic, Aldi Simply Nature, Great Value",
+     "per100g": {
+      "calories": 145,
+      "protein": 16,
+      "carbs": 3,
+      "fat": 8,
+      "sugar": 1,
+      "fiber": 2
+     },
+     "prep": "Press, cut into bite pieces, marinate in garlic, lemon and Old Bay, pan-fry or air-fry until golden 10-12 min",
+     "textureMatch": 3,
+     "why": "Everywhere and protein-rich; works in tacos, spring rolls and stir-fries",
+     "nutritionSource": "Typical US extra-firm tofu label / USDA firm tofu"
+    },
+    {
+     "key": "king_oyster_mushrooms",
+     "name": "King oyster mushrooms",
+     "availability": "most_stores",
+     "whereToBuy": "Asian groceries (H Mart, 99 Ranch), Whole Foods, Sprouts, many Kroger produce sections",
+     "brands": "Any (loose or packaged)",
+     "per100g": {
+      "calories": 33,
+      "protein": 3.3,
+      "carbs": 6.1,
+      "fat": 0.4,
+      "sugar": 1.1,
+      "fiber": 2.3
+     },
+     "prep": "Slice stems into thick coins, score both sides, marinate, sear in a hot pan 2-3 min per side",
+     "textureMatch": 4,
+     "why": "Springy, scallop/shrimp-like bite; very low protein",
+     "nutritionSource": "USDA oyster mushrooms, raw"
+    },
+    {
+     "key": "hearts_of_palm",
+     "name": "Hearts of palm (canned)",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target, Kroger, Trader Joe's, Aldi (canned vegetable aisle)",
+     "brands": "Reese, Native Forest, Trader Joe's, Great Value",
+     "per100g": {
+      "calories": 28,
+      "protein": 2.5,
+      "carbs": 4.6,
+      "fat": 0.6,
+      "sugar": 0,
+      "fiber": 2.4
+     },
+     "prep": "Slice into rounds, pat dry, season and sear 2 min per side",
+     "textureMatch": 3,
+     "why": "Tender and mild like seafood; very low protein",
+     "nutritionSource": "USDA hearts of palm, canned"
+    },
+    {
+     "key": "paneer",
+     "name": "Paneer",
+     "availability": "most_stores",
+     "whereToBuy": "Trader Joe's, Costco, Whole Foods, many Kroger/H-E-B stores, every Indian grocery (Patel Brothers, Apna Bazar)",
+     "brands": "Trader Joe's Paneer, Nanak, Gopi, Amul",
+     "per100g": {
+      "calories": 300,
+      "protein": 20,
+      "carbs": 3,
+      "fat": 23,
+      "sugar": 2,
+      "fiber": 0
+     },
+     "prep": "Cube small, marinate in garlic-chili-lime, sear 3-4 min",
+     "textureMatch": 3,
+     "why": "Firm, bouncy bites with good protein",
+     "nutritionSource": "Nanak paneer label: 30 g = 90 kcal, 6 g P, 7 g F"
+    }
+   ]
+  }
+ },
+ "keyToRole": {
+  "bacon": "bacon",
+  "bacon_medallions": "bacon",
+  "beef_burger": "burger_patty",
+  "beef_filling_portion": "beef_mince",
+  "beef_meatballs": "meatballs",
+  "beef_mince": "beef_mince",
+  "beef_mince_10pct": "beef_mince",
+  "beef_mince_15pct": "beef_mince",
+  "beef_mince_5pct": "beef_mince",
+  "beef_mix_portion": "beef_mince",
+  "beef_patty": "burger_patty",
+  "beef_sirloin": "steak_strips",
+  "beef_steak": "steak_strips",
+  "beef_steak_lean": "steak_strips",
+  "beef_tortilla_portion": "beef_mince",
+  "burger_patty": "burger_patty",
+  "carnitas": "pulled_pork",
+  "chicken_breast": "chicken_strips",
+  "chicken_breast_cooked": "chicken_cooked",
+  "chicken_breast_ground": "ground_poultry",
+  "chicken_curry_pieces": "chicken_curry",
+  "chicken_drumsticks": "chicken_strips",
+  "chicken_fridge_raiders": "deli_chicken",
+  "chicken_meatballs": "meatballs",
+  "chicken_mince": "ground_poultry",
+  "chicken_nuggets": "chicken_strips",
+  "chicken_sausage": "sausage",
+  "chicken_slices": "deli_chicken",
+  "chicken_tenders": "chicken_strips",
+  "chicken_thigh": "chicken_thighs",
+  "chicken_thighs": "chicken_thighs",
+  "chicken_tikka": "chicken_curry",
+  "chicken_wings": "chicken_strips",
+  "chorizo": "sausage",
+  "cod": "fish_fillet",
+  "cooked_chicken": "chicken_cooked",
+  "crispy_chicken_portion": "chicken_strips",
+  "deli_ham": "deli_chicken",
+  "deli_turkey": "deli_chicken",
+  "fish_fillet": "fish_fillet",
+  "flank_steak": "steak_strips",
+  "ground_chicken": "ground_poultry",
+  "ground_turkey": "ground_poultry",
+  "haddock": "fish_fillet",
+  "ham": "deli_chicken",
+  "kebab_mix_portion": "beef_mince",
+  "king_prawns": "shrimp",
+  "meatballs": "meatballs",
+  "pepperoni": "pepperoni",
+  "popcorn_chicken": "chicken_strips",
+  "pork_sausage": "sausage",
+  "pork_sausages": "sausage",
+  "pork_shoulder": "pulled_pork",
+  "prawns": "shrimp",
+  "pulled_pork": "pulled_pork",
+  "rotisserie_chicken": "chicken_cooked",
+  "salmon": "salmon",
+  "salmon_fillet": "salmon",
+  "sausage": "sausage",
+  "shrimp": "shrimp",
+  "shrimp_cooked": "shrimp",
+  "smoked_salmon": "salmon",
+  "steak": "steak_strips",
+  "steak_lean": "steak_strips",
+  "steak_portion": "steak_strips",
+  "streaky_bacon": "bacon",
+  "tilapia": "fish_fillet",
+  "tuna": "tuna_canned",
+  "tuna_canned": "tuna_canned",
+  "turkey_bacon": "bacon",
+  "turkey_mince": "ground_poultry",
+  "turkey_or_beef_pepperoni": "pepperoni",
+  "turkey_pepperoni": "pepperoni",
+  "turkey_slices": "deli_chicken",
+  "white_fish": "fish_fillet"
+ }
+}

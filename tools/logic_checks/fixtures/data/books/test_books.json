@@ -1,0 +1,217 @@
+[
+ {
+  "id": "chef-chicken-wrap",
+  "name": "Chicken Wrap",
+  "section": "meal",
+  "course": "dinner",
+  "bookCategory": "Dinner: Wraps",
+  "source": {
+   "kind": "book",
+   "title": "The Ultimate High Protein Chef Cookbook",
+   "page": 40
+  },
+  "servings": 2,
+  "macrosPerServing": {
+   "calories": 500,
+   "protein": 40,
+   "carbs": 30,
+   "fat": 20,
+   "sugar": null,
+   "fiber": null
+  },
+  "cookMinutes": 15,
+  "base": [
+   {
+    "text": "200 g chicken breast",
+    "key": "chicken_breast",
+    "grams": 200,
+    "ml": null,
+    "count": null,
+    "optional": false
+   },
+   {
+    "text": "100 g Greek yogurt",
+    "key": "greek_yogurt",
+    "grams": 100,
+    "ml": null,
+    "count": null,
+    "optional": false
+   }
+  ],
+  "mixIns": [],
+  "instructions": [
+   "Cook the chicken.",
+   "Wrap it up."
+  ],
+  "proTip": null,
+  "tags": [
+   "high-protein"
+  ],
+  "vegetarian": false,
+  "containsEgg": false,
+  "vegAdaptation": {
+   "summary": "Chicken -> tofu",
+   "swaps": [
+    {
+     "replaces": "200 g chicken breast",
+     "with": {
+      "text": "250 g extra-firm tofu",
+      "key": "tofu_extra_firm",
+      "grams": 250,
+      "ml": null,
+      "count": null,
+      "optional": false
+     },
+     "note": "Press the tofu 15 min"
+    }
+   ],
+   "steps": [
+    "Press and crisp the tofu.",
+    "Wrap it up."
+   ],
+   "macrosPerServing": {
+    "calories": 450,
+    "protein": 35,
+    "carbs": 25,
+    "fat": 22,
+    "sugar": null,
+    "fiber": null
+   }
+  }
+ },
+ {
+  "id": "chef-omelette",
+  "name": "Plain Omelette",
+  "section": "meal",
+  "course": "breakfast",
+  "bookCategory": "Breakfast",
+  "source": {
+   "kind": "book",
+   "title": "The Ultimate Guide to Lean Bulking",
+   "page": 12
+  },
+  "servings": 1,
+  "macrosPerServing": {
+   "calories": 300,
+   "protein": 25,
+   "carbs": 3,
+   "fat": 20
+  },
+  "base": [
+   {
+    "text": "3 eggs",
+    "key": "eggs",
+    "grams": null,
+    "ml": null,
+    "count": 3,
+    "optional": false
+   }
+  ],
+  "instructions": [
+   "Whisk.",
+   "Cook."
+  ],
+  "tags": [],
+  "vegetarian": true,
+  "containsEgg": true,
+  "vegAdaptation": null
+ },
+ {
+  "id": "bulk-oat-shake",
+  "name": "Oat Shake",
+  "section": "drink",
+  "course": "drink",
+  "bookCategory": "Drinks",
+  "source": {
+   "kind": "book",
+   "title": "The Ultimate Guide to Lean Bulking",
+   "page": 60
+  },
+  "servings": 1,
+  "macrosPerServing": {
+   "calories": 400,
+   "protein": 30,
+   "carbs": 40,
+   "fat": 10
+  },
+  "base": [
+   {
+    "text": "1 banana",
+    "key": "banana",
+    "count": 1
+   }
+  ],
+  "instructions": [
+   "Blend.",
+   "Drink."
+  ],
+  "tags": [],
+  "vegetarian": true,
+  "containsEgg": false,
+  "vegAdaptation": null
+ },
+ {
+  "id": "chef-chicken-bowl",
+  "name": "Chicken Bowl",
+  "section": "meal",
+  "course": "lunch",
+  "bookCategory": "Lunch",
+  "source": {
+   "kind": "book",
+   "title": "The Ultimate High Protein Chef Cookbook",
+   "page": 50
+  },
+  "servings": 2,
+  "macrosPerServing": {
+   "calories": 500,
+   "protein": 40,
+   "carbs": 30,
+   "fat": 15
+  },
+  "base": [
+   {
+    "text": "300 g chicken breast",
+    "key": "chicken_breast",
+    "grams": 300,
+    "ml": null,
+    "count": null,
+    "optional": false
+   }
+  ],
+  "mixIns": [],
+  "instructions": [
+   "Slice the chicken.",
+   "Fry the chicken until golden.",
+   "Serve."
+  ],
+  "proTip": null,
+  "tags": [],
+  "vegetarian": false,
+  "containsEgg": false,
+  "vegAdaptation": {
+   "summary": "Chicken -> seitan",
+   "swaps": [
+    {
+     "replaces": "300 g chicken breast",
+     "with": {
+      "text": "375 g seitan",
+      "key": "seitan",
+      "grams": 375
+     },
+     "note": "Slice thin"
+    }
+   ],
+   "steps": [
+    "Slice the seitan.",
+    "Fry the seitan until golden.",
+    "Serve."
+   ],
+   "macrosPerServing": {
+    "calories": 480,
+    "protein": 50,
+    "carbs": 20,
+    "fat": 10
+   }
+  }
+ }
+]

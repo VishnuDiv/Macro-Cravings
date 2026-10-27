@@ -1,0 +1,7 @@
+[
+  {"id": "dymatize_iso100_gourmet_vanilla", "name": "Dymatize ISO100 Gourmet Vanilla", "brand": "Dymatize", "type": "whey_isolate",
+   "flavors": ["vanilla"], "scoopGrams": 32, "perScoop": {"calories": 120, "protein": 25, "carbs": 2, "fat": 0.5, "sugar": 1, "fiber": 0},
+   "ingredientKey": "dymatize_iso100", "note": "Thin and clean; no extra fat", "futureField": 1},
+  {"id": "casein_vanilla", "name": "Casein vanilla", "brand": "Generic", "type": "casein", "flavors": ["vanilla"], "scoopGrams": 33,
+   "perScoop": {"calories": 130, "protein": 24, "carbs": 4, "fat": 1.5}, "ingredientKey": null, "note": "Thickens when frozen"}
+]

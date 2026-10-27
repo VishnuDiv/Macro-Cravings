@@ -1,0 +1,4 @@
+[
+ {"id": "whole_milk", "name": "Whole milk", "family": "milk", "servingMl": 240, "perServing": {"calories": 150, "protein": 8, "carbs": 12, "fat": 8}, "gramsPerMl": 1.03},
+ {"id": "fairlife_skim", "name": "Fairlife skim", "family": "ultra_filtered", "servingMl": 240, "perServing": {"calories": 80, "protein": 13, "carbs": 6, "fat": 0}, "gramsPerMl": 1.03}
+]

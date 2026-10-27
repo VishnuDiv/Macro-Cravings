@@ -1,0 +1,931 @@
+[
+ {
+  "id": "high_protein_paneer",
+  "title": "High-Protein Paneer",
+  "subtitle": "Which milk to use, how to make it, and what you get per litre",
+  "icon": "square.stack.3d.up.fill",
+  "sections": [
+   {
+    "heading": "How paneer works",
+    "body": "Paneer is milk protein and milk fat pulled out of the liquid with heat and acid. When hot milk turns acidic, casein (about 80% of the protein in cow's milk) loses its charge and clumps into curds, and those curds trap most of the fat. Boiling the milk first also unfolds part of the whey protein, which then sticks to the casein and comes out with it, so boiled milk gives more paneer than milk that is only warmed.\nWhat stays behind in the yellow-green whey is mostly water, milk sugar, some minerals and a few grams of protein. That is why the milk you start with decides almost everything: more protein in the milk means more paneer and more protein per bite, and more fat means softer paneer with more calories."
+   },
+   {
+    "heading": "Which milk to use",
+    "body": "Judge milks by protein per 100 kcal of the finished paneer. Ultra-filtered milk (Fairlife, store-brand UF) has been filtered to hold back the protein and drop half the milk sugar, so it carries about 13 g of protein per cup instead of 8 g. Filtering keeps casein and whey in the same proportion, so it curdles just like normal milk, only with a bigger yield per litre.",
+    "bullets": [
+     "Most protein per calorie: fat-free ultra-filtered milk, about 33.1 g protein and 139.8 kcal per 100 g of paneer. Firm and a little springy.",
+     "Best all-rounder: Fairlife 2%, about 29.1 g protein and 218.6 kcal per 100 g, soft enough for curries and still lean.",
+     "Softest, richest texture: whole milk (or Fairlife whole). Regular whole milk gives about 142 g per litre at 19.9 g protein and 283.6 kcal per 100 g.",
+     "Plain skim milk alone gives only about 97 g per litre and turns rubbery and crumbly, because there is no fat to keep the curd tender. Fixes are below.",
+     "Lactose-free milk (Lactaid, Fairlife) works exactly like regular milk; the enzyme only splits the milk sugar.",
+     "Ultra-pasteurized milk (most UF and organic cartons) still works, because paneer is set by acid, not rennet. The curds may be finer, so drain through a doubled cloth.",
+     "Chocolate milk works but gives brown, faintly chocolatey paneer; keep it for sweets.",
+     "Plant milks do not make paneer: they have no casein. Soy milk does curdle, but set with a salt coagulant it becomes tofu, not paneer (see Tofu 101). Almond, oat, cashew and coconut milks will not form a usable curd."
+    ]
+   },
+   {
+    "heading": "What 1 litre gives you (estimates)",
+    "body": "Pressed paneer from 1 L of each milk, sorted by protein per 100 kcal. Low-fat paneer is pressed to the same firmness but holds more water, so its moisture is set higher (62% for fat-free, 53% for whole). The last column is the protein left in the whey. These come from the app's paneer model; your own numbers will vary by about 10% with pressing time and acid.",
+    "table": {
+     "columns": [
+      "Milk (1 L)",
+      "Paneer",
+      "kcal/100 g",
+      "Protein/100 g",
+      "Fat/100 g",
+      "Carbs/100 g",
+      "Protein per 100 kcal",
+      "Protein left in whey"
+     ],
+     "rows": [
+      [
+       "Fairlife fat-free (ultra-filtered)",
+       "139 g",
+       "140",
+       "33.1",
+       "0",
+       "1.8",
+       "23.7",
+       "8.1 g"
+      ],
+      [
+       "Store-brand fat-free ultra-filtered",
+       "139 g",
+       "140",
+       "33.1",
+       "0",
+       "1.8",
+       "23.7",
+       "8.1 g"
+      ],
+      [
+       "Skim milk",
+       "97 g",
+       "138",
+       "29.2",
+       "0",
+       "5.2",
+       "21.2",
+       "5 g"
+      ],
+      [
+       "Lactaid fat-free",
+       "98 g",
+       "138",
+       "28.9",
+       "0",
+       "5.5",
+       "21",
+       "5 g"
+      ],
+      [
+       "Fairlife 2% (ultra-filtered)",
+       "158 g",
+       "219",
+       "29.1",
+       "10.7",
+       "1.6",
+       "13.3",
+       "8.1 g"
+      ],
+      [
+       "1% milk",
+       "110 g",
+       "198",
+       "25.8",
+       "8.5",
+       "4.5",
+       "13",
+       "5 g"
+      ],
+      [
+       "Fairlife chocolate 2%",
+       "165 g",
+       "217",
+       "27.9",
+       "10.2",
+       "3.3",
+       "12.9",
+       "8.1 g"
+      ],
+      [
+       "Fairlife whole (ultra-filtered)",
+       "176 g",
+       "264",
+       "26.1",
+       "17",
+       "1.4",
+       "9.9",
+       "8.1 g"
+      ],
+      [
+       "2% milk",
+       "126 g",
+       "239",
+       "22.4",
+       "14.8",
+       "4",
+       "9.4",
+       "5 g"
+      ],
+      [
+       "Whole milk",
+       "142 g",
+       "284",
+       "19.9",
+       "21.1",
+       "3.5",
+       "7",
+       "5 g"
+      ]
+     ]
+    }
+   },
+   {
+    "heading": "You will need",
+    "body": "A heavy pot, a colander lined with cheesecloth or a thin clean cotton cloth, a bowl under it to catch the whey, a plate, and something heavy for pressing (a pot of water or a few cans).",
+    "bullets": [
+     "Lemon juice: 2 to 3 tbsp (30 to 45 ml) per litre, mixed with the same amount of water. Mildest flavor, slightly softer curd.",
+     "White vinegar (5%): about 2 tbsp (30 ml) per litre, mixed with 2 tbsp water. Cheap and consistent; rinse well.",
+     "Citric acid: about 1.5 g (a level 1/4 tsp) per litre dissolved in 60 ml warm water. Cleanest taste; this is what dairies use.",
+     "Yesterday's whey, left at room temperature for a day or two until sour: 250 to 500 ml per litre. Gives the softest paneer and no acid taste.",
+     "Ultra-filtered milk has about 60% more protein, so plan on roughly half again as much acid."
+    ]
+   },
+   {
+    "heading": "Step by step",
+    "body": "1. Bring the milk to a full rolling boil, stirring the bottom so it does not scorch. The boil is what pulls some whey protein into the paneer.\n2. Turn off the heat and wait 1 to 2 minutes so the milk drops to about 80 to 85 C (175 to 185 F). Coagulating a little below boiling gives softer, moister paneer; adding acid at a hard boil makes it tougher.\n3. Pour in the acid a spoonful at a time, stirring gently. Stop as soon as the curds separate and the liquid turns clear and yellow-green. If the liquid is still milky after a minute, add a little more acid.\n4. Let it rest 5 minutes off the heat so the curds firm up.\n5. Pour through the cloth-lined colander. Keep the whey.\n6. Rinse the curds under cold water for 10 to 20 seconds. This washes off the acid (no sour or lemon taste) and stops the cooking.\n7. Gather the cloth, twist out the loose water, and shape the bundle into a flat square.\n8. Press it under the plate and weight:\n   Soft (for crumbling, bhurji, sandwiches, kneaded sweets): about 1 kg for 20 to 30 minutes.\n   Firm (cubes for curry, grilling, air frying): 2 to 4 kg for 1 to 2 hours, or overnight in the fridge for very firm blocks.\n9. Unwrap, chill 30 minutes, then cut. Cold paneer cuts cleanly without crumbling."
+   },
+   {
+    "heading": "Get more protein out of it",
+    "body": "Small changes that raise yield or protein:",
+    "bullets": [
+     "Whisk 30 to 40 g of nonfat dry milk powder into each litre of cold milk before heating. Each 35 g adds about 12 g of milk protein and roughly 25 to 30 g of extra paneer. Dairy studies that fortified milk with milk powder saw yields jump by about a third.",
+     "Use ultra-filtered milk, or mix it half and half with regular whole milk for a soft paneer with about 25 g protein per 100 g.",
+     "Do not skip the boil: warm milk gives less paneer because the whey protein never joins the curd.",
+     "Save the whey. Regular milk leaves roughly 5 g of protein per litre in it, ultra-filtered milk about 8 g. Use it instead of water in roti or bread dough, in rice, dal or soup, in smoothies and protein shakes, or keep a cup in the fridge as the acid for the next batch."
+    ]
+   },
+   {
+    "heading": "Low-fat, high-protein version",
+    "body": "Fat-free milk makes the leanest paneer, but it needs help to stay tender.",
+    "bullets": [
+     "Start with fat-free ultra-filtered milk, or blend 750 ml fat-free UF with 250 ml whole milk for a softer curd that still lands near 30 g protein per 100 g.",
+     "Add the acid when the milk has cooled to about 75 C (165 F), not at the boil, and stir only until it separates.",
+     "Use lemon juice or soured whey rather than vinegar; gentler acids give a softer curd.",
+     "Press lightly (1 kg, 15 to 20 minutes). Low-fat paneer goes rubbery when pressed hard.",
+     "Keep the cubes in water in the fridge, and cook them gently: simmer in sauce or soak in hot salted water for 10 minutes before using."
+    ]
+   },
+   {
+    "heading": "Troubleshooting",
+    "body": "Most problems come from the milk, the acid, or the heat.",
+    "bullets": [
+     "Crumbly, falls apart: too little fat, too much acid, or stirred too hard. Use 2% or whole milk (or add 2 to 3 tbsp cream per litre), add acid slowly, stir gently, and knead the warm curd for a minute before pressing.",
+     "Chewy or rubbery: acid added at a hard boil, curds left in hot whey too long, or pressed too long. Cool the milk to 80 C first, drain within 5 minutes, press for less time, and soak finished cubes in hot water before cooking.",
+     "Low yield: the milk was not boiled, not enough acid (whey still milky), the cloth was too coarse, or the milk was skim. Boil fully, add acid until the whey is clear, use a doubled cloth, and try milk powder.",
+     "Sour or lemony: not rinsed, or too much acid. Rinse under cold water and switch to citric acid or soured whey.",
+     "Grainy or tiny curds: ultra-pasteurized milk or stirring too much. Stir less, rest longer, and drain through a fine cloth."
+    ]
+   },
+   {
+    "heading": "Storage",
+    "body": "Fresh paneer keeps 3 to 4 days in the fridge in a covered container of cold water; change the water daily. Wrapped tightly without water it keeps 2 to 3 days. For longer storage, freeze cubes on a tray, then bag them for up to 2 months. Thaw in the fridge or in warm water; frozen paneer is a little more crumbly, so use it in curries and scrambles rather than for grilling."
+   }
+  ]
+ },
+ {
+  "id": "veg_protein_cheat_sheet",
+  "title": "Vegetarian Protein Sources Cheat Sheet",
+  "subtitle": "Protein, calories and protein per 100 kcal, per 100 g",
+  "icon": "leaf.fill",
+  "sections": [
+   {
+    "heading": "How to read this",
+    "body": "Protein per 100 kcal tells you how lean a source is: above 10 g is excellent, 6 to 10 g is good, below 5 g is mostly an energy food with some protein. Dry foods (soy chunks, vital wheat gluten, powders) look huge per 100 g because they have no water; once cooked or mixed they land where the per-100-kcal number says. Values are typical US label numbers; brands differ by 10 to 20%."
+   },
+   {
+    "heading": "The table",
+    "body": "Sorted from leanest to richest.",
+    "table": {
+     "columns": [
+      "Food",
+      "Protein /100 g",
+      "kcal /100 g",
+      "Protein per 100 kcal",
+      "Best uses",
+      "Where to buy (US)"
+     ],
+     "rows": [
+      [
+       "Whey isolate powder",
+       "85",
+       "370",
+       "23",
+       "Shakes, Creami, oats",
+       "Dymatize ISO100, Isopure, Costco"
+      ],
+      [
+       "Casein powder",
+       "75",
+       "355",
+       "21.1",
+       "Creami, puddings, baking",
+       "ON Gold Standard Casein, Dymatize Elite Casein"
+      ],
+      [
+       "Pea protein isolate",
+       "80",
+       "380",
+       "21.1",
+       "Shakes, baking (dairy-free)",
+       "Naked Pea, Now Foods, Orgain"
+      ],
+      [
+       "Egg whites (liquid)",
+       "10.9",
+       "52",
+       "21",
+       "Omelets, oats, baking",
+       "All Whites, store-brand cartons"
+      ],
+      [
+       "Vital wheat gluten (dry)",
+       "75",
+       "370",
+       "20.3",
+       "Homemade seitan, bread",
+       "Bob's Red Mill, Anthony's (baking aisle, Amazon)"
+      ],
+      [
+       "Seitan",
+       "24",
+       "125",
+       "19.2",
+       "Strips, shawarma, cutlets, roast",
+       "Whole Foods, Asian groceries (Upton's, WestSoy) or homemade"
+      ],
+      [
+       "Skyr, plain nonfat",
+       "11",
+       "63",
+       "17.5",
+       "Breakfast, Creami bases, dips",
+       "Siggi's, Icelandic Provisions"
+      ],
+      [
+       "Greek yogurt, nonfat",
+       "10.2",
+       "59",
+       "17.3",
+       "Breakfast, marinades, dips, baking",
+       "Fage 0%, Chobani, Oikos, Great Value"
+      ],
+      [
+       "Soy chunks / TVP (dry)",
+       "52",
+       "340",
+       "15.3",
+       "Curries, mince, chili, bolognese",
+       "Indian groceries (Nutrela), Bob's Red Mill TVP at Walmart, Amazon"
+      ],
+      [
+       "Mycoprotein (Quorn pieces)",
+       "14",
+       "100",
+       "14",
+       "Stir-fries, curries, wraps",
+       "Kroger, Target, Whole Foods freezer; most Quorn contains egg"
+      ],
+      [
+       "Paneer, low fat (homemade 2% UF)",
+       "29",
+       "220",
+       "13.2",
+       "Curries, bhurji, high-protein snacks",
+       "Make it (see High-Protein Paneer guide)"
+      ],
+      [
+       "Cottage cheese, 2%",
+       "10.5",
+       "81",
+       "13",
+       "Snacks, blended into sauces and Creami",
+       "Good Culture, Daisy, store brands"
+      ],
+      [
+       "Super-firm / high-protein tofu",
+       "16",
+       "145",
+       "11",
+       "Slicing, grilling, sandwiches (no pressing needed)",
+       "Trader Joe's High Protein Tofu, Wildwood/Pulmuone, Whole Foods"
+      ],
+      [
+       "Extra-firm tofu",
+       "12",
+       "115",
+       "10.4",
+       "Stir-fries, air-fried cubes, baking",
+       "Any grocery; Trader Joe's, Walmart, Kroger"
+      ],
+      [
+       "Tempeh",
+       "20",
+       "192",
+       "10.4",
+       "Bacon strips, crumbles, sandwiches",
+       "Whole Foods, Trader Joe's, Kroger: Lightlife"
+      ],
+      [
+       "Firm tofu",
+       "10",
+       "100",
+       "10",
+       "Scrambles, curries, soups",
+       "Any grocery: House Foods, Nasoya, store brands"
+      ],
+      [
+       "Edamame, shelled",
+       "12",
+       "121",
+       "9.9",
+       "Snacks, bowls, salads, fried rice",
+       "Frozen aisle anywhere"
+      ],
+      [
+       "Beyond Burger (raw)",
+       "19",
+       "204",
+       "9.3",
+       "Burgers, crumbles",
+       "Most supermarkets"
+      ],
+      [
+       "Eggs, whole",
+       "12.6",
+       "143",
+       "8.8",
+       "Everything",
+       "Anywhere"
+      ],
+      [
+       "Impossible Burger (raw)",
+       "17",
+       "212",
+       "8",
+       "Burgers, tacos, bolognese",
+       "Most supermarkets"
+      ],
+      [
+       "Lentils, cooked",
+       "9",
+       "116",
+       "7.8",
+       "Dal, soups, salads, mince stretcher",
+       "Any grocery (dry or canned)"
+      ],
+      [
+       "Paneer, full fat",
+       "20",
+       "320",
+       "6.2",
+       "Curries, tikka, grilling",
+       "Indian groceries (Patel Brothers), Costco, Whole Foods: Nanak, Gopi"
+      ],
+      [
+       "Chickpeas, cooked",
+       "8.9",
+       "164",
+       "5.4",
+       "Curries, hummus, roasted snacks",
+       "Any grocery (dry or canned)"
+      ]
+     ]
+    }
+   },
+   {
+    "heading": "Quick picks",
+    "body": "If you want one easy win per meal:",
+    "bullets": [
+     "Breakfast: egg whites, skyr or Greek yogurt with a scoop of whey or casein.",
+     "Lunch: super-firm tofu or seitan in a wrap or bowl, plus edamame.",
+     "Dinner: soy chunks or homemade low-fat paneer in a curry; lentils on the side.",
+     "Snack: cottage cheese, a Creami pint, or roasted chickpeas.",
+     "Cheapest protein per dollar: soy chunks/TVP, vital wheat gluten, dry lentils."
+    ]
+   },
+   {
+    "heading": "Complete protein",
+    "body": "Soy, dairy, eggs, mycoprotein and pea-blend powders have all the essential amino acids in good amounts. Wheat gluten is low in lysine and legumes are low in methionine, so pair seitan with beans, lentils, soy or dairy over the day. You do not need to combine them in the same meal."
+   }
+  ]
+ },
+ {
+  "id": "meat_swap_guide",
+  "title": "Meat Swap Guide",
+  "subtitle": "Which vegetarian protein fits which job, and how to prep it",
+  "icon": "arrow.left.arrow.right",
+  "sections": [
+   {
+    "heading": "Pick by the job, not the meat",
+    "body": "A swap works when it does the same job in the dish: holds its shape in strips, pulls apart in shreds, gets crunchy, soaks up a sauce, or browns like mince. Use the table to choose, then follow the prep notes below.",
+    "table": {
+     "columns": [
+      "Dish role",
+      "Best swap",
+      "Also good",
+      "Why it works"
+     ],
+     "rows": [
+      [
+       "Strips (fajitas, stir-fry, shawarma)",
+       "Seitan sliced thin",
+       "Frozen-then-thawed extra-firm tofu; Quorn pieces",
+       "Seitan is chewy and fibrous like chicken breast and holds together in a hot pan."
+      ],
+      [
+       "Shredded (pulled 'chicken', BBQ, tacos)",
+       "Seitan or vegan chicken pieces pulled with two forks",
+       "Young jackfruit (low protein), shredded super-firm tofu",
+       "Gluten tears into long strands; add soy chunks or beans if you use jackfruit, which has little protein."
+      ],
+      [
+       "Crispy (nuggets, popcorn bites, katsu)",
+       "Extra-firm tofu, pressed and cornstarch-coated",
+       "Seitan cutlets; paneer",
+       "Pressed tofu dries on the outside and crisps in the air fryer while staying tender inside."
+      ],
+      [
+       "Curry (chunks in sauce)",
+       "Soy chunks or paneer",
+       "Tofu, chickpeas, tempeh",
+       "Soy chunks soak up gravy like a sponge; paneer stays soft and holds its cubes."
+      ],
+      [
+       "Mince (bolognese, chili, keema, tacos)",
+       "TVP or plant-based mince",
+       "Crumbled tempeh, lentils, crumbled frozen tofu",
+       "TVP browns and takes on any seasoning at a fraction of the cost; plant mince is closest in fat and juiciness."
+      ],
+      [
+       "Burger",
+       "Impossible or Beyond patty",
+       "Homemade black bean + TVP patty; seitan patty",
+       "These are built to sear, stay juicy and taste meaty."
+      ],
+      [
+       "Sausage",
+       "Veggie sausage (Beyond, field roast style)",
+       "Homemade seitan sausage (baked in foil)",
+       "Wheat-gluten sausages have the snap; plant-based ones brown well."
+      ],
+      [
+       "Bacon",
+       "Tempeh bacon",
+       "Veggie bacon strips; rice-paper bacon",
+       "Thin tempeh soaks up a smoky marinade and crisps in 3 to 4 minutes a side."
+      ],
+      [
+       "Fish (fish tacos, 'tuna' salad, fish curry)",
+       "Tofu with nori and lemon; mashed chickpeas for tuna salad",
+       "Banana blossom (low protein), Gardein fishless filets",
+       "Nori and kelp powder bring the sea flavor; firm tofu gives the flaky bite."
+      ]
+     ]
+    }
+   },
+   {
+    "heading": "Tofu prep",
+    "body": "Pressing and freezing change tofu more than any marinade.",
+    "bullets": [
+     "Press extra-firm tofu 20 to 30 minutes (tofu press, or wrapped in a towel under a heavy pan). Super-firm tofu needs no pressing.",
+     "For a chewier, meatier texture, freeze the whole block (in its package is fine) overnight, thaw in the fridge or in a bowl of hot water, then squeeze out the water. The ice crystals leave small pockets that make it spongy and stringy, and it drinks up marinade.",
+     "Coat in cornstarch (1 tbsp per 400 g block) before air frying or pan frying for a crisp shell."
+    ]
+   },
+   {
+    "heading": "Soy chunks and TVP",
+    "body": "Dry soy chunks are about 50% protein and cost very little. They need rehydrating first.",
+    "bullets": [
+     "Cover with boiling salted water (or broth) and soak 10 to 15 minutes, or simmer 5 minutes. They double to triple in weight.",
+     "Rinse under cold water and squeeze hard by the handful, twice. This removes the beany taste and makes room for sauce.",
+     "Marinate 30 minutes in yogurt and spices for curry, or soy sauce, garlic and a little oil for stir-fry.",
+     "Brown in a pan before adding to sauce so the edges get firm.",
+     "TVP granules for mince: soak 1 part TVP in about 0.9 parts boiling broth for 10 minutes; no squeezing needed."
+    ]
+   },
+   {
+    "heading": "Seitan, tempeh and paneer prep",
+    "body": "Each has a small trick:",
+    "bullets": [
+     "Seitan: slice against the grain for strips; sear in a hot pan with a little oil until browned, then add sauce. Homemade seitan freezes well.",
+     "Tempeh: steam or simmer 10 minutes first to take out the bitterness, then marinate. For bacon, slice 3 to 4 mm thick.",
+     "Paneer: soak cubes in hot salted water for 10 minutes before cooking to keep them soft; sear on two sides only.",
+     "Quorn and vegan chicken pieces: cook from frozen; they only need heating through and some color."
+    ]
+   },
+   {
+    "heading": "Marinating times",
+    "body": "How long each protein needs to take on flavor:",
+    "table": {
+     "columns": [
+      "Protein",
+      "Minimum",
+      "Best",
+      "Notes"
+     ],
+     "rows": [
+      [
+       "Fresh pressed tofu",
+       "30 min",
+       "4 h to overnight",
+       "Takes flavor slowly; cut thin or into small cubes."
+      ],
+      [
+       "Frozen-thawed tofu",
+       "15 min",
+       "1 h",
+       "Absorbs fast; squeeze, then marinate."
+      ],
+      [
+       "Soy chunks",
+       "20 min",
+       "1 to 2 h",
+       "Squeeze dry first so they absorb the marinade."
+      ],
+      [
+       "Tempeh",
+       "30 min",
+       "2 h to overnight",
+       "Steam first for better absorption."
+      ],
+      [
+       "Seitan",
+       "15 min",
+       "1 h",
+       "Already seasoned if cooked in broth."
+      ],
+      [
+       "Paneer",
+       "20 min",
+       "1 to 2 h",
+       "Yogurt-based (tikka) marinades; avoid long acidic soaks, which make it rubbery."
+      ]
+     ]
+    }
+   }
+  ]
+ },
+ {
+  "id": "homemade_seitan",
+  "title": "Homemade Seitan",
+  "subtitle": "About 30 g protein per 100 g from vital wheat gluten",
+  "icon": "flame.fill",
+  "sections": [
+   {
+    "heading": "What it is",
+    "body": "Seitan is wheat gluten, the protein left when starch is removed from flour. Vital wheat gluten is that protein as a dry powder (about 75% protein), so you can make seitan in minutes instead of washing dough. Cooked, it is chewy and meaty and takes any seasoning. It is not suitable for anyone avoiding gluten."
+   },
+   {
+    "heading": "Ingredients (about 420 g cooked, 4 servings)",
+    "body": "Dry:",
+    "bullets": [
+     "150 g vital wheat gluten",
+     "20 g chickpea flour (makes it more tender)",
+     "15 g nutritional yeast",
+     "1 tsp garlic powder, 1 tsp onion powder, 1 tsp smoked paprika, 1/2 tsp black pepper",
+     "Wet: 170 ml cold vegetable stock, 15 ml soy sauce, 10 g olive oil",
+     "Cooking liquid (simmer method): 1.5 L vegetable stock with 2 tbsp soy sauce",
+     "Whole batch: about 805 kcal and 127 g protein; per 100 g cooked about 190 kcal and 30 g protein; per serving about 200 kcal and 32 g protein."
+    ]
+   },
+   {
+    "heading": "Make the dough",
+    "body": "1. Whisk the dry ingredients in a bowl.\n2. Mix the wet ingredients and pour them in. Stir with a spoon until it forms one shaggy mass.\n3. Knead 2 minutes for tender seitan, or 5 to 8 minutes for a chewier, more stringy texture.\n4. Let it rest 10 minutes; the gluten relaxes and is easier to shape.\n5. Shape into a log for slicing, flat cutlets, or 4 sausage shapes."
+   },
+   {
+    "heading": "Three ways to cook it",
+    "body": "Each method gives a different texture.",
+    "bullets": [
+     "Simmer (softest, chicken-like): put the dough in cool stock, bring to a bare simmer and keep it there, covered, for 45 to 60 minutes. Never let it boil, or it puffs up and turns spongy and brain-like. Cool in the broth.",
+     "Steam (firm and juicy, the most reliable): wrap the log tightly in foil, twisting the ends, and steam 45 minutes. Good for slices and shreds.",
+     "Bake (densest, sausage-like): wrap tightly in foil and bake at 350 F (175 C) for 60 to 75 minutes, turning once. Best for sausages and deli slices.",
+     "After any method, cool fully before slicing; it firms up as it cools. Then sear, grill or air fry."
+    ]
+   },
+   {
+    "heading": "Storage and uses",
+    "body": "Keeps 5 days in the fridge (in its broth if simmered) and 3 months in the freezer. Slice thin for stir-fries and shawarma, tear for pulled 'chicken', cube for curries, or crumble for tacos. For a sausage version, add 1 tsp fennel seed and 1 tsp dried sage to the dry mix and bake it."
+   }
+  ]
+ },
+ {
+  "id": "hidden_non_veg",
+  "title": "Hidden Non-Vegetarian Ingredients",
+  "subtitle": "What to check on labels, and what to buy instead",
+  "icon": "exclamationmark.magnifyingglass",
+  "sections": [
+   {
+    "heading": "Why this matters",
+    "body": "Some ordinary foods use animal parts as thickeners, colorings, clarifiers or flavorings. Labels list them, but under names that are easy to miss. The app flags these ingredients in recipes with a leaf callout and offers a vegetarian swap."
+   },
+   {
+    "heading": "The list",
+    "body": "Most common in the US:",
+    "table": {
+     "columns": [
+      "Ingredient",
+      "Where it hides",
+      "What the label says",
+      "Buy instead (US)"
+     ],
+     "rows": [
+      [
+       "Gelatin",
+       "Marshmallows, gummies, Jell-O gelatin, some yogurts and sour creams, mousse, no-bake cheesecake, frosted cereals and toaster pastries, glazed candies",
+       "gelatin, kosher gelatin (can be beef or fish)",
+       "Agar powder (Now Foods, Telephone brand), Simply Delish jel dessert, Dandies marshmallows"
+      ],
+      [
+       "Marshmallows",
+       "Hot cocoa, s'mores, cereal (Lucky Charms), Rice Krispies treats",
+       "gelatin",
+       "Dandies (vanilla or mini), Trader Joe's vegan marshmallows when in season. Marshmallow Fluff and Jet-Puffed Marshmallow Creme use egg white, not gelatin."
+      ],
+      [
+       "Jell-O gelatin vs pudding",
+       "Jell-O gelatin boxes and cups contain gelatin; Jell-O instant and cook-and-serve pudding mixes are thickened with starch and are vegetarian",
+       "gelatin (gelatin boxes only)",
+       "Use pudding mix, or agar for a jelly set"
+      ],
+      [
+       "Worcestershire sauce",
+       "Caesar dressing, Bloody Marys, chili, burgers, gravies",
+       "anchovies",
+       "Annie's Organic Vegan Worcestershire, Wan Ja Shan vegetarian Worcestershire"
+      ],
+      [
+       "Fish sauce",
+       "Thai curries, pad thai, Vietnamese dishes, kimchi",
+       "fish extract, anchovy",
+       "Soy sauce + lime + pinch of seaweed; vegan fish sauce (Ocean's Halo No Fish Fish Sauce)"
+      ],
+      [
+       "Parmesan and Grana Padano",
+       "Pesto, Caesar salad, pasta, risotto",
+       "Parmigiano-Reggiano and Grana Padano are made with calf rennet by rule; 'enzymes' can be animal",
+       "Cheeses labelled vegetarian or 'microbial/non-animal rennet', e.g. BelGioioso Vegetarian Parmesan; nutritional yeast"
+      ],
+      [
+       "Other rennet cheeses",
+       "Some aged cheeses (Gorgonzola, Pecorino, many imported cheeses)",
+       "rennet, animal rennet, enzymes",
+       "Look for 'vegetarian rennet' or 'microbial enzymes'; Tillamook, Cabot and many US brands mark this"
+      ],
+      [
+       "Carmine / cochineal",
+       "Pink and red yogurts, candies, fruit drinks, some ice creams",
+       "carmine, cochineal, carminic acid, natural red 4",
+       "Products colored with beet, Red 40 or fruit concentrates"
+      ],
+      [
+       "Chicken or beef stock",
+       "Restaurant rice and pilaf, refried beans, soups (French onion), risotto, gravy, ramen, 'veg' soups",
+       "chicken broth, chicken fat, beef extract",
+       "Better Than Bouillon Vegetable or No Chicken base, Pacific or Swanson vegetable broth; ask at restaurants"
+      ],
+      [
+       "Lard",
+       "Traditional flour tortillas, refried beans, tamales, pie crusts, some biscuits",
+       "lard, manteca, pork fat",
+       "Mission or Guerrero flour tortillas made with shortening; refried beans labelled vegetarian (Old El Paso, Rosarita, Amy's)"
+      ],
+      [
+       "Isinglass and other fining agents",
+       "Some beers (especially cask ales) and wines",
+       "usually not listed at all",
+       "Check Barnivore.com; most US macro lagers and many wines are vegetarian; spirits are generally fine"
+      ],
+      [
+       "Collagen",
+       "Protein bars, coffee creamers, 'beauty' drinks, some protein powders",
+       "collagen peptides, hydrolyzed collagen, bovine or marine collagen",
+       "Whey, casein or plant protein powders"
+      ],
+      [
+       "Anchovy and fish in condiments",
+       "Caesar dressing, some pestos and tapenades, Thai curry pastes",
+       "anchovy, shrimp paste, dried shrimp",
+       "Vegan Caesar (Follow Your Heart), Maesri or Thai Kitchen curry pastes checked for shrimp"
+      ]
+     ]
+    }
+   },
+   {
+    "heading": "Yogurts and desserts to check",
+    "body": "Most plain yogurts are fine, but 'light', whipped and fruit yogurts sometimes add gelatin for body, and pink ones may use carmine. Store-bought mousses, panna cotta, cheesecake slices, frosted animal cookies and some frosted cereals can contain gelatin too.",
+    "bullets": [
+     "Read the ingredient list for gelatin, carmine and cochineal.",
+     "Plain Fage, Chobani, Oikos and Siggi's are gelatin-free as of writing; recheck flavored lines, which change.",
+     "Jell-O pudding cups and boxed puddings are fine; gelatin cups and boxes are not."
+    ]
+   },
+   {
+    "heading": "Restaurant and takeout traps",
+    "body": "Ask about these when eating out:",
+    "bullets": [
+     "Mexican rice, refried beans and 'charro' beans often use chicken stock or lard.",
+     "Soups marked 'vegetable' may have a chicken base.",
+     "In the US, McDonald's fries contain a beef-derived natural flavoring.",
+     "Thai and Vietnamese dishes often include fish sauce even when made with tofu.",
+     "Caesar salad and pesto use Parmesan and sometimes anchovy."
+    ]
+   },
+   {
+    "heading": "Label words that are fine",
+    "body": "These look suspicious but are vegetarian: lactic acid, mono- and diglycerides in most US foods (usually from vegetable oil), whey and casein (milk), pectin, carrageenan, agar, xanthan gum, guar gum, egg white and lecithin. Vitamin D3 is often from lanolin (sheep's wool), which most vegetarians accept."
+   }
+  ]
+ },
+ {
+  "id": "tofu_101",
+  "title": "Tofu 101",
+  "subtitle": "Pick the right block, press, freeze, crisp and season it",
+  "icon": "square.grid.3x3.fill",
+  "sections": [
+   {
+    "heading": "Which tofu",
+    "body": "Tofu is soy milk set with a salt coagulant, then pressed. The firmer it is, the less water and the more protein.",
+    "table": {
+     "columns": [
+      "Type",
+      "Protein /100 g",
+      "Use for"
+     ],
+     "rows": [
+      [
+       "Silken",
+       "5",
+       "Smoothies, Creami bases, creamy sauces, desserts"
+      ],
+      [
+       "Firm",
+       "10",
+       "Scrambles, soups, soft curries"
+      ],
+      [
+       "Extra-firm",
+       "12",
+       "Stir-fries, air-fried cubes, baking"
+      ],
+      [
+       "Super-firm / high-protein",
+       "16",
+       "Slicing, grilling, sandwiches; no pressing"
+      ]
+     ]
+    }
+   },
+   {
+    "heading": "Pressing",
+    "body": "Pressing removes water so tofu browns instead of steaming and soaks up flavor.",
+    "bullets": [
+     "Drain, wrap the block in a clean towel and set a heavy pan or a few cans on top for 20 to 30 minutes. A tofu press does the same in 15 minutes.",
+     "Firm and extra-firm tofu benefit most; super-firm is ready straight from the package; never press silken.",
+     "Quick method: cut into slabs, lay on a towel, cover with another towel and press with your palms for a minute."
+    ]
+   },
+   {
+    "heading": "Freezing for a chewy texture",
+    "body": "Freezing turns tofu meatier. The water inside turns into ice crystals that push the protein apart, so after thawing it is spongy, layered and chewy.",
+    "bullets": [
+     "Freeze the block (in its package, or pressed and cubed) for at least 12 hours.",
+     "Thaw overnight in the fridge, or put the sealed package in a bowl of hot water for about 1 hour.",
+     "Squeeze out the water with your hands; it releases much more than fresh tofu.",
+     "Frozen-then-thawed tofu soaks up a marinade in 15 minutes and is great for strips, 'chicken' and crumbles."
+    ]
+   },
+   {
+    "heading": "Crispy air-fryer tofu",
+    "body": "1. Press a 400 g block of extra-firm tofu and cut it into 2 cm cubes.\n2. Toss with 1 tbsp soy sauce and 1 tsp oil, then with 1 tbsp cornstarch until each cube is lightly coated.\n3. Air fry at 400 F (200 C) for 12 to 15 minutes in one layer, shaking the basket halfway.\n4. Toss with sauce right before serving so the crust stays crisp.\nWhole batch: about 530 kcal and 49 g protein."
+   },
+   {
+    "heading": "Marinades (for one 400 g block)",
+    "body": "Marinate pressed tofu 30 minutes to overnight, or frozen-thawed tofu 15 minutes to 1 hour.",
+    "bullets": [
+     "Soy-garlic: 3 tbsp soy sauce, 1 tbsp rice vinegar, 1 tsp sesame oil, 2 grated garlic cloves, 1 tsp grated ginger, 1 tsp sugar or sweetener.",
+     "Tikka: 100 g Greek yogurt, 1 tbsp lemon juice, 2 tsp tikka or garam masala, 1 tsp each paprika, garlic and ginger paste, salt.",
+     "Smoky BBQ: 3 tbsp BBQ sauce, 1 tbsp soy sauce, 1/2 tsp liquid smoke, 1 tsp smoked paprika.",
+     "Lemon-herb: 2 tbsp lemon juice, 1 tbsp olive oil, 1 tsp dried oregano, 1 garlic clove, salt and pepper.",
+     "Buffalo: 3 tbsp hot sauce, 1 tbsp melted butter, 1/2 tsp garlic powder; bake or air fry, then toss again."
+    ]
+   },
+   {
+    "heading": "Storage",
+    "body": "Leftover raw tofu keeps 3 to 5 days in the fridge, covered with water you change daily. Cooked tofu keeps 4 days. Unopened packages keep until the date, and tofu can be frozen for up to 3 months."
+   }
+  ]
+ },
+ {
+  "id": "protein_powders_for_cooking",
+  "title": "Best-Tasting Protein Powders for Cooking & Baking",
+  "subtitle": "Which powder to use for baking, pancakes, Creami, shakes and savory food",
+  "icon": "fork.knife",
+  "sections": [
+   {
+    "heading": "Short answer",
+    "body": "No single powder wins at everything. Whey-casein blends bake and freeze best, whey isolates make the cleanest shakes, casein makes the thickest Creami pints and 'proats', and unflavored isolates disappear into savory food. Picks below use the powders in the app's powder list.",
+    "table": {
+     "columns": [
+      "Use",
+      "Best pick",
+      "Runner-up",
+      "Why"
+     ],
+     "rows": [
+      [
+       "Baking (cookies, cakes, muffins)",
+       "PEScience Select (whey + casein): Snickerdoodle, Gourmet Vanilla, Frosted Chocolate Cupcake",
+       "Quest (whey isolate + casein): Vanilla Milkshake, Cookies & Cream; ON Gold Standard Whey: Double Rich Chocolate",
+       "Blends stay moist and soft; flavors tuned for desserts survive the oven."
+      ],
+      [
+       "Pancakes and waffles",
+       "PEScience Select Snickerdoodle or Gourmet Vanilla",
+       "Clean Simple Eats Snickerdoodle; ON Gold Standard Whey Vanilla Ice Cream",
+       "A blend keeps the stack fluffy instead of rubbery; cinnamon and vanilla flavors taste like pancake mix."
+      ],
+      [
+       "Oats ('proats') and overnight oats",
+       "Casein: Dymatize Elite Casein (Smooth Vanilla, Cinnamon Bun) or ON Gold Standard Casein",
+       "PEScience Select",
+       "Casein thickens oats into a pudding; stir it in after cooking so it does not clump."
+      ],
+      [
+       "Creami",
+       "Casein (ON Gold Standard, Dymatize Elite) or a whey-casein blend (PEScience, Quest)",
+       "Dymatize ISO100 with 1 tbsp pudding mix or a pinch of xanthan",
+       "Casein freezes creamy and scoopable; isolate alone spins icy."
+      ],
+      [
+       "Shakes",
+       "Dymatize ISO100 (Gourmet Chocolate, Fudge Brownie, Fruity Pebbles)",
+       "Transparent Labs Whey Isolate; Legion Whey+; Ghost Whey for dessert flavors",
+       "Isolates mix thin and smooth with little aftertaste."
+      ],
+      [
+       "Savory (unflavored)",
+       "Unflavored whey isolate (Isopure Unflavored, Legion Unflavored)",
+       "Naked Whey unflavored; unflavored soy isolate",
+       "Neutral taste; whisk into sauces, soups and mashed potatoes off the boil."
+      ]
+     ]
+    }
+   },
+   {
+    "heading": "Why blends bake better than isolates",
+    "body": "Heat changes protein. Whey isolate is almost pure whey protein; in the oven it unfolds and sets into a firm, springy gel and pulls water out of the batter, so isolate-heavy cookies and muffins come out dry, rubbery or eggy. Casein holds on to water and sets softer, but alone it is heavy and dense and can taste chalky. A whey-casein blend sits in the middle: the casein keeps the crumb moist and the whey gives some lift.",
+    "bullets": [
+     "In one home cookie test that swapped flour for nine kinds of protein, the whey-casein blend had the best flavor with a soft, cookie-dough-like center; isolate came out chewy and gummy with a strong protein taste, casein was cakey and dry, plant protein dry and earthy, and collagen did not hold together at all.",
+     "Replace no more than about a third of the flour with protein powder.",
+     "Add moisture back: Greek yogurt, applesauce, pumpkin or mashed banana.",
+     "Bake 25 F lower and pull them a minute or two early; protein bakes go from moist to dry fast.",
+     "Unflavored isolate in baking needs extra sweetener and vanilla to cover the dairy taste."
+    ]
+   },
+   {
+    "heading": "Flavors that taste best",
+    "body": "Flavor choice matters as much as brand:",
+    "bullets": [
+     "Baking: cinnamon flavors (Snickerdoodle, Cinnamon Bun, Cinnamon Swirl), vanilla and chocolate. Warm spice flavors hide the protein taste once baked.",
+     "Chocolate covers protein aftertaste best in everything; Dymatize Gourmet Chocolate and ON Double Rich Chocolate are reliable.",
+     "Creami: dessert flavors shine because the cold mutes sweetness (Ghost Cereal Milk or Chips Ahoy!, Dymatize Fruity Pebbles, PEScience Chocolate Peanut Butter Cup).",
+     "Avoid fruit flavors (strawberry, berry) for baking: the artificial notes get stronger and turn medicinal with heat.",
+     "For anything savory, use unflavored only; even 'vanilla' contains sweetener."
+    ]
+   },
+   {
+    "heading": "Casein and plant options",
+    "body": "Casein: ON Gold Standard Casein, Dymatize Elite Casein and Ascent Casein are the creamiest single powders for Creami, puddings and proats. In baking they are best mixed with whey (about half and half).\nPlant: plant powders absorb more liquid and taste earthier. Orgain Organic is the easiest to like (sweet, with added carbs), Vega Sport and Garden of Life Sport have more protein per scoop. Use chocolate or peanut butter flavors, which hide the pea taste, and add 2 to 3 tbsp more liquid per scoop in batters.",
+    "bullets": [
+     "Plant powders bake dry and crumbly; pair them with banana, pumpkin or nut butter.",
+     "Collagen is not vegetarian (made from animal hides or fish) and does not bake or freeze well anyway.",
+     "Whey and casein are dairy. Most US whey comes from cheese making with microbial or mixed rennet; strict vegetarians who avoid animal rennet can ask the brand."
+    ]
+   },
+   {
+    "heading": "Evidence and sources",
+    "body": "The evidence here is mostly home tests and review sites, not lab studies, so treat rankings as starting points. What the sources agree on:",
+    "bullets": [
+     "Cheat Day Design cookie experiment (cheatdaydesign.com): flour swapped for 9 protein types; the whey-casein blend tasted best, isolate was gummy, casein cakey and dry, plant and collagen worst.",
+     "Fitness Volt, Best Protein Powders for Baking (fitnessvolt.com, 2026): names PEScience Select Gourmet Vanilla its top choice for sweet recipes.",
+     "Breaking Muscle best-tasting test (75+ powders): Legion Whey+ as best whey; Transparent Labs Rice and Pea as best plant.",
+     "Gear Up to Fit taste guide (2026): Optimum Nutrition Gold Standard as the overall taste pick, Dymatize ISO100 as the best isolate with no grit, and Ghost and PEScience for dessert flavors.",
+     "Reddit protein-baking summaries (via a RedditRecs digest, now offline) and Creami recipe communities: casein-heavy blends for baking moisture and Creami creaminess; isolate alone tends to spin icy.",
+     "The app's protein powder list (protein_powders.json) for scoop sizes and flavors."
+    ]
+   }
+  ]
+ }
+]

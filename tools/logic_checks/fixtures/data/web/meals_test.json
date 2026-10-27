@@ -1,0 +1,112 @@
+[
+ {
+  "id": "web-paneer-tikka",
+  "name": "Paneer Tikka Bowl",
+  "section": "meal",
+  "course": "dinner",
+  "cuisine": "indian",
+  "servings": 2,
+  "source": {
+   "site": "example.com",
+   "url": "https://example.com/p"
+  },
+  "macrosPerServing": {
+   "calories": 400,
+   "protein": 28,
+   "carbs": 30,
+   "fat": 18,
+   "sugar": 5,
+   "fiber": 9
+  },
+  "base": [
+   {
+    "text": "200 g paneer",
+    "key": "paneer",
+    "grams": 200
+   }
+  ],
+  "instructions": [
+   "Grill.",
+   "Serve."
+  ],
+  "tags": [
+   "spicy",
+   "high-fiber"
+  ],
+  "vegetarian": true,
+  "containsEgg": false,
+  "vegAdaptation": null,
+  "evidence": {
+   "verdict": "promising",
+   "rating": 4.5
+  }
+ },
+ {
+  "id": "web-carbonara",
+  "name": "Veggie Carbonara",
+  "section": "meal",
+  "course": "dinner",
+  "cuisine": "other",
+  "servings": 2,
+  "source": {
+   "site": "example.com",
+   "url": "https://example.com/web-carbonara"
+  },
+  "macrosPerServing": {
+   "calories": 500,
+   "protein": 20,
+   "carbs": 60,
+   "fat": 15,
+   "fiber": 3
+  },
+  "base": [
+   {
+    "text": "200 g cheese",
+    "key": "cheese_x",
+    "grams": 200
+   }
+  ],
+  "instructions": [
+   "Cook.",
+   "Serve."
+  ],
+  "tags": [],
+  "vegetarian": true,
+  "containsEgg": false,
+  "vegAdaptation": null
+ },
+ {
+  "id": "web-hakka",
+  "name": "Hakka Noodles",
+  "section": "meal",
+  "course": "dinner",
+  "cuisine": "indo-chinese",
+  "servings": 2,
+  "source": {
+   "site": "example.com",
+   "url": "https://example.com/web-hakka"
+  },
+  "macrosPerServing": {
+   "calories": 500,
+   "protein": 20,
+   "carbs": 60,
+   "fat": 15,
+   "fiber": 3
+  },
+  "base": [
+   {
+    "text": "200 g hakka noodles",
+    "key": "hakka_noodles",
+    "grams": 200
+   }
+  ],
+  "instructions": [
+   "Cook.",
+   "Serve."
+  ],
+  "tags": [],
+  "vegetarian": true,
+  "containsEgg": false,
+  "vegAdaptation": null
+ }
+]

@@ -1,0 +1,250 @@
+{
+ "version": 1,
+ "proteinRecovery": 0.85,
+ "fatRecovery": 0.9,
+ "lactoseRecovery": 0.1,
+ "ashGramsPerLitreMilk": 7.0,
+ "ashRecovery": 0.5,
+ "moisturePct": 0.53,
+ "calorieFactors": {
+  "protein": 4,
+  "fat": 9,
+  "carbs": 4
+ },
+ "formula": "yield_g = (protein_g*proteinRecovery + fat_g*fatRecovery + carbs_g*lactoseRecovery + ashGramsPerLitreMilk*litres*ashRecovery) / (1 - moisturePct). Paneer macros: protein = protein_g*proteinRecovery, fat = fat_g*fatRecovery, carbs = sugar = carbs_g*lactoseRecovery, fiber 0, calories from calorieFactors. Milk grams come from the liquid's perServing scaled by litres*1000/servingMl. A per-liquid override replaces any of these fields for that liquid.",
+ "families": [
+  "milk",
+  "ultra_filtered"
+ ],
+ "notes": [
+  "What the model does: paneer is the milk's casein and most of its fat, trapped in a curd that keeps about half its weight as water. Each milk component is carried over by a recovery fraction, and the dry solids are divided by (1 - moisture).",
+  "proteinRecovery 0.85: casein is about 80% of cow-milk protein and is fully precipitated by acid near pH 5. Heating milk to a boil (85-90 C or more) denatures much of the whey protein (mainly beta-lactoglobulin), which binds to the casein micelles and comes down with the curd. Indian dairy-technology texts state paneer keeps about 90% of the milk protein; reported paneer whey holds about 0.45-0.55% crude protein (part of that is non-protein nitrogen), i.e. roughly 4-6 g per litre of milk left behind. 0.85 sits between those two numbers.",
+  "fatRecovery 0.90: fat globules are caught in the casein network during acid-heat coagulation; the same texts report about 90% fat retention, with paneer whey at roughly 0.5-0.6% fat when made from full-fat milk.",
+  "lactoseRecovery 0.10: lactose stays dissolved in the whey; the only lactose left is what sits in the curd's trapped water (about 10% of the milk's lactose per the dairy texts). For lactose-free and ultra-filtered milk the 'carbs' are the label carbs, treated the same way.",
+  "Ash: milk has about 7 g of minerals per litre and paneer keeps about half (casein-bound calcium phosphate); ultra-filtered milk keeps more of the casein-bound minerals, so its override uses 8.5 g/L.",
+  "moisturePct: 0.53 for whole milk, matching the 50-55% typical of pressed paneer (good-quality paneer is reported at roughly 53-55% moisture, 23-26% fat, 17-18% protein). Low-fat curd holds more water at the same pressing, so 2% uses 0.56, 1% 0.58, and fat-free 0.62. Pressing harder or longer lowers moisture and the yield in grams, but not the grams of protein.",
+  "Ultra-filtered milk (Fairlife and store-brand UF): filtering removes water, lactose and some soluble salts but holds back every protein, so it raises protein from about 8 g to 13 g per 240 ml while keeping the same casein-to-whey ratio (about 80:20). The recovery fractions therefore stay the same and the yield per litre rises with the protein; half the lactose is gone, so the paneer is slightly leaner in carbs.",
+  "Plant milks and protein shakes are excluded (see 'unsupported').",
+  "Sanity check vs published yields: Indian dairy-technology course text (INFLIBNET e-PG Pathshala, 'Technology of Paneer'): cow milk standardized to 4.5-5% fat gives 17-18% yield at 51-54% moisture: published 170-180 g/kg, model 163-175 g; Same source: buffalo milk (~6% fat, ~4% protein) gives 21-23% yield: published 210-230 g/kg, model 205 g; US home-cook reports (recipe and calculator sites): a half gallon (1.89 L) of whole milk gives about 230-285 g: published 122-151 g/L, model 142 g; Korean-indexed 1992 study (koreascience JAKO199223443162239): cow-milk paneer 14.1% yield (unstandardized milk): published 141 g/kg, model 142 (US whole milk) g.",
+  "Composition check: for the 4.5%-fat cow-milk case the model predicts 17.2% protein and 24.8% fat in the paneer, close to the 17-18% protein and 23-26% fat reported for good-quality paneer.",
+  "Why the US numbers are lower than the often-quoted 180-200 g per litre: those figures are for Indian cow milk standardized to 4.5-5% fat or for buffalo milk. US whole milk is about 3.25% fat, so firmly pressed home paneer lands nearer 150 g per litre, which matches US home-cook reports. Lightly pressed, wetter paneer (60% moisture) would weigh about 165 g.",
+  "Skim milk alone gives about 95-100 g per litre of pressed paneer; ultra-filtered fat-free gives about 140 g with more protein per gram. With UF milk about 8 g of protein per litre stays in the whey (versus about 5 g for regular milk), because it starts with more whey protein."
+ ],
+ "overrides": {
+  "fat_free_ultra_filtered_milk": {
+   "moisturePct": 0.62,
+   "ashGramsPerLitreMilk": 8.5
+  },
+  "fairlife_2pct": {
+   "moisturePct": 0.56,
+   "ashGramsPerLitreMilk": 8.5
+  },
+  "fairlife_whole": {
+   "ashGramsPerLitreMilk": 8.5
+  },
+  "fairlife_chocolate_2pct": {
+   "moisturePct": 0.56,
+   "ashGramsPerLitreMilk": 8.5,
+   "note": "Works, but the cocoa and the added sugar mostly wash out with the whey and the paneer comes out pale brown with a faint chocolate taste. Use plain milk for savory dishes."
+  },
+  "store_brand_uf_fat_free": {
+   "moisturePct": 0.62,
+   "ashGramsPerLitreMilk": 8.5
+  },
+  "skim_milk": {
+   "moisturePct": 0.62
+  },
+  "one_percent_milk": {
+   "moisturePct": 0.58
+  },
+  "two_percent_milk": {
+   "moisturePct": 0.56
+  },
+  "lactaid_fat_free": {
+   "moisturePct": 0.62,
+   "note": "Lactose-free milk curdles exactly like regular milk (the lactase only splits the milk sugar). The paneer tastes slightly sweeter."
+  }
+ },
+ "unsupported": {
+  "plant": "Plant milks do not make paneer: paneer depends on casein, the milk protein that clumps when heated with acid, and plant milks have none. Almond, oat, cashew and coconut milks just turn sour or separate slightly. Soy milk does curdle, but with a salt coagulant (nigari or calcium sulfate) the result is tofu, not paneer; see the Tofu 101 guide.",
+  "protein_shake": "Bottled protein shakes are not suitable: they contain stabilizers, sweeteners and sometimes plant protein, and many are heat-treated so the curd will not form cleanly."
+ },
+ "sources": [
+  "INFLIBNET e-PG Pathshala, Technology of Milk and Milk Products, 'Technology of Paneer' (ebooks.inflibnet.ac.in/ftp04/chapter/technology-of-paneer/)",
+  "Korean-indexed paneer yield study, 1992 (koreascience.kr/article/JAKO199223443162239.pdf)",
+  "Paneer whey composition reports (e.g. microbiologyjournal.org, 'Evaluation of cheddar cheese whey and paneer whey as a growth medium for lactic acid bacteria')",
+  "Low-fat paneer studies, Indian Journal of Veterinary and Animal Sciences Research (epubs.icar.org.in/index.php/IJVASR/article/view/130395)"
+ ],
+ "table1L": [
+  {
+   "id": "fat_free_ultra_filtered_milk",
+   "name": "Fairlife fat-free (ultra-filtered)",
+   "yieldG": 139,
+   "kcal": 194,
+   "proteinG": 46.0,
+   "fatG": 0.0,
+   "carbsG": 2.5,
+   "per100g": {
+    "kcal": 139.8,
+    "protein": 33.1,
+    "fat": 0.0,
+    "carbs": 1.8
+   },
+   "proteinPer100kcal": 23.7,
+   "wheyProteinLeftG": 8.1
+  },
+  {
+   "id": "store_brand_uf_fat_free",
+   "name": "Store-brand fat-free ultra-filtered",
+   "yieldG": 139,
+   "kcal": 194,
+   "proteinG": 46.0,
+   "fatG": 0.0,
+   "carbsG": 2.5,
+   "per100g": {
+    "kcal": 139.8,
+    "protein": 33.1,
+    "fat": 0.0,
+    "carbs": 1.8
+   },
+   "proteinPer100kcal": 23.7,
+   "wheyProteinLeftG": 8.1
+  },
+  {
+   "id": "skim_milk",
+   "name": "Skim milk",
+   "yieldG": 97,
+   "kcal": 133,
+   "proteinG": 28.3,
+   "fatG": 0.0,
+   "carbsG": 5.0,
+   "per100g": {
+    "kcal": 137.6,
+    "protein": 29.2,
+    "fat": 0.0,
+    "carbs": 5.2
+   },
+   "proteinPer100kcal": 21.2,
+   "wheyProteinLeftG": 5.0
+  },
+  {
+   "id": "lactaid_fat_free",
+   "name": "Lactaid fat-free",
+   "yieldG": 98,
+   "kcal": 135,
+   "proteinG": 28.3,
+   "fatG": 0.0,
+   "carbsG": 5.4,
+   "per100g": {
+    "kcal": 137.7,
+    "protein": 28.9,
+    "fat": 0.0,
+    "carbs": 5.5
+   },
+   "proteinPer100kcal": 21.0,
+   "wheyProteinLeftG": 5.0
+  },
+  {
+   "id": "fairlife_2pct",
+   "name": "Fairlife 2% (ultra-filtered)",
+   "yieldG": 158,
+   "kcal": 346,
+   "proteinG": 46.0,
+   "fatG": 16.9,
+   "carbsG": 2.5,
+   "per100g": {
+    "kcal": 218.6,
+    "protein": 29.1,
+    "fat": 10.7,
+    "carbs": 1.6
+   },
+   "proteinPer100kcal": 13.3,
+   "wheyProteinLeftG": 8.1
+  },
+  {
+   "id": "one_percent_milk",
+   "name": "1% milk",
+   "yieldG": 110,
+   "kcal": 218,
+   "proteinG": 28.3,
+   "fatG": 9.4,
+   "carbsG": 5.0,
+   "per100g": {
+    "kcal": 197.9,
+    "protein": 25.8,
+    "fat": 8.5,
+    "carbs": 4.5
+   },
+   "proteinPer100kcal": 13.0,
+   "wheyProteinLeftG": 5.0
+  },
+  {
+   "id": "fairlife_chocolate_2pct",
+   "name": "Fairlife chocolate 2%",
+   "yieldG": 165,
+   "kcal": 358,
+   "proteinG": 46.0,
+   "fatG": 16.9,
+   "carbsG": 5.4,
+   "per100g": {
+    "kcal": 216.8,
+    "protein": 27.9,
+    "fat": 10.2,
+    "carbs": 3.3
+   },
+   "proteinPer100kcal": 12.9,
+   "wheyProteinLeftG": 8.1
+  },
+  {
+   "id": "fairlife_whole",
+   "name": "Fairlife whole (ultra-filtered)",
+   "yieldG": 176,
+   "kcal": 464,
+   "proteinG": 46.0,
+   "fatG": 30.0,
+   "carbsG": 2.5,
+   "per100g": {
+    "kcal": 263.5,
+    "protein": 26.1,
+    "fat": 17.0,
+    "carbs": 1.4
+   },
+   "proteinPer100kcal": 9.9,
+   "wheyProteinLeftG": 8.1
+  },
+  {
+   "id": "two_percent_milk",
+   "name": "2% milk",
+   "yieldG": 126,
+   "kcal": 302,
+   "proteinG": 28.3,
+   "fatG": 18.8,
+   "carbsG": 5.0,
+   "per100g": {
+    "kcal": 239.1,
+    "protein": 22.4,
+    "fat": 14.8,
+    "carbs": 4.0
+   },
+   "proteinPer100kcal": 9.4,
+   "wheyProteinLeftG": 5.0
+  },
+  {
+   "id": "whole_milk",
+   "name": "Whole milk",
+   "yieldG": 142,
+   "kcal": 403,
+   "proteinG": 28.3,
+   "fatG": 30.0,
+   "carbsG": 5.0,
+   "per100g": {
+    "kcal": 283.6,
+    "protein": 19.9,
+    "fat": 21.1,
+    "carbs": 3.5
+   },
+   "proteinPer100kcal": 7.0,
+   "wheyProteinLeftG": 5.0
+  }
+ ]
+}

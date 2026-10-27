@@ -1,0 +1,506 @@
+[
+ {
+  "id": "fat_free_ultra_filtered_milk",
+  "name": "Fairlife fat-free (ultra-filtered)",
+  "family": "ultra_filtered",
+  "brand": "Fairlife",
+  "servingMl": 240,
+  "perServing": {
+   "calories": 80,
+   "protein": 13,
+   "carbs": 6,
+   "fat": 0,
+   "sugar": 6,
+   "fiber": 0
+  },
+  "gramsPerMl": 1.035,
+  "ingredientKey": "fat_free_ultra_filtered_milk",
+  "note": "The book's default milk."
+ },
+ {
+  "id": "fairlife_2pct",
+  "name": "Fairlife 2% (ultra-filtered)",
+  "family": "ultra_filtered",
+  "brand": "Fairlife",
+  "servingMl": 240,
+  "perServing": {
+   "calories": 120,
+   "protein": 13,
+   "carbs": 6,
+   "fat": 4.5,
+   "sugar": 6,
+   "fiber": 0
+  },
+  "gramsPerMl": 1.035,
+  "ingredientKey": "ultra_filtered_milk_2pct",
+  "note": "Creamier; about +65 kcal per 400 g vs the book."
+ },
+ {
+  "id": "fairlife_whole",
+  "name": "Fairlife whole (ultra-filtered)",
+  "family": "ultra_filtered",
+  "brand": "Fairlife",
+  "servingMl": 240,
+  "perServing": {
+   "calories": 150,
+   "protein": 13,
+   "carbs": 6,
+   "fat": 8,
+   "sugar": 6,
+   "fiber": 0
+  },
+  "gramsPerMl": 1.035,
+  "ingredientKey": "ultra_filtered_milk_whole",
+  "note": "Richest UF; about +110 kcal per 400 g vs the book."
+ },
+ {
+  "id": "fairlife_chocolate_2pct",
+  "name": "Fairlife chocolate 2%",
+  "family": "ultra_filtered",
+  "brand": "Fairlife",
+  "servingMl": 240,
+  "perServing": {
+   "calories": 140,
+   "protein": 13,
+   "carbs": 13,
+   "fat": 4.5,
+   "sugar": 12,
+   "fiber": 0
+  },
+  "gramsPerMl": 1.035,
+  "ingredientKey": "ultra_filtered_milk_chocolate",
+  "note": "For chocolate recipes; about +95 kcal and +9 g sugar per 400 g vs fat-free; cut the sweetener."
+ },
+ {
+  "id": "store_brand_uf_fat_free",
+  "name": "Store-brand fat-free ultra-filtered",
+  "family": "ultra_filtered",
+  "brand": "Great Value / Kroger",
+  "servingMl": 240,
+  "perServing": {
+   "calories": 80,
+   "protein": 13,
+   "carbs": 6,
+   "fat": 0,
+   "sugar": 6,
+   "fiber": 0
+  },
+  "gramsPerMl": 1.035,
+  "ingredientKey": "ultra_filtered_milk_store_brand",
+  "note": "Same as the book within a few kcal; check your carton."
+ },
+ {
+  "id": "skim_milk",
+  "name": "Skim milk",
+  "family": "milk",
+  "brand": null,
+  "servingMl": 240,
+  "perServing": {
+   "calories": 80,
+   "protein": 8,
+   "carbs": 12,
+   "fat": 0,
+   "sugar": 12,
+   "fiber": 0
+  },
+  "gramsPerMl": 1.03,
+  "ingredientKey": "skim_milk",
+  "note": "Same calories as the book, ~-13 g protein per pint and icier; add 20 g dry milk powder."
+ },
+ {
+  "id": "one_percent_milk",
+  "name": "1% milk",
+  "family": "milk",
+  "brand": null,
+  "servingMl": 240,
+  "perServing": {
+   "calories": 110,
+   "protein": 8,
+   "carbs": 12,
+   "fat": 2.5,
+   "sugar": 12,
+   "fiber": 0
+  },
+  "gramsPerMl": 1.03,
+  "ingredientKey": "one_percent_milk",
+  "note": "About +50 kcal and ~-13 g protein per pint vs the book."
+ },
+ {
+  "id": "two_percent_milk",
+  "name": "2% milk",
+  "family": "milk",
+  "brand": null,
+  "servingMl": 240,
+  "perServing": {
+   "calories": 130,
+   "protein": 8,
+   "carbs": 12,
+   "fat": 5,
+   "sugar": 12,
+   "fiber": 0
+  },
+  "gramsPerMl": 1.03,
+  "ingredientKey": "two_percent_milk",
+  "note": "About +80 kcal and ~-13 g protein per pint vs the book; creamier."
+ },
+ {
+  "id": "whole_milk",
+  "name": "Whole milk",
+  "family": "milk",
+  "brand": null,
+  "servingMl": 240,
+  "perServing": {
+   "calories": 150,
+   "protein": 8,
+   "carbs": 12,
+   "fat": 8,
+   "sugar": 12,
+   "fiber": 0
+  },
+  "gramsPerMl": 1.03,
+  "ingredientKey": "whole_milk",
+  "note": "About +115 kcal and ~-13 g protein per pint vs the book; creamiest regular milk."
+ },
+ {
+  "id": "lactaid_fat_free",
+  "name": "Lactaid fat-free",
+  "family": "milk",
+  "brand": "Lactaid",
+  "servingMl": 240,
+  "perServing": {
+   "calories": 80,
+   "protein": 8,
+   "carbs": 13,
+   "fat": 0,
+   "sugar": 12,
+   "fiber": 0
+  },
+  "gramsPerMl": 1.03,
+  "ingredientKey": "lactose_free_skim_milk",
+  "note": "Lactose-free; same calories as the book, ~-13 g protein per pint."
+ },
+ {
+  "id": "silk_unsweetened_almond",
+  "name": "Silk unsweetened almond",
+  "family": "plant",
+  "brand": "Silk",
+  "servingMl": 240,
+  "perServing": {
+   "calories": 30,
+   "protein": 1,
+   "carbs": 1,
+   "fat": 2.5,
+   "sugar": 0,
+   "fiber": 0
+  },
+  "gramsPerMl": 1.01,
+  "ingredientKey": "almond_milk",
+  "note": "About -80 kcal and ~-20 g protein per pint vs the book; icier, add 0.5 g xanthan."
+ },
+ {
+  "id": "almond_breeze_unsweetened",
+  "name": "Almond Breeze unsweetened original",
+  "family": "plant",
+  "brand": "Blue Diamond",
+  "servingMl": 240,
+  "perServing": {
+   "calories": 30,
+   "protein": 1,
+   "carbs": 1,
+   "fat": 2.5,
+   "sugar": 0,
+   "fiber": 0
+  },
+  "gramsPerMl": 1.01,
+  "ingredientKey": "almond_milk",
+  "note": "Same as Silk unsweetened almond."
+ },
+ {
+  "id": "oatly_original",
+  "name": "Oatly Original oat milk",
+  "family": "plant",
+  "brand": "Oatly",
+  "servingMl": 240,
+  "perServing": {
+   "calories": 120,
+   "protein": 3,
+   "carbs": 16,
+   "fat": 5,
+   "sugar": 7,
+   "fiber": 2
+  },
+  "gramsPerMl": 1.03,
+  "ingredientKey": "oat_milk",
+  "note": "About +65 kcal and ~-16 g protein per pint vs the book; creamy, naturally sweet."
+ },
+ {
+  "id": "oatly_unsweetened",
+  "name": "Oatly Unsweetened oat milk",
+  "family": "plant",
+  "brand": "Oatly",
+  "servingMl": 240,
+  "perServing": {
+   "calories": 45,
+   "protein": 1,
+   "carbs": 9,
+   "fat": 0.5,
+   "sugar": 0,
+   "fiber": 1
+  },
+  "gramsPerMl": 1.03,
+  "ingredientKey": "oat_milk_unsweetened",
+  "note": "About -55 kcal and ~-19 g protein per pint vs the book; thin, icier."
+ },
+ {
+  "id": "planet_oat_original",
+  "name": "Planet Oat Original oat milk",
+  "family": "plant",
+  "brand": "Planet Oat",
+  "servingMl": 240,
+  "perServing": {
+   "calories": 90,
+   "protein": 2,
+   "carbs": 20,
+   "fat": 1.5,
+   "sugar": 4,
+   "fiber": 1
+  },
+  "gramsPerMl": 1.03,
+  "ingredientKey": "oat_milk_planet_oat",
+  "note": "About +15 kcal and ~-18 g protein per pint vs the book."
+ },
+ {
+  "id": "silk_unsweetened_soy",
+  "name": "Silk unsweetened soy",
+  "family": "plant",
+  "brand": "Silk",
+  "servingMl": 240,
+  "perServing": {
+   "calories": 80,
+   "protein": 7,
+   "carbs": 3,
+   "fat": 4,
+   "sugar": 1,
+   "fiber": 2
+  },
+  "gramsPerMl": 1.01,
+  "ingredientKey": "soy_milk",
+  "note": "Same calories as the book, best dairy-free protein (~-10 g per pint)."
+ },
+ {
+  "id": "silk_unsweetened_cashew",
+  "name": "Silk unsweetened cashew",
+  "family": "plant",
+  "brand": "Silk",
+  "servingMl": 240,
+  "perServing": {
+   "calories": 25,
+   "protein": 0.5,
+   "carbs": 1,
+   "fat": 2,
+   "sugar": 0,
+   "fiber": 0
+  },
+  "gramsPerMl": 1.01,
+  "ingredientKey": "cashew_milk",
+  "note": "About -90 kcal and ~-20 g protein per pint vs the book; creamier than almond."
+ },
+ {
+  "id": "coconut_milk_beverage",
+  "name": "Unsweetened coconut milk beverage",
+  "family": "plant",
+  "brand": "So Delicious",
+  "servingMl": 240,
+  "perServing": {
+   "calories": 45,
+   "protein": 0,
+   "carbs": 1,
+   "fat": 4.5,
+   "sugar": 0,
+   "fiber": 0
+  },
+  "gramsPerMl": 1.01,
+  "ingredientKey": "coconut_milk_beverage",
+  "note": "About -55 kcal and no protein vs the book; coconut flavor, icy."
+ },
+ {
+  "id": "protein_shake_generic",
+  "name": "Protein shake (book default, ~375 ml)",
+  "family": "protein_shake",
+  "brand": null,
+  "servingMl": 375,
+  "perServing": {
+   "calories": 160,
+   "protein": 28,
+   "carbs": 5,
+   "fat": 3,
+   "sugar": 2,
+   "fiber": 1
+  },
+  "gramsPerMl": 1.04,
+  "ingredientKey": "protein_shake_generic",
+  "note": "The book's shake: Core Power 26 g / Premier style."
+ },
+ {
+  "id": "core_power_26",
+  "name": "Fairlife Core Power 26 g",
+  "family": "protein_shake",
+  "brand": "Fairlife",
+  "servingMl": 414,
+  "perServing": {
+   "calories": 170,
+   "protein": 26,
+   "carbs": 8,
+   "fat": 4.5,
+   "sugar": 5,
+   "fiber": 0
+  },
+  "gramsPerMl": 1.05,
+  "ingredientKey": "protein_shake_core_power_26",
+  "note": "Bigger bottle; +~10 kcal, -2 g protein vs the book's shake."
+ },
+ {
+  "id": "core_power_42",
+  "name": "Fairlife Core Power Elite 42 g",
+  "family": "protein_shake",
+  "brand": "Fairlife",
+  "servingMl": 414,
+  "perServing": {
+   "calories": 230,
+   "protein": 42,
+   "carbs": 8,
+   "fat": 4,
+   "sugar": 8,
+   "fiber": 0
+  },
+  "gramsPerMl": 1.05,
+  "ingredientKey": "protein_shake_core_power_42",
+  "note": "+~70 kcal and +14 g protein per pint vs the book's shake."
+ },
+ {
+  "id": "fairlife_nutrition_plan",
+  "name": "Fairlife Nutrition Plan",
+  "family": "protein_shake",
+  "brand": "Fairlife",
+  "servingMl": 340,
+  "perServing": {
+   "calories": 150,
+   "protein": 30,
+   "carbs": 3,
+   "fat": 2.5,
+   "sugar": 2,
+   "fiber": 1
+  },
+  "gramsPerMl": 1.05,
+  "ingredientKey": "protein_shake_fairlife_nutrition_plan",
+  "note": "-10 kcal, +2 g protein vs the book's shake."
+ },
+ {
+  "id": "premier_protein_shake",
+  "name": "Premier Protein",
+  "family": "protein_shake",
+  "brand": "Premier Protein",
+  "servingMl": 325,
+  "perServing": {
+   "calories": 160,
+   "protein": 30,
+   "carbs": 4,
+   "fat": 3,
+   "sugar": 1,
+   "fiber": 1
+  },
+  "gramsPerMl": 1.05,
+  "ingredientKey": "protein_shake_premier",
+  "note": "Same calories, +2 g protein; smaller 325 ml bottle."
+ },
+ {
+  "id": "muscle_milk_pro",
+  "name": "Muscle Milk Pro Series 32 g",
+  "family": "protein_shake",
+  "brand": "Muscle Milk",
+  "servingMl": 325,
+  "perServing": {
+   "calories": 170,
+   "protein": 32,
+   "carbs": 9,
+   "fat": 2,
+   "sugar": 1,
+   "fiber": 5
+  },
+  "gramsPerMl": 1.05,
+  "ingredientKey": "protein_shake_muscle_milk_pro",
+  "note": "+10 kcal, +4 g protein vs the book's shake."
+ },
+ {
+  "id": "owyn_pro_elite",
+  "name": "OWYN Pro Elite 32 g (plant)",
+  "family": "protein_shake",
+  "brand": "OWYN",
+  "servingMl": 330,
+  "perServing": {
+   "calories": 200,
+   "protein": 32,
+   "carbs": 3,
+   "fat": 7,
+   "sugar": 0,
+   "fiber": 3
+  },
+  "gramsPerMl": 1.05,
+  "ingredientKey": "protein_shake_owyn",
+  "note": "Dairy-free; +40 kcal, +4 g protein vs the book's shake."
+ },
+ {
+  "id": "orgain_plant_shake",
+  "name": "Orgain plant protein shake",
+  "family": "protein_shake",
+  "brand": "Orgain",
+  "servingMl": 330,
+  "perServing": {
+   "calories": 140,
+   "protein": 20,
+   "carbs": 7,
+   "fat": 4.5,
+   "sugar": 1,
+   "fiber": 2
+  },
+  "gramsPerMl": 1.05,
+  "ingredientKey": "protein_shake_orgain_plant",
+  "note": "Dairy-free; -20 kcal, -8 g protein vs the book's shake (values vary by line)."
+ },
+ {
+  "id": "atkins_shake",
+  "name": "Atkins shake",
+  "family": "protein_shake",
+  "brand": "Atkins",
+  "servingMl": 325,
+  "perServing": {
+   "calories": 160,
+   "protein": 15,
+   "carbs": 5,
+   "fat": 9,
+   "sugar": 1,
+   "fiber": 3
+  },
+  "gramsPerMl": 1.05,
+  "ingredientKey": "protein_shake_atkins",
+  "note": "Same calories but only 15 g protein (-13 g) and more fat."
+ },
+ {
+  "id": "quest_shake",
+  "name": "Quest protein shake",
+  "family": "protein_shake",
+  "brand": "Quest",
+  "servingMl": 325,
+  "perServing": {
+   "calories": 170,
+   "protein": 30,
+   "carbs": 3,
+   "fat": 3.5,
+   "sugar": 1,
+   "fiber": 0
+  },
+  "gramsPerMl": 1.05,
+  "ingredientKey": "protein_shake_quest",
+  "note": "+10 kcal, +2 g protein vs the book's shake."
+ }
+]

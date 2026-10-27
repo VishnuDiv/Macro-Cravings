@@ -1,0 +1,28 @@
+# --- Personal / licensed content: never published ---
+# Recipe books the owner bought (text, extracted recipes, photos)
+data/books/
+data/book_recipes.json
+data/extract/
+data/photos/
+data/qr_links.json
+# Recipes collected from other creators' websites (kept local; app links to sources)
+data/web/
+data/web_images.json
+data/web_images_failures.json
+# Generated app data built from the above
+CreamiCravings/Resources/recipes.json
+CreamiCravings/Resources/Photos/
+# Local Apple signing (team ID)
+Signing.xcconfig
+
+# --- Build / OS noise ---
+xcuserdata/
+DerivedData/
+build/
+*.xcuserstate
+.DS_Store
+__pycache__/
+*.pyc
+# Catalog merge working files (quote sample recipe lines)
+data/catalog/missing_*.json
+data/catalog/fragment_*.json

@@ -1,0 +1,517 @@
+[
+ {
+  "id": "on_gold_standard_whey",
+  "name": "Optimum Nutrition Gold Standard 100% Whey",
+  "brand": "Optimum Nutrition",
+  "type": "whey_blend",
+  "flavors": [
+   "Double Rich Chocolate",
+   "Vanilla Ice Cream",
+   "Extreme Milk Chocolate",
+   "Cookies & Cream",
+   "Delicious Strawberry"
+  ],
+  "scoopGrams": 31,
+  "perScoop": {
+   "calories": 120,
+   "protein": 24,
+   "carbs": 3,
+   "fat": 1.5,
+   "sugar": 1,
+   "fiber": 1
+  },
+  "ingredientKey": "protein_powder_on_gold_standard_whey",
+  "note": "Creami: concentrate/isolate blends spin creamier than pure isolate; a little pudding mix or gum still helps. Baking/cheesecake: can turn rubbery or dry if overused; keep amounts modest and don't overbake. Taste: Classic, mild and not too sweet; mixes easily."
+ },
+ {
+  "id": "on_gold_standard_casein",
+  "name": "Optimum Nutrition Gold Standard 100% Casein",
+  "brand": "Optimum Nutrition",
+  "type": "casein",
+  "flavors": [
+   "Chocolate Supreme",
+   "Creamy Vanilla",
+   "Cookies & Cream",
+   "Chocolate Peanut Butter"
+  ],
+  "scoopGrams": 34,
+  "perScoop": {
+   "calories": 120,
+   "protein": 24,
+   "carbs": 3,
+   "fat": 1,
+   "sugar": 1,
+   "fiber": 1
+  },
+  "ingredientKey": "protein_powder_on_gold_standard_casein",
+  "note": "Creami: casein thickens the base and freezes creamy and scoopable; often the best single powder for pints. Baking/cheesecake: casein bakes best: moist, dense, holds a cheesecake together. Taste: Thick, pudding-like; chocolate is the favorite."
+ },
+ {
+  "id": "dymatize_iso100",
+  "name": "Dymatize ISO100 Hydrolyzed Whey Isolate",
+  "brand": "Dymatize",
+  "type": "whey_isolate",
+  "flavors": [
+   "Gourmet Chocolate",
+   "Gourmet Vanilla",
+   "Fudge Brownie",
+   "Birthday Cake",
+   "Fruity Pebbles",
+   "Cocoa Pebbles"
+  ],
+  "scoopGrams": 30,
+  "perScoop": {
+   "calories": 110,
+   "protein": 25,
+   "carbs": 1,
+   "fat": 0.5,
+   "sugar": 1,
+   "fiber": 0
+  },
+  "ingredientKey": "protein_powder_dymatize_iso100",
+  "note": "Creami: spins smooth but leans icy and can turn chalky; add 1 tbsp pudding mix or 0.5 g xanthan, and a re-spin with a splash of milk. Baking/cheesecake: isolate dries out and turns rubbery; use at most 1/4 of the dry ingredients, or mix with casein. Taste: Clean and sweet; Fruity/Cocoa Pebbles flavors are popular in pints."
+ },
+ {
+  "id": "dymatize_elite_casein",
+  "name": "Dymatize Elite Casein",
+  "brand": "Dymatize",
+  "type": "casein",
+  "flavors": [
+   "Smooth Vanilla",
+   "Rich Chocolate",
+   "Cookies & Cream",
+   "Cinnamon Bun"
+  ],
+  "scoopGrams": 34,
+  "perScoop": {
+   "calories": 120,
+   "protein": 25,
+   "carbs": 3,
+   "fat": 1,
+   "sugar": 1,
+   "fiber": 1
+  },
+  "ingredientKey": "protein_powder_dymatize_elite_casein",
+  "note": "Creami: casein thickens the base and freezes creamy and scoopable; often the best single powder for pints. Baking/cheesecake: casein bakes best: moist, dense, holds a cheesecake together. Taste: Smooth and thick; vanilla is mild."
+ },
+ {
+  "id": "pescience_select",
+  "name": "PEScience Select Protein (whey-casein blend)",
+  "brand": "PEScience",
+  "type": "whey_casein_blend",
+  "flavors": [
+   "Gourmet Vanilla",
+   "Chocolate Peanut Butter Cup",
+   "Snickerdoodle",
+   "Frosted Chocolate Cupcake",
+   "Cake Pop"
+  ],
+  "scoopGrams": 31,
+  "perScoop": {
+   "calories": 120,
+   "protein": 24,
+   "carbs": 3,
+   "fat": 1.5,
+   "sugar": 1,
+   "fiber": 1
+  },
+  "ingredientKey": "protein_powder_pescience_select",
+  "note": "Creami: whey-casein blends are among the creamiest powders in a pint, less icy than isolate. Baking/cheesecake: blends bake well, moister than pure whey; a common pick for protein cheesecake. Taste: Dessert-like flavors; a favorite for Creami pints and protein cheesecake."
+ },
+ {
+  "id": "ghost_whey",
+  "name": "Ghost Whey Protein",
+  "brand": "Ghost",
+  "type": "whey_blend",
+  "flavors": [
+   "Chips Ahoy!",
+   "Oreo",
+   "Nutter Butter",
+   "Cereal Milk",
+   "Fruity Cereal Milk",
+   "Peanut Butter Cereal Milk"
+  ],
+  "scoopGrams": 36,
+  "perScoop": {
+   "calories": 130,
+   "protein": 25,
+   "carbs": 4,
+   "fat": 2,
+   "sugar": 2,
+   "fiber": 1
+  },
+  "ingredientKey": "protein_powder_ghost_whey",
+  "note": "Creami: concentrate/isolate blends spin creamier than pure isolate; a little pudding mix or gum still helps. Baking/cheesecake: can turn rubbery or dry if overused; keep amounts modest and don't overbake. Taste: Very sweet, candy-like branded flavors; cookie flavors contain real cookie pieces (wheat)."
+ },
+ {
+  "id": "clean_simple_eats",
+  "name": "Clean Simple Eats Protein Powder",
+  "brand": "Clean Simple Eats",
+  "type": "whey_blend",
+  "flavors": [
+   "Simply Vanilla",
+   "Chocolate Brownie Batter",
+   "Snickerdoodle",
+   "Coconut Cream",
+   "Mint Chocolate Chip",
+   "Pumpkin Pie"
+  ],
+  "scoopGrams": 32,
+  "perScoop": {
+   "calories": 130,
+   "protein": 20,
+   "carbs": 6,
+   "fat": 2.5,
+   "sugar": 3,
+   "fiber": 1
+  },
+  "ingredientKey": "protein_powder_clean_simple_eats",
+  "note": "Creami: concentrate/isolate blends spin creamier than pure isolate; a little pudding mix or gum still helps. Baking/cheesecake: can turn rubbery or dry if overused; keep amounts modest and don't overbake. Taste: Sweetened with coconut sugar and stevia; dessert flavors, a bit less protein per scoop."
+ },
+ {
+  "id": "quest",
+  "name": "Quest Protein Powder",
+  "brand": "Quest",
+  "type": "whey_casein_blend",
+  "flavors": [
+   "Vanilla Milkshake",
+   "Chocolate Milkshake",
+   "Cookies & Cream",
+   "Salted Caramel",
+   "Peanut Butter"
+  ],
+  "scoopGrams": 32,
+  "perScoop": {
+   "calories": 110,
+   "protein": 24,
+   "carbs": 2,
+   "fat": 1,
+   "sugar": 0.5,
+   "fiber": 0
+  },
+  "ingredientKey": "protein_powder_quest",
+  "note": "Creami: whey-casein blends are among the creamiest powders in a pint, less icy than isolate. Baking/cheesecake: blends bake well, moister than pure whey; a common pick for protein cheesecake. Taste: Milk-protein blend, low carb; vanilla milkshake is neutral."
+ },
+ {
+  "id": "premier_protein_powder",
+  "name": "Premier Protein 100% Whey Powder",
+  "brand": "Premier Protein",
+  "type": "whey_blend",
+  "flavors": [
+   "Chocolate Milkshake",
+   "Vanilla Milkshake",
+   "Cafe Latte"
+  ],
+  "scoopGrams": 41,
+  "perScoop": {
+   "calories": 150,
+   "protein": 30,
+   "carbs": 5,
+   "fat": 1.5,
+   "sugar": 1,
+   "fiber": 1
+  },
+  "ingredientKey": "protein_powder_premier_protein_powder",
+  "note": "Creami: concentrate/isolate blends spin creamier than pure isolate; a little pudding mix or gum still helps. Baking/cheesecake: can turn rubbery or dry if overused; keep amounts modest and don't overbake. Taste: Tastes like the Premier shakes; 30 g protein per scoop."
+ },
+ {
+  "id": "isopure_zero_carb",
+  "name": "Isopure Zero Carb Whey Isolate",
+  "brand": "Isopure",
+  "type": "whey_isolate",
+  "flavors": [
+   "Creamy Vanilla",
+   "Dutch Chocolate",
+   "Cookies & Cream",
+   "Unflavored",
+   "Strawberries & Cream"
+  ],
+  "scoopGrams": 31,
+  "perScoop": {
+   "calories": 110,
+   "protein": 25,
+   "carbs": 0,
+   "fat": 0.5,
+   "sugar": 0,
+   "fiber": 0
+  },
+  "ingredientKey": "protein_powder_isopure_zero_carb",
+  "note": "Creami: spins smooth but leans icy and can turn chalky; add 1 tbsp pudding mix or 0.5 g xanthan, and a re-spin with a splash of milk. Baking/cheesecake: isolate dries out and turns rubbery; use at most 1/4 of the dry ingredients, or mix with casein. Taste: Thin and clean; unflavored works in any recipe."
+ },
+ {
+  "id": "legion_whey_plus",
+  "name": "Legion Whey+ (grass-fed whey isolate)",
+  "brand": "Legion",
+  "type": "whey_isolate",
+  "flavors": [
+   "Dutch Chocolate",
+   "French Vanilla",
+   "Cinnamon Cereal",
+   "Strawberry",
+   "Unflavored"
+  ],
+  "scoopGrams": 30,
+  "perScoop": {
+   "calories": 100,
+   "protein": 22,
+   "carbs": 3,
+   "fat": 0.5,
+   "sugar": 1,
+   "fiber": 0
+  },
+  "ingredientKey": "protein_powder_legion_whey_plus",
+  "note": "Creami: spins smooth but leans icy and can turn chalky; add 1 tbsp pudding mix or 0.5 g xanthan, and a re-spin with a splash of milk. Baking/cheesecake: isolate dries out and turns rubbery; use at most 1/4 of the dry ingredients, or mix with casein. Taste: Naturally sweetened (stevia); less sweet than most."
+ },
+ {
+  "id": "myprotein_impact_whey",
+  "name": "Myprotein Impact Whey",
+  "brand": "Myprotein",
+  "type": "whey_blend",
+  "flavors": [
+   "Chocolate Smooth",
+   "Vanilla",
+   "Salted Caramel",
+   "Cookies & Cream",
+   "Strawberry Cream",
+   "Unflavored"
+  ],
+  "scoopGrams": 25,
+  "perScoop": {
+   "calories": 100,
+   "protein": 20,
+   "carbs": 2,
+   "fat": 1.5,
+   "sugar": 1,
+   "fiber": 0
+  },
+  "ingredientKey": "protein_powder_myprotein_impact_whey",
+  "note": "Creami: concentrate/isolate blends spin creamier than pure isolate; a little pudding mix or gum still helps. Baking/cheesecake: can turn rubbery or dry if overused; keep amounts modest and don't overbake. Taste: Budget concentrate; flavors vary, smaller 25 g scoop."
+ },
+ {
+  "id": "kaged_whey_isolate",
+  "name": "Kaged Whey Protein Isolate",
+  "brand": "Kaged",
+  "type": "whey_isolate",
+  "flavors": [
+   "Chocolate",
+   "Vanilla",
+   "Cinnamon Swirl"
+  ],
+  "scoopGrams": 31,
+  "perScoop": {
+   "calories": 110,
+   "protein": 25,
+   "carbs": 2,
+   "fat": 0.5,
+   "sugar": 1,
+   "fiber": 0
+  },
+  "ingredientKey": "protein_powder_kaged_whey_isolate",
+  "note": "Creami: spins smooth but leans icy and can turn chalky; add 1 tbsp pudding mix or 0.5 g xanthan, and a re-spin with a splash of milk. Baking/cheesecake: isolate dries out and turns rubbery; use at most 1/4 of the dry ingredients, or mix with casein. Taste: Clean isolate, light texture."
+ },
+ {
+  "id": "ascent_whey",
+  "name": "Ascent Native Fuel Whey",
+  "brand": "Ascent",
+  "type": "whey_blend",
+  "flavors": [
+   "Vanilla Bean",
+   "Chocolate",
+   "Chocolate Peanut Butter",
+   "Salted Caramel",
+   "Unflavored"
+  ],
+  "scoopGrams": 33,
+  "perScoop": {
+   "calories": 120,
+   "protein": 25,
+   "carbs": 3,
+   "fat": 1.5,
+   "sugar": 1,
+   "fiber": 0
+  },
+  "ingredientKey": "protein_powder_ascent_whey",
+  "note": "Creami: concentrate/isolate blends spin creamier than pure isolate; a little pudding mix or gum still helps. Baking/cheesecake: can turn rubbery or dry if overused; keep amounts modest and don't overbake. Taste: Stevia-sweetened, natural taste; vanilla bean is subtle."
+ },
+ {
+  "id": "ascent_casein",
+  "name": "Ascent Native Fuel Micellar Casein",
+  "brand": "Ascent",
+  "type": "casein",
+  "flavors": [
+   "Vanilla Bean",
+   "Chocolate",
+   "Chocolate Peanut Butter"
+  ],
+  "scoopGrams": 33,
+  "perScoop": {
+   "calories": 120,
+   "protein": 25,
+   "carbs": 3,
+   "fat": 1,
+   "sugar": 1,
+   "fiber": 1
+  },
+  "ingredientKey": "protein_powder_ascent_casein",
+  "note": "Creami: casein thickens the base and freezes creamy and scoopable; often the best single powder for pints. Baking/cheesecake: casein bakes best: moist, dense, holds a cheesecake together. Taste: Thick and creamy; mild stevia sweetness."
+ },
+ {
+  "id": "transparent_labs_whey_isolate",
+  "name": "Transparent Labs 100% Grass-Fed Whey Isolate",
+  "brand": "Transparent Labs",
+  "type": "whey_isolate",
+  "flavors": [
+   "Milk Chocolate",
+   "French Vanilla",
+   "Chocolate Peanut Butter",
+   "Cinnamon French Toast",
+   "Cookies & Cream"
+  ],
+  "scoopGrams": 32,
+  "perScoop": {
+   "calories": 120,
+   "protein": 28,
+   "carbs": 1,
+   "fat": 0.5,
+   "sugar": 0,
+   "fiber": 0
+  },
+  "ingredientKey": "protein_powder_transparent_labs_whey_isolate",
+  "note": "Creami: spins smooth but leans icy and can turn chalky; add 1 tbsp pudding mix or 0.5 g xanthan, and a re-spin with a splash of milk. Baking/cheesecake: isolate dries out and turns rubbery; use at most 1/4 of the dry ingredients, or mix with casein. Taste: Stevia-sweetened, high protein per scoop."
+ },
+ {
+  "id": "naked_whey",
+  "name": "Naked Whey (unflavored grass-fed whey concentrate)",
+  "brand": "Naked Nutrition",
+  "type": "whey_blend",
+  "flavors": [
+   "Unflavored",
+   "Chocolate",
+   "Vanilla"
+  ],
+  "scoopGrams": 30,
+  "perScoop": {
+   "calories": 120,
+   "protein": 25,
+   "carbs": 3,
+   "fat": 2,
+   "sugar": 2,
+   "fiber": 0
+  },
+  "ingredientKey": "protein_powder_naked_whey",
+  "note": "Creami: concentrate/isolate blends spin creamier than pure isolate; a little pudding mix or gum still helps. Baking/cheesecake: can turn rubbery or dry if overused; keep amounts modest and don't overbake. Taste: Plain milky taste; you add all the sweetener and flavor."
+ },
+ {
+  "id": "ryse_loaded",
+  "name": "RYSE Loaded Protein",
+  "brand": "RYSE",
+  "type": "whey_blend",
+  "flavors": [
+   "Jet-Puffed Marshmallow",
+   "Cinnabon",
+   "Fruity Crunch",
+   "Chocolate Peanut Butter Cup"
+  ],
+  "scoopGrams": 38,
+  "perScoop": {
+   "calories": 140,
+   "protein": 25,
+   "carbs": 5,
+   "fat": 2,
+   "sugar": 2,
+   "fiber": 1
+  },
+  "ingredientKey": "protein_powder_ryse_loaded",
+  "note": "Creami: concentrate/isolate blends spin creamier than pure isolate; a little pudding mix or gum still helps. Baking/cheesecake: can turn rubbery or dry if overused; keep amounts modest and don't overbake. Taste: Very sweet licensed dessert flavors."
+ },
+ {
+  "id": "orgain_organic",
+  "name": "Orgain Organic Protein (plant-based)",
+  "brand": "Orgain",
+  "type": "plant",
+  "flavors": [
+   "Vanilla Bean",
+   "Creamy Chocolate Fudge",
+   "Peanut Butter",
+   "Iced Coffee"
+  ],
+  "scoopGrams": 46,
+  "perScoop": {
+   "calories": 150,
+   "protein": 21,
+   "carbs": 15,
+   "fat": 4,
+   "sugar": 1,
+   "fiber": 3
+  },
+  "ingredientKey": "protein_powder_orgain_organic",
+  "note": "Creami: plant powders are thicker and grainier; blend well, add sweetener, expect an earthier taste and denser pint. Baking/cheesecake: absorbs a lot of liquid; add extra milk and expect a denser crumb. Taste: Earthy, sweet; serving is 2 scoops (46 g)."
+ },
+ {
+  "id": "vega_sport",
+  "name": "Vega Sport Premium Protein (plant-based)",
+  "brand": "Vega",
+  "type": "plant",
+  "flavors": [
+   "Chocolate",
+   "Vanilla",
+   "Mocha",
+   "Peanut Butter",
+   "Berry"
+  ],
+  "scoopGrams": 44,
+  "perScoop": {
+   "calories": 160,
+   "protein": 30,
+   "carbs": 6,
+   "fat": 3,
+   "sugar": 2,
+   "fiber": 2
+  },
+  "ingredientKey": "protein_powder_vega_sport",
+  "note": "Creami: plant powders are thicker and grainier; blend well, add sweetener, expect an earthier taste and denser pint. Baking/cheesecake: absorbs a lot of liquid; add extra milk and expect a denser crumb. Taste: Pea-based, noticeably earthy; chocolate masks it best."
+ },
+ {
+  "id": "garden_of_life_sport",
+  "name": "Garden of Life Sport Organic Plant-Based Protein",
+  "brand": "Garden of Life",
+  "type": "plant",
+  "flavors": [
+   "Vanilla",
+   "Chocolate"
+  ],
+  "scoopGrams": 39,
+  "perScoop": {
+   "calories": 150,
+   "protein": 30,
+   "carbs": 4,
+   "fat": 2.5,
+   "sugar": 0,
+   "fiber": 1
+  },
+  "ingredientKey": "protein_powder_garden_of_life_sport",
+  "note": "Creami: plant powders are thicker and grainier; blend well, add sweetener, expect an earthier taste and denser pint. Baking/cheesecake: absorbs a lot of liquid; add extra milk and expect a denser crumb. Taste: Stevia-sweetened pea blend; slightly gritty."
+ },
+ {
+  "id": "vital_proteins_collagen",
+  "name": "Vital Proteins Collagen Peptides",
+  "brand": "Vital Proteins",
+  "type": "collagen",
+  "flavors": [
+   "Unflavored",
+   "Vanilla",
+   "Chocolate"
+  ],
+  "scoopGrams": 20,
+  "perScoop": {
+   "calories": 70,
+   "protein": 18,
+   "carbs": 0,
+   "fat": 0,
+   "sugar": 0,
+   "fiber": 0
+  },
+  "ingredientKey": "protein_powder_vital_proteins_collagen",
+  "note": "Creami: collagen adds protein but almost no body; pair it with pudding mix or a gum. Baking/cheesecake: dissolves invisibly; adds protein without changing texture much. Taste: Unflavored dissolves with no taste; not a complete protein."
+ }
+]

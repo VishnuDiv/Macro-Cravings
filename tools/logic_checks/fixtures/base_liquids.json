@@ -1,0 +1,6 @@
+[
+  {"id": "fairlife_2pct", "name": "Fairlife 2% (ultra-filtered)", "family": "milk", "brand": "Fairlife", "servingMl": 240,
+   "perServing": {"calories": 120, "protein": 13, "carbs": 6, "fat": 4.5, "sugar": 6, "fiber": 0}, "gramsPerMl": 1.03,
+   "ingredientKey": "ultra_filtered_milk_2pct", "note": "Creamier"},
+  {"id": "oat", "name": "Oat milk", "family": "plant", "servingMl": 240, "perServing": {"calories": 120, "protein": 3}}
+]

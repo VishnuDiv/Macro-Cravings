@@ -1,0 +1,126 @@
+{
+ "roles": {
+  "chicken_strips": {
+   "label": "Chicken (strips / crispy / shredded)",
+   "matchKeys": [
+    "chicken_breast",
+    "chicken_thigh"
+   ],
+   "meatPer100g": {
+    "calories": 120,
+    "protein": 23,
+    "carbs": 0,
+    "fat": 2.6
+   },
+   "alternatives": [
+    {
+     "key": "seitan",
+     "name": "Seitan",
+     "availability": "most_stores",
+     "whereToBuy": "Whole Foods",
+     "brands": "Upton's",
+     "per100g": {
+      "calories": 140,
+      "protein": 25,
+      "carbs": 6,
+      "fat": 2
+     },
+     "prep": "Slice thin and pan-fry.",
+     "textureMatch": 5,
+     "why": "Chewiest"
+    },
+    {
+     "key": "tofu_extra_firm",
+     "name": "Extra-firm tofu",
+     "availability": "everywhere",
+     "whereToBuy": "Walmart, Target",
+     "brands": "Nasoya",
+     "per100g": {
+      "calories": 145,
+      "protein": 16,
+      "carbs": 3,
+      "fat": 8
+     },
+     "prep": "Press 15 min, cut into strips.",
+     "textureMatch": 3,
+     "why": "Cheap and everywhere"
+    },
+    {
+     "key": "paneer_low_fat",
+     "name": "Low-fat paneer",
+     "availability": "specialty",
+     "per100g": {
+      "calories": 200,
+      "protein": 24,
+      "carbs": 3,
+      "fat": 12
+     }
+    }
+   ],
+   "keywords": [
+    "chicken tender",
+    "shredded chicken"
+   ]
+  },
+  "mince": {
+   "label": "Mince",
+   "matchKeys": [
+    "beef_mince"
+   ],
+   "alternatives": [
+    {
+     "key": "soy_chunks",
+     "name": "Soy chunks",
+     "availability": "specialty",
+     "per100g": {
+      "calories": 345,
+      "protein": 52,
+      "carbs": 33,
+      "fat": 0.5
+     }
+    },
+    {
+     "key": "impossible_mince",
+     "name": "Impossible mince",
+     "availability": "most_stores",
+     "per100g": {
+      "calories": 220,
+      "protein": 17,
+      "carbs": 6,
+      "fat": 14
+     }
+    }
+   ],
+   "keywords": [
+    "mince"
+   ]
+  },
+  "chicken_curry": {
+   "label": "Chicken (curry)",
+   "matchKeys": [],
+   "keywords": [
+    "tikka",
+    "butter chicken"
+   ],
+   "alternatives": [
+    {
+     "key": "paneer",
+     "name": "Paneer",
+     "availability": "most_stores",
+     "per100g": {
+      "calories": 300,
+      "protein": 19,
+      "carbs": 3,
+      "fat": 24
+     },
+     "aliasKeys": [
+      "paneer_full_fat"
+     ]
+    }
+   ]
+  }
+ },
+ "keyToRole": {
+  "chicken_breast": "chicken_strips"
+ }
+}
