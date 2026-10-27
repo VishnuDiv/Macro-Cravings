@@ -28471,5 +28471,58 @@
    "dairy"
   ],
   "vegetarian": true
+ },
+ "milk_powder_full_fat": {
+  "name": "Whole milk powder",
+  "category": "dairy",
+  "per100g": {
+   "calories": 496,
+   "protein": 26.3,
+   "carbs": 38.4,
+   "fat": 26.7,
+   "sugar": 38.4,
+   "fiber": 0
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 0.5,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": "Nido (Nestlé), Indian grocers' full-cream milk powder",
+  "homemadeAlternative": null,
+  "swaps": [
+   {
+    "name": "Nonfat dry milk powder",
+    "key": "nonfat_dry_milk_powder",
+    "ratio": 1.0,
+    "note": "About −140 kcal per 100 g; slightly less rich"
+   }
+  ],
+  "pantryStaple": false,
+  "allergens": [
+   "dairy"
+  ],
+  "vegetarian": true
+ },
+ "rose_water": {
+  "name": "Rose water",
+  "category": "flavoring",
+  "per100g": {
+   "calories": 2,
+   "protein": 0,
+   "carbs": 0.5,
+   "fat": 0,
+   "sugar": 0,
+   "fiber": 0
+  },
+  "gramsPerCount": null,
+  "gramsPerMl": 1.0,
+  "defaultGrams": null,
+  "affiliate": null,
+  "storeAlternative": "Indian/Middle Eastern grocers (Dabur, Cortas)",
+  "homemadeAlternative": null,
+  "swaps": [],
+  "pantryStaple": true,
+  "allergens": [],
+  "vegetarian": true
  }
 }
