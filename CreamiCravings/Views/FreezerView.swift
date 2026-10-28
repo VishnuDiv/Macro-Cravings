@@ -6,7 +6,11 @@ struct FreezerView: View {
     @Environment(Router.self) private var router
 
     var body: some View {
-        NavigationStack {
+        content
+    }
+
+    private var content: some View {
+        Group {
             Group {
                 if user.data.freezer.isEmpty {
                     ContentUnavailableView {

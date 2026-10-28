@@ -44,6 +44,7 @@ struct FilterSheet: View {
                 quickSection
                 goalSection
                 densitySection
+                if section == "creami" { creamiTypeSection }
                 if isMeal { mealSections }
                 if isDessert { dessertSections }
                 Section("Vegetarian and eggs") {
@@ -51,11 +52,13 @@ struct FilterSheet: View {
                         flagChip("Vegetarian as written", \.vegAsWritten)
                         flagChip("Has a vegetarian version", \.hasVegVersion)
                         flagChip("No egg", \.noEgg)
+                        flagChip("Air fryer", \.airFryer)
                         flagChip("High fiber (8 g+)", \.highFiber)
                     }
                     .padding(.vertical, 4)
                     if user.data.avoidsEggs { Text("\"I avoid eggs\" in Settings turns on No egg.").font(.caption).foregroundStyle(.secondary) }
                 }
+                Section("Good for") { chips(Benefit.allCases.map { ($0.rawValue, $0.title) }, \.goodFor) }
                 Section("Tags") {
                     chips(Recipe.vocabulary.map { ($0, $0.replacingOccurrences(of: "-", with: " ").capitalized) }, \.tags)
                 }
@@ -175,6 +178,13 @@ struct FilterSheet: View {
     }
 
     static func num(_ d: Double) -> String { d == d.rounded() ? String(Int(d)) : String(format: "%.1f", d) }
+
+    /// Only the types that have at least one Creami recipe.
+    @ViewBuilder private var creamiTypeSection: some View {
+        let present = Set(store.recipes.compactMap { $0.section == "creami" ? $0.creamiType : nil })
+        let list = Recipe.creamiTypes.filter { present.contains($0.id) }
+        if !list.isEmpty { Section("Type") { chips(list.map { ($0.id, $0.title) }, \.creamiTypes) } }
+    }
 
     @ViewBuilder private var mealSections: some View {
         Section("Course") { chips(Recipe.courses.map { ($0, $0.capitalized) }, \.courses) }

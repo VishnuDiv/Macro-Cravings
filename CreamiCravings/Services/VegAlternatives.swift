@@ -126,6 +126,16 @@ enum VegAlternatives {
         return alt.name.split(separator: " ").first.map { String($0).capitalized } ?? alt.name
     }
 
+    /// Safety net for veg versions whose meat line has no ranked-alternative role (so the title kept "Chicken" / "Steak"): the meat word
+    /// becomes the short name of the first swapped-in ingredient ("Korean Popcorn Chicken & Rice" -> "Korean Popcorn Seitan & Rice").
+    static func meatFreeTitle(_ title: String, of recipe: Recipe) -> String {
+        guard let key = recipe.vegAdaptation?.swaps.compactMap({ $0.with.key }).first(where: { !$0.contains("stock") && !$0.contains("sauce") }) else { return title }
+        let pairs: [(String, String)] = [("seitan", "Seitan"), ("tofu", "Tofu"), ("soy", "Soy chunk"), ("bacon", "Veggie bacon"), ("sausage", "Veggie sausage"), ("paneer", "Paneer"),
+                                         ("tempeh", "Tempeh"), ("jackfruit", "Jackfruit"), ("mushroom", "Mushroom"), ("chickpea", "Chickpea"), ("halloumi", "Halloumi"), ("egg", "Egg")]
+        let short = pairs.first { key.contains($0.0) }?.1 ?? "Veggie"
+        return replaceMeatWords(in: title, with: short)
+    }
+
     static func replaceMeatWords(in text: String, with short: String) -> String {
         guard let rx = meatRegex else { return text }
         let ns = text as NSString

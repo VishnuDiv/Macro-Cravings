@@ -1,4 +1,7 @@
 import Foundation
+import CoreGraphics
+import ImageIO
+import UniformTypeIdentifiers
 
 // Logic checks for Models/ + Services/. Args: <dir with recipes.json> <dir with ingredients.json + base_liquids.json>
 
@@ -690,6 +693,290 @@ MainActor.assumeIsolated {
         check(rules.annotate("2 tbsp tomato puree") == rules.annotate(rules.annotate("2 tbsp tomato puree")), "annotating twice changes nothing")
     } else { check(false, "clarity_notes.json not loaded") }
 
+    // ---- stage 1: modes, lock, targets
+    print("(h1) food / health mode, lock, targets")
+    do {
+        var hd = UserData()
+        check(hd.appMode == .food && hd.healthLockEnabled && !hd.progressInBackup, "defaults: Food mode, Face ID lock ON, progress photos excluded from backup")
+        hd.appMode = .health; hd.healthLockEnabled = false; hd.progressInBackup = true; hd.targetCalories = 2000; hd.weightLb = 180
+        let back = UserStore.encode(hd).flatMap { UserStore.decode($0) }
+        check(back?.appMode == .health && back?.healthLockEnabled == false && back?.progressInBackup == true && back?.targetCalories == 2000 && back?.weightLb == 180, "mode, lock, backup and target choices persist")
+        let t0 = Date(timeIntervalSince1970: 1_700_000_000)
+        check(!HealthLock.shouldRelock(leftAt: t0, now: t0.addingTimeInterval(299)) && HealthLock.shouldRelock(leftAt: t0, now: t0.addingTimeInterval(300))
+              && !HealthLock.shouldRelock(leftAt: nil, now: t0), "Health relocks after 5 minutes in the background, not before")
+        var gu = UserData(); gu.goal = .cut
+        check(gu.dailyKcal == 1900 && gu.dailyProtein == 160, "Cut targets default to 1,900 kcal / 160 g")
+        gu.goal = .maintain; check(gu.dailyKcal == 2300 && gu.dailyProtein == 150, "Maintain: 2,300 / 150")
+        gu.goal = .bulk; check(gu.dailyKcal == 2800 && gu.dailyProtein == 170, "Bulk: 2,800 / 170")
+        gu.targetProtein = 140; check(gu.dailyProtein == 140 && gu.dailyKcal == 2800, "own targets override the defaults")
+        check(DailyTargets.proteinRange(weightLb: 180) == 144...180, "protein helper: 0.8-1 g per lb (180 lb -> 144-180 g)")
+    }
+
+    // ---- stage 2: meal planner
+    print("(plan) meal planner on the real data")
+    do {
+        let pu = UserStore(fileURL: nil)
+        let planner = MealPlanner(store: store, user: pu)
+        let t0 = DispatchTime.now().uptimeNanoseconds
+        var bad: [String] = [], meatLines = 0, ratios: [Double] = [], kerrs: [Double] = [], badSlots: [String] = [], badPortions: [String] = []
+        for g in [Goal.cut, .maintain, .bulk] {
+            let d = DailyTargets.defaults(for: g)
+            let t = PlanTargets(kcal: Double(d.kcal), protein: Double(d.protein))
+            var gr: [Double] = []
+            for seed in 1...14 {
+                let plan = planner.generateDay(seed: seed, targets: t, goal: g)
+                let f = planner.fit(plan, t)
+                gr.append(f.proteinRatio); ratios.append(f.proteinRatio); kerrs.append(f.kcalError)
+                let hi = MealPlanner.proteinCeiling(for: g)
+                if f.kcalError > 0.07 || f.proteinRatio < 0.95 || f.proteinRatio > hi { bad.append("\(g.rawValue)#\(seed) kcal \(Int(f.kcalError * 100))% protein \(Int(f.proteinRatio * 100))%") }
+                for s in plan.slots {
+                    guard let r = s.recipeId.flatMap({ store.recipeByID[$0] }) else { continue }
+                    if !planner.isVegSafe(r) { meatLines += 1 }
+                    let kc = planner.macros(of: r, goal: g).calories
+                    if MealPlanner.isMainSlot(s.slot) && (MealPlanner.isComponent(r) || kc < 250 || r.section == "drink") { badSlots.append("\(g.rawValue)#\(seed) \(s.slot.rawValue) \(r.name)") }
+                    if !MealPlanner.portions(for: s.slot, kcal: kc).contains(s.portion) { badPortions.append("\(g.rawValue)#\(seed) \(s.slot.rawValue) \(s.portion)x") }
+                }
+            }
+            gr.sort()
+            print("  \(g.rawValue): protein % of target min \(Int(gr.first! * 100)) / median \(Int(gr[gr.count / 2] * 100)) / max \(Int(gr.last! * 100))")
+        }
+        ratios.sort()
+        print("  42 days: protein min/median/max \(Int(ratios.first! * 100))/\(Int(ratios[ratios.count / 2] * 100))/\(Int(ratios.last! * 100))%, worst kcal error \(String(format: "%.1f", (kerrs.max() ?? 0) * 100))%, \(String(format: "%.0f", Double(DispatchTime.now().uptimeNanoseconds - t0) / 1e6)) ms")
+        check(bad.isEmpty, "every generated day (3 goals x 14 seeds) is within 7% kcal and protein 95-125% (cut up to 135%) \(bad.prefix(4))")
+        check(badSlots.isEmpty, "no main-meal slot holds a component, a drink or a recipe under 250 kcal \(badSlots.prefix(3))")
+        check(badPortions.isEmpty, "portions are 0.75-1.5x, with 2x only for snacks and desserts under 250 kcal \(badPortions.prefix(3))")
+        check(meatLines == 0, "no planned recipe has a non-vegetarian line")
+        // plan rows show the vegetarian title ("Tofu Chow Mein"), never the meat original
+        let meatRx = try! NSRegularExpression(pattern: "\\b(chicken|beef|steak|pork|(?<!veggie )bacon|turkey|ham|(?<!veggie )sausages?|shrimp|prawns?|salmon|tuna|fish|lamb)\\b", options: [.caseInsensitive])
+        func hasMeatWord(_ t: String) -> Bool { meatRx.firstMatch(in: t, range: NSRange(t.startIndex..., in: t)) != nil }
+        let adapted = store.recipes.filter { $0.vegAdaptation != nil && $0.vegetarian != true && planner.isVegSafe($0) }
+        let meatTitles = adapted.filter { hasMeatWord(planner.displayTitle(of: $0)) }.map { "\($0.name) -> \(planner.displayTitle(of: $0))" }
+        check(!adapted.isEmpty && meatTitles.isEmpty, "a planned adapted recipe's row title has no meat word (\(adapted.count) adapted recipes) \(meatTitles.count) \(meatTitles.prefix(12))")
+        let renamed = adapted.filter { hasMeatWord($0.name) && planner.displayTitle(of: $0) != $0.name }.count
+        check(renamed > 0, "adapted recipes with a meat word in the original name get a different plan title (\(renamed))")
+        var plannedTitles: [String] = []
+        for seed in 1...14 { for s in planner.generateDay(seed: seed, targets: PlanTargets(kcal: 2300, protein: 150), goal: .maintain).slots {
+            if let r = s.recipeId.flatMap({ store.recipeByID[$0] }), r.vegAdaptation != nil, r.vegetarian != true { plannedTitles.append(planner.displayTitle(of: r)) }
+        } }
+        check(plannedTitles.allSatisfy { !hasMeatWord($0) }, "every adapted recipe in 14 generated days shows a meat-free title (\(plannedTitles.count) rows)")
+        let t = PlanTargets(kcal: 2300, protein: 150)
+        let a = planner.generateDay(seed: 7, targets: t, goal: .maintain), b = planner.generateDay(seed: 7, targets: t, goal: .maintain)
+        check(a == b && a.slots.count == 4 && a.slots.allSatisfy { $0.recipeId != nil }, "the generator is deterministic for a seed (and fills all four slots)")
+        check(planner.generateDay(seed: 8, targets: t, goal: .maintain) != a, "a different seed gives a different day")
+        // lock keeps the slot
+        var locked = a
+        locked.slots[1].locked = true
+        let again = planner.generateDay(seed: 99, targets: t, goal: .maintain, existing: locked)
+        check(again.slots.first { $0.slot == locked.slots[1].slot }?.recipeId == locked.slots[1].recipeId && again.slots.first { $0.slot == locked.slots[1].slot }?.portion == locked.slots[1].portion, "a locked slot survives regenerate")
+        // no repeats within 3 days over a week
+        var week: [String: DayPlan] = [:]
+        let cal = Calendar(identifier: .gregorian)
+        let start = cal.date(from: DateComponents(year: 2026, month: 3, day: 2))!
+        for i in 0..<7 {
+            let day = cal.date(byAdding: .day, value: i, to: start)!
+            let avoid = planner.recentIds(before: day, plans: week, calendar: cal)
+            week[PlanKey.key(day, calendar: cal)] = planner.generateDay(seed: 11 + i, targets: t, goal: .maintain, avoid: avoid)
+        }
+        var repeats = 0
+        for i in 0..<7 {
+            let day = cal.date(byAdding: .day, value: i, to: start)!
+            let today = Set(week[PlanKey.key(day, calendar: cal)]?.slots.compactMap(\.recipeId) ?? [])
+            if !today.isDisjoint(with: planner.recentIds(before: day, plans: week, calendar: cal)) { repeats += 1 }
+        }
+        check(week.count == 7 && repeats == 0, "no recipe repeats within 3 days across a generated week")
+        // swap candidates fit the remaining budget
+        let slot = a.slots[2].slot
+        let cands = planner.swapCandidates(for: slot, in: a, targets: t, goal: .maintain)
+        var restPlan = a; restPlan.slots.removeAll { $0.slot == slot }
+        let remaining = max(150, t.kcal - planner.totals(restPlan).calories)
+        check(!cands.isEmpty && cands.count <= 5 && cands.allSatisfy { c in
+            abs(planner.macros(of: c.recipe, goal: .maintain).calories * c.portion - remaining) / remaining <= 0.07 + 1e-9 && c.recipe.id != a.slots[2].recipeId
+        }, "swap candidates (\(cands.count)) fit the remaining budget of \(Int(remaining)) kcal within 7%")
+    }
+
+    // ---- stage 2: "Good for"
+    print("(gf) good for")
+    if let fbCat = Optional(fx.catalog), fbCat.foodBenefits != nil {
+        let lent = RecipeStore.decodeRecipes(Data(#"[{"id":"lent","name":"Lentil Bowl","servings":1,"macros":{"calories":520,"protein":27,"carbs":60,"fat":12,"fiber":18},"base":[{"text":"200 g lentils","key":"lentils","grams":200},{"text":"1 g paprika","key":"paprika","grams":1},{"text":"5 g lentils","key":"lentils","grams":5,"optional":true}],"instructions":["a","b"]}]"#.utf8))[0]
+        let res = BenefitEngine.compute(lent, perServing: lent.macros, catalog: fbCat)
+        let kinds = Set(res.map(\.benefit))
+        check(kinds.isSuperset(of: [.gut, .muscle, .skin, .hair]) && res.allSatisfy { !$0.reasons.isEmpty }, "200 g lentils -> gut; 27 g protein -> muscle (and hair); paprika -> skin; every tag has a reason (\(res.map { $0.benefit.rawValue }))")
+        check(res.first?.benefit == .gut || res.first?.benefit == .muscle, "ranked by weight: lentils' benefits first")
+        check(res.first { $0.benefit == .gut }?.reasons.contains { $0.why.contains("fiber") } == true, "the why list explains gut (fiber)")
+        let tiny = RecipeStore.decodeRecipes(Data(#"[{"id":"tiny","name":"Tiny","servings":1,"macros":{"calories":50,"protein":2,"carbs":5,"fat":1,"fiber":1},"base":[{"text":"4 g lentils","key":"lentils","grams":4}],"instructions":["a","b"]}]"#.utf8))[0]
+        check(BenefitEngine.compute(tiny, perServing: tiny.macros, catalog: fbCat).isEmpty, "a few grams of lentils do not earn a tag (minimum grams)")
+        let ferm = RecipeStore.decodeRecipes(Data(#"[{"id":"f","name":"Kefir smoothie","servings":1,"macros":{"calories":200,"protein":10,"carbs":20,"fat":4,"fiber":2},"base":[{"text":"100 g kefir","key":"kefir","grams":100}],"instructions":["a","b"]}]"#.utf8))[0]
+        check(BenefitEngine.compute(ferm, perServing: ferm.macros, catalog: fbCat).first?.benefit == .gut, "a fermented ingredient -> gut")
+        // chips, filter and sorts through the index
+        let fs = RecipeStore(); fs.apply(LoadedData(recipes: [lent, ferm, tiny], catalog: fbCat))
+        var gf = FilterState(); gf.section = nil; gf.goodFor = ["muscle"]
+        check(FilterEngine.apply(store: fs, recipes: fs.recipes, query: "", state: gf, ctx: FilterContext()).map(\.id) == ["lent"] && gf.activePills().map(\.label) == ["Good for Muscle"], "Good for filter and pill")
+        var gs = FilterState(); gs.section = nil; gs.sort = .bestGut
+        check(FilterEngine.apply(store: fs, recipes: fs.recipes, query: "", state: gs, ctx: FilterContext()).first?.id == "lent", "'Best for gut' sorts the strongest gut recipe first")
+    } else { check(false, "fixture food_benefits.json not loaded") }
+    if let rb = store.catalog.foodBenefits {
+        let withTags = store.recipes.filter { !(store.index[$0.id]?.benefits.isEmpty ?? true) }.count
+        var perBenefit: [String: Int] = [:]
+        for r in store.recipes { for b in (store.index[r.id]?.benefits ?? []).prefix(rb.maxChips) { perBenefit[b.benefit.rawValue, default: 0] += 1 } }
+        print("  real food_benefits: \(rb.ingredientBenefits.count) ingredients, \(rb.rules.count) rules; \(withTags) of \(store.recipes.count) recipes have a Good for tag \(perBenefit.sorted { $0.key < $1.key })")
+        check(rb.ingredientBenefits.count >= 200 && rb.rules.count >= 10 && withTags > store.recipes.count / 3, "the real food_benefits.json decodes and tags a good share of recipes")
+        check(store.recipes.allSatisfy { r in (store.index[r.id]?.benefits ?? []).allSatisfy { !$0.reasons.isEmpty } }, "every real Good for tag has at least one reason")
+    }
+
+    // ---- stage 3: skin and hair content and logic
+    print("(skin) skin / hair / schedules")
+    if let sk = store.catalog.skincare, let hc = store.catalog.haircare {
+        print("  skincare: \(sk.actives.count) actives, \(sk.routines.count) routines, \(sk.conflicts.count) conflicts, \(sk.guides.count) guides; haircare: \(hc.interventions.count) interventions, \(hc.styles.count) styles, \(hc.plans.count) plans, \(hc.faceShapes.count) face shapes, \(hc.norwood.count) Norwood stages")
+        check(sk.actives.count >= 15 && sk.routines.count >= 5 && sk.conflicts.count >= 10 && hc.interventions.count >= 15 && hc.styles.count >= 20 && hc.norwood.count == 7 && hc.faceShapes.count >= 5, "the real skincare.json and haircare.json decode with their expected content")
+        let activeIds = Set(sk.actives.map(\.id))
+        let badConflict = sk.conflicts.flatMap { [$0.a, $0.b] }.filter { $0 != "*new_active" && !activeIds.contains($0) }
+        let badRoutine = sk.routines.flatMap { $0.am + $0.pm }.compactMap(\.activeId).filter { !activeIds.contains($0) }
+        check(badConflict.isEmpty && badRoutine.isEmpty, "every conflict id and routine activeId resolves to an active (\(Set(badConflict + badRoutine).sorted()))")
+        let ivIds = Set(hc.interventions.map(\.id))
+        let badPlan = hc.plans.flatMap(\.steps).map(\.interventionId).filter { !ivIds.contains($0) }
+        let badItems = hc.routineItems.compactMap(\.linkedIntervention).filter { !ivIds.contains($0) }
+        check(badPlan.isEmpty && badItems.isEmpty, "hair plan steps and routine items resolve to interventions (\(Set(badPlan + badItems).sorted()))")
+        let styleIds = Set(hc.styles.map(\.id))
+        check(hc.faceShapes.flatMap(\.goodStyles).allSatisfy { styleIds.contains($0) }, "face-shape style suggestions resolve to styles")
+        check(hc.norwood.map(\.stage) == [1, 2, 3, 4, 5, 6, 7], "Norwood 1-7 present")
+
+        // conflicts: retinoid + glycolic acid the same PM warns; on alternate nights it does not
+        let cal = Calendar(identifier: .gregorian)
+        let now = cal.date(from: DateComponents(year: 2026, month: 3, day: 2))!
+        func prod(_ active: String, period: String = "pm", days: Set<Int> = [], started: Date? = nil) -> SkinProduct {
+            var p = SkinProduct(name: active, step: "treatment", activeId: active, period: period, startedAt: started ?? now.addingTimeInterval(-90 * 86400)); p.weekdays = days; return p
+        }
+        let both = SkinRoutine.conflicts(products: [prod("retinol"), prod("aha")], content: sk, now: now, calendar: cal)
+        check(both.contains { Set([$0.a, $0.b]) == ["retinol", "aha"] && $0.period == "pm" }, "retinoid + glycolic/lactic acid in the same PM triggers a warning")
+        let altern = SkinRoutine.conflicts(products: [prod("retinol", days: [2, 4, 6]), prod("aha", days: [3, 5, 7])], content: sk, now: now, calendar: cal)
+        check(!altern.contains { Set([$0.a, $0.b]) == ["retinol", "aha"] && $0.sameTimeLike }, "on alternate nights it does not warn")
+        let amPm = SkinRoutine.conflicts(products: [prod("retinol", period: "pm"), prod("aha", period: "am")], content: sk, now: now, calendar: cal)
+        check(!amPm.contains { Set([$0.a, $0.b]) == ["retinol", "aha"] && $0.period != "" }, "AM acid and PM retinoid are separate sessions")
+        let twoNew = SkinRoutine.conflicts(products: [prod("retinol", started: now.addingTimeInterval(-3 * 86400)), prod("aha", started: now.addingTimeInterval(-5 * 86400))], content: sk, now: now, calendar: cal)
+        check(twoNew.contains { $0.a == "*new_active" || $0.b == "*new_active" }, "two new actives within two weeks trigger the ramp-up warning (from the products' start dates)")
+        // retinoid ramp-up by week since the start
+        let ramp = sk.rampUps["retinoid"] ?? []
+        check(!ramp.isEmpty && SkinRoutine.rampNights(weeksSinceStart: 0, ramp: ramp) == 2 && SkinRoutine.rampNights(weeksSinceStart: 2, ramp: ramp) == 3
+              && SkinRoutine.rampNights(weeksSinceStart: 6, ramp: ramp) == 7 && SkinRoutine.rampNights(weeksSinceStart: 20, ramp: ramp) == 7, "retinoid ramp-up: 2 nights in week 1, 3 in week 3, nightly from week 7")
+        check(SkinRoutine.rampWeekdays(nights: 3).count == 3 && SkinRoutine.rampWeekdays(nights: 7).count == 7, "ramp-up spreads the nights over the week")
+        var oily = SkinProfile(); oily.skinType = "oily"; oily.concerns = ["acne"]
+        check(SkinRoutine.templates(for: oily, content: sk).first?.skinTypes.contains("oily") == true, "the routine builder ranks a template for an oily, acne-prone profile first")
+        // styles
+        var hp = HairProfile(); hp.hairType = "straight"; hp.faceShape = "oval"; hp.length = "short"; hp.concerns = ["receding_hairline"]; hp.norwood = 3
+        let ranked = HairStyles.rank(hp, content: hc)
+        check(!ranked.isEmpty && ranked.allSatisfy { $0.style.norwoodMax >= 3 && $0.style.receding != "avoid" } && ranked.first?.style.receding == "great", "styles for a receding oval-face profile: ranked, none that avoid recession, a 'great' one first (\(ranked.first?.style.name ?? "-"))")
+        hp.norwood = 6
+        check(HairStyles.rank(hp, content: hc).allSatisfy { $0.style.norwoodMax >= 6 }, "styles above the user's Norwood stage are left out")
+    } else { check(false, "skincare.json / haircare.json not loaded") }
+    do {
+        let cal = Calendar(identifier: .gregorian)
+        let d0 = cal.date(from: DateComponents(year: 2026, month: 3, day: 1))!
+        func day(_ n: Int) -> Date { cal.date(byAdding: .day, value: n, to: d0)! }
+        var daily = PhotoSchedule(); daily.frequency = "daily"; daily.enabled = true
+        var every2 = PhotoSchedule(); every2.frequency = "every2"; every2.enabled = true
+        var weekly = PhotoSchedule(); weekly.frequency = "weekly"; weekly.enabled = true
+        var custom = PhotoSchedule(); custom.frequency = "custom"; custom.customDays = 3; custom.enabled = true
+        check(PhotoSchedules.nextDue(last: d0, schedule: daily, now: d0, calendar: cal) == day(1) && PhotoSchedules.nextDue(last: d0, schedule: every2, now: d0, calendar: cal) == day(2)
+              && PhotoSchedules.nextDue(last: d0, schedule: weekly, now: d0, calendar: cal) == day(7) && PhotoSchedules.nextDue(last: d0, schedule: custom, now: d0, calendar: cal) == day(3), "next due: daily +1, every 2 days +2, weekly +7, custom 3 days +3")
+        check(PhotoSchedules.nextDue(last: d0, schedule: weekly, now: day(12), calendar: cal) == day(12) && PhotoSchedules.isDue(last: d0, schedule: weekly, now: day(12), calendar: cal), "after missed days a photo is due today, not in the past")
+        check(!PhotoSchedules.isDue(last: d0, schedule: weekly, now: day(3), calendar: cal) && PhotoSchedules.isDue(last: nil, schedule: daily, now: day(3), calendar: cal), "not due before the interval; always due when there is no photo yet")
+        weekly.enabled = false
+        check(!PhotoSchedules.isDue(last: nil, schedule: weekly, now: day(1), calendar: cal), "a disabled schedule is never due")
+        var rem = daily; rem.hour = 9; rem.minute = 30
+        let noon = cal.date(bySettingHour: 12, minute: 0, second: 0, of: day(1))!
+        check(cal.component(.hour, from: PhotoSchedules.nextReminder(last: nil, schedule: rem, now: noon, calendar: cal)) == 9 && PhotoSchedules.nextReminder(last: nil, schedule: rem, now: noon, calendar: cal) > noon, "the reminder is at the chosen time, tomorrow once today's time has passed")
+        check(Cadence.isDue("daily", start: d0, on: day(5), calendar: cal) && Cadence.isDue("every-2-days", start: d0, on: day(4), calendar: cal) && !Cadence.isDue("every-2-days", start: d0, on: day(3), calendar: cal)
+              && Cadence.isDue("weekly", start: d0, on: day(14), calendar: cal) && !Cadence.isDue("weekly", start: d0, on: day(13), calendar: cal)
+              && Cadence.isDue("2x-week", start: d0, on: day(3), calendar: cal) && Cadence.isDue("2x-week", start: d0, on: day(7), calendar: cal) && !Cadence.isDue("2x-week", start: d0, on: day(5), calendar: cal), "hair routine cadences: daily, every 2 days, 2x a week, weekly")
+    }
+
+    // ---- stage 4: progress photos
+    print("(photos) progress store and hairline metric")
+    do {
+        let tmp = FileManager.default.temporaryDirectory.appendingPathComponent("creami_progress_\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: tmp) }
+        let ps = ProgressStore(root: tmp)
+        let when = Date(timeIntervalSince1970: 1_700_000_000)
+        let jpg = Data([0xFF, 0xD8, 0xFF, 0xD9])
+        var e = ProgressEntry(series: .hairline, date: when, note: "morning", ratings: ["shedding": 1])
+        e.marks = HairlineMarks(hairline: [NormPoint(x: 0.3, y: 0.2), NormPoint(x: 0.5, y: 0.18), NormPoint(x: 0.7, y: 0.2)], brows: [NormPoint(x: 0.3, y: 0.5), NormPoint(x: 0.7, y: 0.5)])
+        let saved = try? ps.save(jpeg: jpg, entry: e, excludeFromBackup: true)
+        check(saved != nil && ps.entries(.hairline).count == 1 && ps.entries(.hairline).first?.note == "morning" && ps.entries(.hairline).first?.marks == e.marks, "photo store: save then load round-trips the entry and its marks")
+        check(saved.flatMap { ps.jpeg($0) } == jpg, "photo store: the JPEG bytes come back unchanged")
+        check(ps.isExcludedFromBackup, "photo store: the folder is excluded from backup by default")
+        ps.applyBackupFlag(false)
+        check(!ps.isExcludedFromBackup, "photo store: the backup opt-in clears the exclusion flag")
+        let second = try? ps.save(jpeg: jpg, entry: e, excludeFromBackup: false)
+        check(second != nil && second?.fileName != saved?.fileName && ps.entries(.hairline).count == 2, "photo store: two photos on one day are both kept")
+        check(ps.entries(.crown).isEmpty, "photo store: another series stays empty")
+        if let s = saved { ps.delete(s) }
+        check(ps.entries(.hairline).count == 1 && saved.map { !FileManager.default.fileExists(atPath: ps.photoURL($0).path) } == true, "photo store: delete removes the photo and its details")
+        ps.deleteAll()
+        check(!FileManager.default.fileExists(atPath: tmp.path), "photo store: delete-all removes the folder")
+        // hairline metric: hairline 0.3 above the brows, brows 0.4 apart -> 0.75
+        let m1 = HairlineMarks(hairline: [NormPoint(x: 0.3, y: 0.2), NormPoint(x: 0.5, y: 0.2), NormPoint(x: 0.7, y: 0.2)], brows: [NormPoint(x: 0.3, y: 0.5), NormPoint(x: 0.7, y: 0.5)])
+        check(abs((HairlineMetric.ratio(m1) ?? 0) - 0.75) < 1e-9, "hairline metric: 0.3 above the brows over a 0.4 brow gap is 0.75")
+        let m2 = HairlineMarks(hairline: m1.hairline, brows: [NormPoint(x: 0.2, y: 0.5), NormPoint(x: 0.8, y: 0.5)])
+        let m3 = HairlineMarks(hairline: [NormPoint(x: 0.3, y: 0.35), NormPoint(x: 0.5, y: 0.2), NormPoint(x: 0.7, y: 0.35)], brows: m1.brows)
+        check(abs((HairlineMetric.ratio(m2) ?? 0) - 0.5) < 1e-9, "hairline metric: a wider brow gap (0.6) gives 0.5, so the ratio follows the brow distance")
+        check(HairlineMetric.ratio(HairlineMarks(hairline: [], brows: [])) == nil && HairlineMetric.ratio(HairlineMarks(hairline: m1.hairline, brows: [NormPoint(x: 0.5, y: 0.5), NormPoint(x: 0.5, y: 0.5)])) == nil && m3.hairline.count == 3, "hairline metric: missing or degenerate points give no number")
+        check(HairlineMetric.trend([0.75, 0.80, 0.85]).trend == .notEnough, "trend: fewer than 4 entries says not enough data")
+        check(HairlineMetric.trend([0.75, 0.76, 0.75, 0.76]).trend == .stable, "trend: a change under 5% is stable")
+        check(HairlineMetric.trend([0.75, 0.78, 0.82, 0.86]).trend == .receding, "trend: more than 5% bigger over 4+ entries is receding")
+        check(HairlineMetric.trend([0.86, 0.82, 0.78, 0.74]).trend == .improving, "trend: more than 5% smaller over 4+ entries is improving")
+        check(HairlineMetric.trend([0.75, 0.75, 0.75, 0.75, 0.75]).trend == .stable, "trend: flat is stable")
+    }
+
+    // ---- stage 5: Today checklist
+    print("(today) checklist, streaks, adherence")
+    do {
+        let cal = Calendar(identifier: .gregorian)
+        let mon = cal.date(from: DateComponents(year: 2026, month: 3, day: 2))!     // a Monday
+        func day(_ n: Int) -> Date { cal.date(byAdding: .day, value: -n, to: mon)! }
+        var u = UserData()
+        var am = SkinProduct(name: "Cleanser", step: "cleanser"); am.period = "am"; am.startedAt = day(60)
+        var both = SkinProduct(name: "Moisturizer", step: "moisturizer"); both.period = "both"; both.startedAt = day(60)
+        var rx = SkinProduct(name: "Adapalene", step: "treatment", activeId: "adapalene", period: "pm", startedAt: day(0)); rx.frequency = "ramp-up"
+        var asNeeded = SkinProduct(name: "Spot gel", step: "spot"); asNeeded.frequency = "as-needed"
+        u.products = [am, both, rx, asNeeded]
+        u.hairItems = [HairRoutineItem(title: "Ketoconazole", schedule: "2x-week", startedAt: mon)]
+        u.extraItems = [ExtraCheckItem(title: "Water")]
+        var sched = PhotoSchedule(); sched.enabled = true; sched.frequency = "weekly"
+        u.photoSchedules[PhotoSeries.hairline.rawValue] = sched
+        let ramp = store.catalog.skincare?.rampUps["retinoid"]
+        let sk = store.catalog.skincare
+        let items = TodayChecklist.items(on: mon, data: u, skincare: sk, lastPhoto: { _ in nil }, calendar: cal)
+        check(items.filter { $0.group == .skinAM }.map(\.productName) == ["Cleanser", "Moisturizer"], "Today: skin AM lists the morning and both-time products (as-needed ones are left out)")
+        check(items.filter { $0.group == .skinPM }.map(\.productName).contains("Moisturizer"), "Today: a both-time product also appears in the evening")
+        let rampItem = items.first { $0.productName == "Adapalene" }
+        let nights = SkinRoutine.rampNights(weeksSinceStart: 0, ramp: ramp ?? [])
+        check((rampItem != nil) == SkinRoutine.rampWeekdays(nights: nights).contains(2) && (rampItem == nil || rampItem!.detail.contains("Ramp-up week 1")), "Today: a retinoid ramp-up shows only on its nights and says the week's target")
+        check(items.contains { $0.group == .hair && $0.title == "Ketoconazole" } && items.contains { $0.group == .photo && $0.series == .hairline } && items.contains { $0.group == .extra }, "Today: hair items due, photos due and extras are listed")
+        let tookToday = TodayChecklist.items(on: mon, data: u, skincare: sk, lastPhoto: { _ in mon }, calendar: cal).first { $0.group == .photo }
+        check(tookToday?.autoDone == true, "Today: a photo taken today ticks itself")
+        let notDue = TodayChecklist.items(on: mon, data: u, skincare: sk, lastPhoto: { _ in day(2) }, calendar: cal)
+        check(!notDue.contains { $0.group == .photo }, "Today: a weekly photo taken 2 days ago is not due")
+        // adherence and streaks: tick everything in the morning list for 3 days
+        u.products = [am]; u.hairItems = []; u.extraItems = []; u.photoSchedules = [:]
+        for n in 0..<3 { u.checks[TodayChecklist.dayKey(day(n), calendar: cal)] = ["am-\(am.id.uuidString)"] }
+        check(TodayChecklist.streak(.skinAM, endingOn: mon, data: u, skincare: sk, calendar: cal) == 3, "streak: three fully ticked days in a row is 3")
+        u.checks[TodayChecklist.dayKey(mon, calendar: cal)] = []
+        check(TodayChecklist.streak(.skinAM, endingOn: mon, data: u, skincare: sk, calendar: cal) == 2, "streak: today not done yet keeps yesterday's run")
+        u.checks[TodayChecklist.dayKey(day(1), calendar: cal)] = []
+        check(TodayChecklist.streak(.skinAM, endingOn: mon, data: u, skincare: sk, calendar: cal) == 0, "streak: a missed yesterday breaks the run")
+        check(abs((TodayChecklist.weekAdherence(endingOn: mon, data: u, skincare: sk, calendar: cal) ?? -1) - 1.0 / 7.0) < 1e-9, "adherence ring: 1 of 7 days ticked is 14%")
+        check(TodayChecklist.adherence(on: day(2), data: u, skincare: sk, calendar: cal) == 1.0 && TodayChecklist.adherence(on: day(1), data: u, skincare: sk, calendar: cal) == 0.0, "adherence: a day's share of ticked routine items")
+        var empty = UserData(); empty.extraItems = [ExtraCheckItem(title: "Water")]
+        check(TodayChecklist.adherence(on: mon, data: empty, skincare: sk, calendar: cal) == nil, "adherence: nothing due gives no number")
+        var h = UserData(); h.hairItems = [HairRoutineItem(title: "x", schedule: "every-2-days", startedAt: day(10))]
+        check(TodayChecklist.items(on: day(0), data: h, skincare: sk, lastPhoto: { _ in nil }, calendar: cal).count == 1 && TodayChecklist.items(on: day(1), data: h, skincare: sk, lastPhoto: { _ in nil }, calendar: cal).isEmpty, "Today: an every-2-days hair item skips the off day")
+        // UserData with all the new health fields survives a JSON round trip
+        var full = UserData(); full.appMode = .health; full.skinRoutineId = "r"; full.skinRoutineStart = Date(timeIntervalSince1970: 1_700_000_000)
+        full.products = [am]; full.hairItems = [HairRoutineItem(title: "k", schedule: "weekly", startedAt: Date(timeIntervalSince1970: 1_700_000_000))]; full.checks = ["2026-03-02": ["a"]]
+        full.photoSchedules = ["hairline": sched]; full.hairProfile.norwood = 2; full.skinProfile.skinType = "dry"
+        check(UserStore.encode(full).flatMap { UserStore.decode($0) } == full, "health fields round-trip through JSON")
+    }
+
     // ---- negative-macro sweep: no recipe, source (Book / Calculated) or version (Cut / Maintain / Bulk) may show a negative number
     print("(neg) negative-macro sweep")
     do {
@@ -1029,6 +1316,355 @@ MainActor.assumeIsolated {
     let us = UserStore(fileURL: nil)
     us.save("z", for: .bulk)
     check(us.isSaved("z") && us.savedGoal("z") == .bulk, "in-memory store works")
+
+    // ---- photo analysis v2: on-device metrics (§10a)
+    print("(metrics) on-device photo metrics")
+    do {
+        let white = ColorMath.lab(r: 255, g: 255, b: 255), red = ColorMath.lab(r: 255, g: 0, b: 0)
+        check(near(white.L, 100, 0.1) && near(white.a, 0, 0.1) && near(red.L, 53.2, 0.3) && near(red.a, 80.1, 0.5), "Lab conversion: white is L 100 a 0; pure red is L 53.2 a 80.1")
+
+        let flat = RGBAImage(width: 256, height: 256, r: 224, g: 172, b: 150)
+        let full = GrayMask(width: 256, height: 256, fill: 255)
+        let base = SkinMetrics.measure(flat, mask: full)
+        check(base != nil && base!.spots == 0 && base!.evenness < 0.01, "flat skin: no spots, evenness ~0")
+        var patched = flat
+        patched.fill(CGRect(x: 40, y: 40, width: 100, height: 100), r: 236, g: 140, b: 130)
+        let pm = SkinMetrics.measure(patched, mask: full)
+        check(pm != nil && base != nil && pm!.redness > base!.redness + 2 && pm!.evenness > base!.evenness, "a red patch raises mean a* (\(String(format: "%.1f", base?.redness ?? 0)) -> \(String(format: "%.1f", pm?.redness ?? 0))) and the unevenness")
+
+        func dotted(_ img: RGBAImage, _ n: Int, dark: (UInt8, UInt8, UInt8)) -> RGBAImage {
+            var out = img
+            for i in 0..<n { out.fillDisc(cx: 30 + Double(i % 4) * 60, cy: 30 + Double(i / 4) * 60, radius: 2, r: dark.0, g: dark.1, b: dark.2) }
+            return out
+        }
+        for n in [0, 5, 12] {
+            let c = SkinMetrics.measure(dotted(flat, n, dark: (170, 115, 95)), mask: full)?.spots
+            check(c == n, "spot count: \(n) dots of 4 px -> \(c.map(String.init) ?? "nil")")
+        }
+        let dim = RGBAImage(width: 256, height: 256, r: 134, g: 103, b: 90)
+        let cdim = SkinMetrics.measure(dotted(dim, 8, dark: (100, 69, 57)), mask: full)?.spots
+        check(cdim == 8, "spot count is lighting-normalised: the same 8 dots on a 60%-dim photo -> \(cdim.map(String.init) ?? "nil")")
+        var half = GrayMask(width: 256, height: 256); half.fill(CGRect(x: 0, y: 0, width: 128, height: 256), 255)
+        let ch = SkinMetrics.measure(dotted(flat, 8, dark: (170, 115, 95)), mask: half)?.spots   // dots at x = 30, 90 are inside; 150, 210 are not
+        check(ch == 4, "spots outside the mask are not counted (4 of 8 inside) -> \(ch.map(String.init) ?? "nil")")
+        var shaded = flat
+        for y in 0..<256 { shaded.fill(CGRect(x: 0, y: y, width: 256, height: 1), r: UInt8(150 + y / 3), g: UInt8(115 + y / 4), b: UInt8(100 + y / 5)) }
+        check((SkinMetrics.measure(shaded, mask: full)?.evenness ?? 0) > 3, "a shading gradient shows up as unevenness")
+
+        // landmarks (256 px frame)
+        func face(scale s: Double) -> FaceGeometry {
+            FaceGeometry(box: CGRect(x: 50 * s, y: 30 * s, width: 150 * s, height: 190 * s), leftPupil: CGPoint(x: 100 * s, y: 150 * s), rightPupil: CGPoint(x: 160 * s, y: 150 * s),
+                         brows: [[CGPoint(x: 85 * s, y: 130 * s), CGPoint(x: 115 * s, y: 130 * s)], [CGPoint(x: 145 * s, y: 130 * s), CGPoint(x: 175 * s, y: 130 * s)]],
+                         eyes: [[CGPoint(x: 88 * s, y: 150 * s), CGPoint(x: 112 * s, y: 150 * s)], [CGPoint(x: 148 * s, y: 150 * s), CGPoint(x: 172 * s, y: 150 * s)]],
+                         lips: [CGPoint(x: 110 * s, y: 200 * s), CGPoint(x: 150 * s, y: 205 * s)])
+        }
+        let f1 = face(scale: 1)
+        let fm = SkinRegions.fallbackMask(width: 256, height: 256, face: f1)
+        let fcount = fm.data.filter { $0 > 0 }.count
+        check(fcount > 2000 && fm[130, 105] == 255 && fm[100, 150] == 0 && fm[130, 202] == 0, "landmark fallback mask: forehead and cheeks in, eyes and lips out (\(fcount) px)")
+        let mm = SkinRegions.matteMask(full, face: f1)
+        check(mm[100, 190] == 255 && mm[100, 150] == 0 && mm[130, 202] == 0 && mm[5, 5] == 0, "skin matte is limited to the face box with eyes, brows and lips cut out")
+        let withMatte = MetricsEngine.compute(series: .faceFront, image: patched, face: f1, hairMatte: nil, skinMatte: full)
+        let noMatte = MetricsEngine.compute(series: .faceFront, image: patched, face: f1, hairMatte: nil, skinMatte: nil)
+        check(!withMatte.lowerConfidence && noMatte.lowerConfidence && withMatte.redness != nil && noMatte.redness != nil, "skin metrics: matte = normal confidence, landmark fallback = lower confidence")
+        check(MetricsEngine.compute(series: .faceFront, image: flat, face: nil, hairMatte: nil, skinMatte: nil).redness == nil, "no matte and no face: no skin numbers")
+
+        // hairline: hair above y=100 everywhere, except a 20 px higher gap at the midline (hair ends at 80); brows at y=130; pupils 60 apart
+        func matte(scale s: Double) -> GrayMask {
+            var m = GrayMask(width: Int(256 * s), height: Int(256 * s))
+            m.fill(CGRect(x: 0, y: 0, width: 256 * s, height: 100 * s), 255)
+            m.fill(CGRect(x: 100 * s, y: 80 * s, width: 60 * s, height: 20 * s), 0)
+            return m
+        }
+        let hl = MetricsEngine.compute(series: .hairline, image: flat, face: f1, hairMatte: matte(scale: 1), skinMatte: nil)
+        check(near(hl.hairlineRatio ?? -1, 50.0 / 60.0, 0.001) && near(hl.hairlineTempleRatio ?? -1, 0.5, 0.001) && !hl.lowerConfidence, "hairline from a matte with a known boundary: midline (130-80)/60 = 0.833, temples 0.5")
+        let flat2 = RGBAImage(width: 512, height: 512, r: 224, g: 172, b: 150)
+        let hl2 = MetricsEngine.compute(series: .hairline, image: flat2, face: face(scale: 2), hairMatte: matte(scale: 2), skinMatte: nil)
+        check(near(hl2.hairlineRatio ?? -1, hl.hairlineRatio ?? -2, 0.001), "hairline ratio is scale-invariant (same photo at 2x)")
+        check(HairlineMath.ratio(boundaryY: 50, browY: 40, interPupil: 60) == nil && HairlineMath.ratio(boundaryY: 10, browY: 40, interPupil: 0) == nil, "hairline ratio: degenerate geometry gives nothing")
+        var hairPhoto = flat
+        hairPhoto.fill(CGRect(x: 0, y: 0, width: 256, height: 100), r: 40, g: 30, b: 25)
+        let hlc = MetricsEngine.compute(series: .hairline, image: hairPhoto, face: f1, hairMatte: nil, skinMatte: nil)
+        check(hlc.lowerConfidence && near(hlc.hairlineRatio ?? -1, 0.5, 0.06), "hairline colour fallback (no matte): ~0.5 and lower confidence (\(hlc.hairlineRatio.map { String(format: "%.2f", $0) } ?? "nil"))")
+
+        // crown
+        var cm = GrayMask(width: 200, height: 200); cm.fill(CGRect(x: 0, y: 0, width: 100, height: 200), 255)
+        let sv = CrownMath.scalpVisibility(matte: cm) ?? -1
+        check(near(sv, 0.5, 0.02) && near(CrownMath.scalpVisibility(matte: GrayMask(width: 200, height: 200, fill: 255)) ?? -1, 0, 0.001) && near(CrownMath.scalpVisibility(matte: GrayMask(width: 200, height: 200)) ?? -1, 1, 0.001),
+              "crown scalp visibility: half-covered circle 0.5, fully covered 0, bald 1 (\(String(format: "%.3f", sv)))")
+        var crownPhoto = RGBAImage(width: 200, height: 200, r: 220, g: 170, b: 150)
+        crownPhoto.fill(CGRect(x: 0, y: 0, width: 100, height: 200), r: 30, g: 20, b: 15)
+        let cf = MetricsEngine.compute(series: .crown, image: crownPhoto, face: nil, hairMatte: nil, skinMatte: nil)
+        check(cf.lowerConfidence && near(cf.scalpVisibility ?? -1, 0.5, 0.03), "crown luminance fallback: ~0.5 and lower confidence")
+        check(MetricsEngine.compute(series: .crown, image: RGBAImage(width: 200, height: 200, r: 120, g: 120, b: 120), face: nil, hairMatte: nil, skinMatte: nil).scalpVisibility == nil, "crown fallback on a flat photo gives nothing")
+
+        // lighting guard and trends
+        check(!LightingGuard.differs(0.57, median: 0.5) && LightingGuard.differs(0.58, median: 0.5) && LightingGuard.differs(0.42, median: 0.5) && !LightingGuard.differs(0.43, median: 0.5), "lighting guard: 14% apart is fine, 16% apart is flagged (both directions)")
+        check(LightingGuard.flags([0.5, 0.5, 0.5, 0.6, nil]) == [false, false, false, true, false], "lighting guard flags only the photo far from the series median")
+        check(MetricTrend.evaluate([10, 10, 10]).label == .notEnough && MetricTrend.evaluate([10, 10.2, 10.1, 10.1]).label == .stable
+              && MetricTrend.evaluate([10, 9.5, 9, 8.5]).label == .improving && MetricTrend.evaluate([10, 10.5, 11, 11.5]).label == .worsening
+              && MetricTrend.evaluate([10, 10.5, 11, 11.5], lowerIsBetter: false).label == .improving, "metric trend: needs 4 entries and > 5%; direction follows lower-is-better")
+
+        // store: mattes next to the photo
+        let tmp = FileManager.default.temporaryDirectory.appendingPathComponent("creami_matte_\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: tmp) }
+        let ps = ProgressStore(root: tmp)
+        var e = ProgressEntry(series: .hairline, date: Date(timeIntervalSince1970: 1_700_000_000))
+        var pmx = PhotoMetrics(); pmx.hairlineRatio = 0.5; pmx.luminance = 0.4; pmx.lowerConfidence = true
+        e.metrics = pmx
+        let png = Data([0x89, 0x50, 0x4E, 0x47])
+        let se = try? ps.save(jpeg: Data([0xFF, 0xD8, 0xFF, 0xD9]), entry: e, mattes: ["hair": png, "skin": png], excludeFromBackup: true)
+        check(se != nil && ps.hasMatte(se!, "hair") && ps.hasMatte(se!, "skin") && ps.matteURL(se!, "hair").path.hasPrefix(tmp.path) && ps.matteURL(se!, "hair").lastPathComponent.hasSuffix(".hair.png"), "mattes are saved as PNG beside the photo, inside the progress folder")
+        check(ps.isExcludedFromBackup && ps.entries(.hairline).first?.metrics == pmx, "the folder (mattes included) is excluded from backup; metrics round-trip in the entry JSON")
+        if let se { ps.delete(se) }
+        check(se.map { !ps.hasMatte($0, "hair") && !ps.hasMatte($0, "skin") } == true, "deleting a photo deletes its mattes")
+    }
+
+    // ---- photo analysis v2: AI check-up (§10b)
+    print("(checkup) request, decoder, client, keychain wrapper")
+    do {
+        // test images
+        func makeJPEG(_ w: Int, _ h: Int, orientation: Int = 1, metadata: Bool = true) -> Data {
+            var px = [UInt8](repeating: 200, count: w * h * 4)
+            for y in 0..<h { for x in 0..<w { let i = (y * w + x) * 4; px[i] = UInt8(x * 255 / max(1, w)); px[i + 1] = UInt8(y * 255 / max(1, h)); px[i + 2] = 90 } }
+            let ctx = CGContext(data: &px, width: w, height: h, bitsPerComponent: 8, bytesPerRow: w * 4, space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+            let out = NSMutableData()
+            let dest = CGImageDestinationCreateWithData(out, UTType.jpeg.identifier as CFString, 1, nil)!
+            var props: [CFString: Any] = [kCGImageDestinationLossyCompressionQuality: 0.95, kCGImagePropertyOrientation: orientation]
+            if metadata {
+                props[kCGImagePropertyGPSDictionary] = [kCGImagePropertyGPSLatitude: 37.33, kCGImagePropertyGPSLatitudeRef: "N", kCGImagePropertyGPSLongitude: 122.03, kCGImagePropertyGPSLongitudeRef: "W"]
+                props[kCGImagePropertyExifDictionary] = [kCGImagePropertyExifUserComment: "secret place", kCGImagePropertyExifDateTimeOriginal: "2026:10:27 10:00:00"]
+                props[kCGImagePropertyTIFFDictionary] = [kCGImagePropertyTIFFMake: "Apple", kCGImagePropertyTIFFModel: "iPhone"]
+            }
+            CGImageDestinationAddImage(dest, ctx.makeImage()!, props as CFDictionary)
+            CGImageDestinationFinalize(dest)
+            return out as Data
+        }
+        func info(_ d: Data) -> (w: Int, h: Int, keys: Set<String>) {
+            let src = CGImageSourceCreateWithData(d as CFData, nil)!
+            let p = CGImageSourceCopyPropertiesAtIndex(src, 0, nil) as! [String: Any]
+            return (p[kCGImagePropertyPixelWidth as String] as! Int, p[kCGImagePropertyPixelHeight as String] as! Int, Set(p.keys))
+        }
+        let big = makeJPEG(3000, 2000)
+        let bigInfo = info(big)
+        check(bigInfo.keys.contains(kCGImagePropertyGPSDictionary as String) && bigInfo.keys.contains(kCGImagePropertyExifDictionary as String), "test photo really carries GPS and EXIF before prep")
+        let prepped = ImagePrep.prepare(big)
+        let pi = prepped.map(info)
+        check(pi != nil && max(pi!.w, pi!.h) == 1568 && pi!.w > pi!.h, "image prep: 3000x2000 -> long edge 1568 (\(pi?.w ?? 0)x\(pi?.h ?? 0))")
+        check(pi != nil && !pi!.keys.contains(kCGImagePropertyGPSDictionary as String) && !pi!.keys.contains(kCGImagePropertyExifDictionary as String) && !pi!.keys.contains(kCGImagePropertyTIFFDictionary as String),
+              "image prep: no GPS / EXIF / TIFF metadata after re-encoding (\(pi?.keys.sorted().joined(separator: ",") ?? "nil"))")
+        check(prepped.map { !String(decoding: $0, as: UTF8.self).contains("Exif") && !String(decoding: $0, as: UTF8.self).contains("secret place") && !String(decoding: $0, as: UTF8.self).contains("Apple") } == true && prepped.map { $0.starts(with: [0xFF, 0xD8]) } == true, "image prep: no EXIF bytes in the JPEG and it is a JPEG")
+        let small = ImagePrep.prepare(makeJPEG(400, 300)).map(info)
+        check(small?.w == 400 && small?.h == 300, "image prep: a small photo is not upscaled")
+        let rot = ImagePrep.prepare(makeJPEG(1600, 800, orientation: 6)).map(info)
+        check(rot != nil && rot!.h > rot!.w, "image prep: orientation is baked into the pixels (landscape + rotate flag -> portrait)")
+
+        // request builder
+        let photos = [PreparedPhoto(label: "Photo 1 · Hairline · 2026-10-27", jpeg: prepped!), PreparedPhoto(label: "Photo 2 · Face (front) · 2026-10-27", jpeg: ImagePrep.prepare(makeJPEG(900, 1200))!)]
+        var user = UserData()
+        user.skinProfile.skinType = "combination"; user.skinProfile.concerns = ["acne"]
+        user.hairProfile.hairType = "wavy"; user.hairProfile.norwood = 2
+        user.products = [SkinProduct(name: "Adapalene", step: "treatment", activeId: "adapalene", period: "pm", startedAt: Date())]
+        let prevRec = CheckupFixtures.record(date: Date(timeIntervalSince1970: 1_700_000_000))
+        let ctxJSON = CheckupContext.json(scope: "both", user: user, skincare: store.catalog.skincare, haircare: store.catalog.haircare, previous: prevRec)
+        let req = try? CheckupRequest.build(key: "sk-ant-test-KEY-12345", photos: photos, contextJSON: ctxJSON, effort: "high")
+        check(req != nil && req!.url?.absoluteString == "https://api.anthropic.com/v1/messages" && req!.httpMethod == "POST" && req!.timeoutInterval == 180, "request: POST api.anthropic.com/v1/messages, 180 s timeout")
+        if let req {
+            check(req.value(forHTTPHeaderField: "content-type") == "application/json" && req.value(forHTTPHeaderField: "x-api-key") == "sk-ant-test-KEY-12345"
+                  && req.value(forHTTPHeaderField: "anthropic-version") == "2026-10-21" && req.value(forHTTPHeaderField: "anthropic-beta") == "server-side-fallback-2026-07-01", "request headers: content-type, x-api-key, anthropic-version 2026-10-21, anthropic-beta server-side-fallback-2026-07-01")
+            let body = (try? JSONSerialization.jsonObject(with: req.httpBody ?? Data())) as? [String: Any] ?? [:]
+            check(Set(body.keys) == ["model", "max_tokens", "fallbacks", "output_config", "system", "messages"] && body["model"] as? String == "claude-opus-5-5" && body["max_tokens"] as? Int == 16000 && body["fallbacks"] as? String == "default", "body: exactly model, max_tokens 16000, fallbacks default, output_config, system, messages (no thinking, no sampling)")
+            let oc = body["output_config"] as? [String: Any], fmt = oc?["format"] as? [String: Any]
+            check(oc?["effort"] as? String == "high" && fmt?["type"] as? String == "json_schema" && fmt?["schema"] is [String: Any], "output_config: effort high, format json_schema with the schema")
+            let content = ((body["messages"] as? [[String: Any]])?.first?["content"] as? [[String: Any]]) ?? []
+            let types = content.map { $0["type"] as? String ?? "" }
+            check(types == ["text", "image", "text", "image", "text"] && content[0]["text"] as? String == "Photo 1 · Hairline · 2026-10-27" && content[2]["text"] as? String == "Photo 2 · Face (front) · 2026-10-27", "content: label, image, label, image, then the context text, in order")
+            let b64 = ((content[1]["source"] as? [String: Any])?["data"] as? String) ?? ""
+            let src = content[1]["source"] as? [String: Any]
+            check(src?["type"] as? String == "base64" && src?["media_type"] as? String == "image/jpeg" && !b64.isEmpty && !b64.contains("\n") && !b64.contains("\r") && !b64.contains(" ") && Data(base64Encoded: b64) == photos[0].jpeg, "image block: base64 JPEG without line breaks that decodes to the prepared bytes")
+            check(!(String(decoding: req.httpBody ?? Data(), as: UTF8.self)).contains("sk-ant-test-KEY"), "the API key is only in the header, never in the body")
+            let ctxText = content.last?["text"] as? String ?? ""
+            check(ctxText.contains("allowedIds") && ctxText.contains("previousCheckupSummary") && ctxText.contains("combination") && ctxText.contains("adapalene"), "context block: profile, routine, previous summary and allowed ids")
+            let hairOnly = CheckupContext.json(scope: "hair", user: user, skincare: store.catalog.skincare, haircare: store.catalog.haircare, previous: nil)
+            check(!hairOnly.contains("skinProfile") && !hairOnly.contains("previousCheckupSummary") && hairOnly.contains("hairProfile"), "context for a hair-only check-up leaves the skin answers out")
+            let med = (try? CheckupRequest.build(key: "k", photos: photos, contextJSON: "{}", effort: "medium")).flatMap { $0.httpBody }.flatMap { (try? JSONSerialization.jsonObject(with: $0)) as? [String: Any] }
+            check(((med?["output_config"] as? [String: Any])?["effort"] as? String) == "medium", "the retry builder can use effort medium")
+            print("EXAMPLE_REQUEST_BODY (image data cut to 40 chars):")
+            print(CheckupRequest.redactedBody(req.httpBody ?? Data(), keep: 40))
+        }
+        // schema: every object closed, every key required
+        func walk(_ n: Any, _ path: String, _ bad: inout [String]) {
+            if let d = n as? [String: Any] {
+                if d["type"] as? String == "object" {
+                    let props = Set((d["properties"] as? [String: Any] ?? [:]).keys), req = Set(d["required"] as? [String] ?? [])
+                    if d["additionalProperties"] as? Bool != false || props != req { bad.append(path) }
+                }
+                for (k, v) in d { walk(v, path + "/" + k, &bad) }
+            } else if let a = n as? [Any] { for (i, v) in a.enumerated() { walk(v, path + "[\(i)]", &bad) } }
+        }
+        var badObjs: [String] = []
+        walk(CheckupSchema.schema, "", &badObjs)
+        let props = CheckupSchema.schema["properties"] as? [String: Any] ?? [:]
+        check(badObjs.isEmpty && Set(props.keys) == ["overall", "photoQuality", "skin", "hair", "seeDermatologist"] && (props["skin"] as? [String: Any])?["anyOf"] != nil, "schema: every object has additionalProperties false and all keys required; skin / hair are anyOf [object, null] \(badObjs.prefix(3))")
+
+        // decoder
+        let fx = CheckupFixtures.result
+        check(fx.skin?.observations.count == 2 && fx.skin?.recommendations.first?.activeId == "adapalene" && fx.skin?.recommendations.last?.activeId == nil && fx.hair?.recommendations.first?.interventionId == "minoxidil_topical" && fx.overall.nextCheckupWeeks == 4 && !fx.seeDermatologist.recommended, "decoder: a full fixture response decodes (nullable ids included)")
+        let nullJSON = #"{"overall":{"summary":"s","nextCheckupWeeks":6},"photoQuality":{"ok":false,"issues":["blurry"]},"skin":null,"hair":null,"seeDermatologist":{"recommended":true,"reason":"r"}}"#
+        let nr = try? CheckupResponse.decode(nullJSON)
+        check(nr != nil && nr!.skin == nil && nr!.hair == nil && nr!.seeDermatologist.recommended && !nr!.photoQuality.ok, "decoder: null skin and hair sections")
+        if let p = try? CheckupResponse.parse(CheckupFixtures.responseData()) {
+            check({ if case .text(let t) = p.kind { return (try? CheckupResponse.decode(t)) == fx } else { return false } }() && p.usage == CheckupUsage(inputTokens: 9_500, outputTokens: 2_100), "parse: first text block + usage")
+        } else { check(false, "parse: fixture response") }
+        let withThinking = #"{"stop_reason":"end_turn","content":[{"type":"thinking","thinking":"x"},{"type":"text","text":"{\"a\":1}"},{"type":"text","text":"second"}],"usage":{"input_tokens":1,"output_tokens":2}}"#
+        check({ if let p = try? CheckupResponse.parse(Data(withThinking.utf8)), case .text(let t) = p.kind { return t == "{\"a\":1}" } else { return false } }(), "parse: takes the FIRST text block, skipping other block types")
+        check((try? CheckupResponse.parse(CheckupFixtures.responseData(stopReason: "refusal")))?.kind == .refusal && (try? CheckupResponse.parse(CheckupFixtures.responseData(stopReason: "max_tokens", text: "{\"over")))?.kind == .maxTokens, "parse: refusal and max_tokens stop reasons")
+        check({ do { _ = try CheckupResponse.parse(Data(#"{"stop_reason":"end_turn","content":[],"usage":{}}"#.utf8)); return false } catch { return (error as? CheckupError) == .noText } }(), "parse: no text block is an error")
+        check({ do { _ = try CheckupResponse.decode("{not json"); return false } catch { if case CheckupError.badJSON = error { return true } else { return false } } }(), "decode: garbage text is a badJSON error")
+
+        // cost
+        let cu = CheckupUsage(inputTokens: 9_500, outputTokens: 2_100)
+        check(near(CheckupPricing.cost(cu), 0.08, 1e-9) && CheckupPricing.label(CheckupPricing.cost(cu)) == "≈ $0.08" && near(CheckupPricing.cost(CheckupUsage(inputTokens: 1_000_000, outputTokens: 1_000_000)), 24, 1e-9), "cost: $4 / $20 per MTok (9,500 in + 2,100 out = $0.08)")
+
+        // client with a fake transport
+        final class Fake: CheckupTransport {
+            var queue: [Result<(Int, [String: String], Data), Error>]
+            var requests: [URLRequest] = []
+            init(_ q: [Result<(Int, [String: String], Data), Error>]) { queue = q }
+            func send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
+                requests.append(request)
+                switch queue.removeFirst() {
+                case .failure(let e): throw e
+                case .success(let (code, headers, data)): return (data, HTTPURLResponse(url: request.url!, statusCode: code, httpVersion: nil, headerFields: headers)!)
+                }
+            }
+        }
+        final class Sleeps { var values: [TimeInterval] = [] }
+        func ok(_ stop: String = "end_turn", i: Int = 9_500, o: Int = 2_100, text: String = CheckupFixtures.resultJSON) -> Result<(Int, [String: String], Data), Error> { .success((200, [:], CheckupFixtures.responseData(stopReason: stop, input: i, output: o, text: text))) }
+        func runSync(_ q: [Result<(Int, [String: String], Data), Error>]) -> (Result<CheckupOutcome, Error>, Fake, [TimeInterval]) {
+            let fake = Fake(q), sl = Sleeps()
+            let client = CheckupClient(transport: fake, sleep: { sl.values.append($0) })
+            let sem = DispatchSemaphore(value: 0)
+            var res: Result<CheckupOutcome, Error> = .failure(CheckupError.noKey)
+            Task.detached { do { res = .success(try await client.run(key: "k", photos: photos, contextJSON: "{}")) } catch { res = .failure(error) }; sem.signal() }
+            sem.wait()
+            return (res, fake, sl.values)
+        }
+        func effortOf(_ r: URLRequest) -> String? { ((((try? JSONSerialization.jsonObject(with: r.httpBody ?? Data())) as? [String: Any])?["output_config"]) as? [String: Any])?["effort"] as? String }
+        let r1 = runSync([ok()])
+        check({ if case .success(let o) = r1.0 { return o.result == fx && o.effort == "high" && near(o.cost, 0.08, 1e-9) && r1.1.requests.count == 1 } else { return false } }(), "client: one request, result decoded, cost computed from usage")
+        let r2 = runSync([ok("max_tokens", i: 9_500, o: 16_000, text: "{\"cut"), ok()])
+        check({ if case .success(let o) = r2.0 { return r2.1.requests.count == 2 && effortOf(r2.1.requests[0]) == "high" && effortOf(r2.1.requests[1]) == "medium" && o.effort == "medium" && o.usage == CheckupUsage(inputTokens: 19_000, outputTokens: 18_100) } else { return false } }(), "max_tokens: retried once with effort medium, usage of both calls summed")
+        let r3 = runSync([ok("max_tokens", text: "x"), ok("max_tokens", text: "x")])
+        check({ if case .failure(let e) = r3.0 { return (e as? CheckupError) == .truncated && r3.1.requests.count == 2 } else { return false } }(), "max_tokens twice: error, no third request")
+        let r4 = runSync([ok("refusal", text: "")])
+        check({ if case .failure(let e) = r4.0 { return (e as? CheckupError) == .refusal && r4.1.requests.count == 1 } else { return false } }(), "refusal: error state, no retry (the screen offers its own retry)")
+        let r5 = runSync([.success((429, ["retry-after": "7"], Data(#"{"error":{"message":"slow down"}}"#.utf8))), ok()])
+        check({ if case .success = r5.0 { return r5.1.requests.count == 2 && r5.2 == [7] } else { return false } }(), "429: waits retry-after (7 s) and retries once")
+        let r6 = runSync([.success((503, [:], Data())), .success((503, [:], Data(#"{"error":{"message":"overloaded"}}"#.utf8)))])
+        check({ if case .failure(let e) = r6.0 { return (e as? CheckupError) == .http(503, "overloaded") && r6.1.requests.count == 2 } else { return false } }(), "5xx twice: one retry, then the error")
+        let r7 = runSync([.success((401, [:], Data(#"{"error":{"message":"invalid x-api-key"}}"#.utf8)))])
+        check({ if case .failure(let e) = r7.0 { return (e as? CheckupError) == .http(401, "invalid x-api-key") && r7.1.requests.count == 1 } else { return false } }(), "401: no retry")
+        let r8 = runSync([.failure(URLError(.timedOut)), ok()])
+        check({ if case .success = r8.0 { return r8.1.requests.count == 2 } else { return false } }(), "network error: one retry")
+        let tk = try? CheckupRequest.testRequest(key: "k")
+        let tkBody = (tk?.httpBody).flatMap { (try? JSONSerialization.jsonObject(with: $0)) as? [String: Any] }
+        check(tkBody != nil && (tkBody?["max_tokens"] as? Int ?? 99_999) <= 32 && tkBody?["thinking"] == nil && tkBody?["temperature"] == nil && tk?.value(forHTTPHeaderField: "anthropic-version") == "2026-10-21", "test-key request is tiny, with the same headers and no thinking / sampling")
+
+        // Keychain wrapper through the injectable store
+        let keys = APIKeyStore(store: MemorySecretStore(), service: "t.service", account: "t.account")
+        check(!keys.hasKey && keys.key == nil, "keychain wrapper: starts empty")
+        check(keys.save("  sk-ant-api03-ABCDEFGHIJ1234  ") && keys.key == "sk-ant-api03-ABCDEFGHIJ1234" && keys.hasKey, "keychain wrapper: save then read round-trips (whitespace trimmed)")
+        check(keys.masked == "sk-ant-…1234" && !(keys.masked ?? "").contains("ABCDEFGHIJ"), "keychain wrapper: display is masked")
+        check(!keys.save("   ") && keys.key == "sk-ant-api03-ABCDEFGHIJ1234", "keychain wrapper: an empty key is refused and the old one stays")
+        keys.remove()
+        check(!keys.hasKey, "keychain wrapper: remove clears it")
+
+        // history, compare, add to routine, pre-selection
+        let htmp = FileManager.default.temporaryDirectory.appendingPathComponent("creami_hist_\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: htmp) }
+        let hist = CheckupHistory(root: htmp)
+        check(hist.load().isEmpty, "history: empty at first")
+        let rec1 = CheckupFixtures.record(date: Date(timeIntervalSince1970: 1_700_000_000)), rec2 = CheckupFixtures.record(date: Date(timeIntervalSince1970: 1_702_000_000))
+        try? hist.save([rec2, rec1])
+        let loaded = hist.load()
+        check(loaded.count == 2 && loaded[0].id == rec1.id && loaded[1] == rec2 && FileManager.default.fileExists(atPath: htmp.appendingPathComponent("checkups.json").path), "history: saved next to the photos, sorted oldest first, round-trips")
+        var worse = fx
+        worse.skin?.observations[0].severity = "moderate"
+        worse.skin?.recommendations[0].action = "Use adapalene every night"
+        worse.seeDermatologist = .init(recommended: true, reason: "r")
+        let diff = CheckupDiff.compare(old: fx, new: worse)
+        check(diff.contains { $0.area == "Cheeks" && $0.text == "mild → moderate" && $0.better == false } && diff.contains { $0.area == "New advice" } && diff.contains { $0.area == "Dropped advice" } && diff.contains { $0.area == "Dermatologist" && $0.better == false }, "compare with last check-up: severity change, new / dropped advice, dermatologist flag")
+        check(CheckupDiff.compare(old: fx, new: fx).isEmpty, "compare: identical check-ups show no changes")
+
+        let sk = store.catalog.skincare, hc = store.catalog.haircare
+        if let rec = fx.skin?.recommendations.first, let p = CheckupActions.product(for: rec, skincare: sk) {
+            check(p.activeId == "adapalene" && p.frequency == "2-3x" && p.weekdays == [2, 4, 6] && p.period == "pm" && !p.name.isEmpty, "add to routine: adapalene becomes a PM product on 3 nights (\(p.name), step \(p.step))")
+            var list: [SkinProduct] = []
+            check(CheckupActions.add(p, to: &list) && !CheckupActions.add(p, to: &list) && list.count == 1, "add to routine: the same active is not added twice")
+        } else { check(false, "add to routine: adapalene product") }
+        check(fx.skin?.recommendations.last.flatMap { CheckupActions.product(for: $0, skincare: sk) } == nil, "add to routine: a recommendation without an id has no action")
+        if let hid = hc?.interventions.first?.id {
+            let hr = CheckupHairRec(action: "Do it", interventionId: hid, why: "because", priority: "high")
+            let item = CheckupActions.hairItem(for: hr, haircare: hc)
+            var items: [HairRoutineItem] = []
+            check(item != nil && item?.interventionId == hid && !(item?.title ?? "").isEmpty && item.map { CheckupActions.add($0, to: &items) } == true && item.map { !CheckupActions.add($0, to: &items) } == true, "add to routine: an intervention id becomes a hair routine item, once")
+        }
+        func entry(_ s: PhotoSeries, _ day: Int) -> ProgressEntry { ProgressEntry(series: s, date: Date(timeIntervalSince1970: 1_700_000_000 + Double(day) * 86400)) }
+        let latest = Dictionary(uniqueKeysWithValues: PhotoSeries.allCases.map { ($0, entry($0, 3)) })
+        check(CheckupPhotos.preselect(scope: "both", latest: latest).map(\.series) == [.faceFront, .hairline, .crown, .faceLeft] && CheckupPhotos.preselect(scope: "skin", latest: latest).count == 3
+              && CheckupPhotos.preselect(scope: "hair", latest: latest).count == 4 && CheckupPhotos.preselect(scope: "hair", latest: [.crown: latest[.crown]!]).map(\.series) == [.crown], "pre-selection: latest photo per relevant series, at most 4")
+        check(CheckupPhotos.label(0, entry(.hairline, 0)).hasPrefix("Photo 1 · Hairline · 20"), "photo label: 'Photo 1 · Hairline · date'")
+
+        // Creami type filter
+        let ctypes = Set(Recipe.creamiTypes.map(\.id))
+        let creamiAll = store.recipes.filter { $0.section == "creami" }
+        check(!creamiAll.isEmpty && creamiAll.allSatisfy { ctypes.contains($0.creamiType ?? "") }, "every Creami recipe in the data has a creamiType (\(creamiAll.count))")
+        var tf = FilterState(); tf.section = "creami"; tf.creamiTypes = ["sorbet", "gelato"]
+        let tres = FilterEngine.apply(store: store, recipes: store.recipes, query: "", state: tf, ctx: FilterContext())
+        let want = creamiAll.filter { ["sorbet", "gelato"].contains($0.creamiType ?? "") }.count
+        check(!tres.isEmpty && tres.count == want && tres.allSatisfy { $0.section == "creami" && ["sorbet", "gelato"].contains($0.creamiType ?? "") }, "Creami type filter (OR) returns only the selected types (\(tres.count))")
+        check(tf.activePills().map(\.id) == ["creamiType:gelato", "creamiType:sorbet"], "Creami type pills: one per type")
+        tf.remove(pill: "creamiType:gelato")
+        check(tf.creamiTypes == ["sorbet"] && (UserStore.decode(UserStore.encode({ var u = UserData(); u.filterState = tf; return u }())!)?.filterState.creamiTypes == ["sorbet"]), "removing a pill clears just that type; the selection persists")
+    }
+
+    // Air-fryer versions
+    do {
+        let afRecipes = store.recipes.filter { $0.airFry != nil }
+        check(afRecipes.count >= 28, "air-fryer versions are in the data (\(afRecipes.count))")
+        let afCalc = NutritionCalculator(catalog: store.catalog)
+        var bad: [String] = []
+        for r in afRecipes {
+            for on in [false, true] {
+                for g in Goal.allCases {
+                    let us = UserStore(fileURL: nil)
+                    us.data.preferAirFryer = on
+                    us.data.isVegetarian = true
+                    us.setVersion(r.id, g)
+                    let n = afCalc.compute(r, us.goalResolution(r, catalog: store.catalog).cfg).displayed
+                    if n.calories < 0 || n.protein < 0 || n.carbs < 0 || n.fat < 0 || n.sugar < 0 || n.fiber < 0 { bad.append("\(r.id)|\(on)|\(g.rawValue)") }
+                }
+            }
+        }
+        check(bad.isEmpty, "every air-fry recipe has non-negative macros in all goal versions, fried and air-fried (\(bad.prefix(3)))")
+        if let r = afRecipes.first {
+            let us = UserStore(fileURL: nil)
+            check(us.data.preferAirFryer, "setting default: Prefer air fryer versions is ON")
+            check(UserStore.decode(Data("{}".utf8))?.preferAirFryer == true, "setting default: ON when absent from saved data")
+            let cat = store.catalog
+            check(us.airFryActive(r) && us.effectiveRecipe(r, catalog: cat).instructions == r.airFry!.steps, "toggle on: the air-fry steps are shown")
+            us.setAirFry(r, false)
+            check(!us.airFryActive(r) && us.effectiveRecipe(r, catalog: cat).instructions == r.instructions, "toggle off: the fried steps are shown")
+            us.setAirFry(r, true)
+            us.data.preferAirFryer = false
+            check(!us.airFryActive(r) && us.effectiveRecipe(r, catalog: cat).instructions == r.instructions, "setting off: recipes open fried")
+            var af = FilterState(); af.section = nil; af.airFryer = true
+            let ares = FilterEngine.apply(store: store, recipes: store.recipes, query: "", state: af, ctx: FilterContext())
+            check(ares.count >= afRecipes.count && afRecipes.allSatisfy { a in ares.contains { $0.id == a.id } }, "Air fryer filter includes every air-fry recipe (\(ares.count))")
+        }
+    }
+
 }
 
 print("\n\(passes) passed, \(failures) failed")

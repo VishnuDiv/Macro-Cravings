@@ -8,15 +8,16 @@ struct ShoppingView: View {
         NavigationStack {
             Group {
                 if user.data.shopping.isEmpty {
-                    ContentUnavailableView {
+                    VStack(spacing: 0) { ModeSwitch(); ContentUnavailableView {
                         Label("Your list is empty", systemImage: "cart")
                     } description: {
                         Text("Use \"Add to list\" on a recipe. Your milk and swaps are applied, and pantry staples are left out.")
                     } actions: {
                         Button("Browse recipes") { router.tab = .recipes }.buttonStyle(.borderedProminent)
-                    }
+                    } }
                 } else {
                     List {
+                        Section { ModeSwitch().listRowBackground(Color.clear).listRowInsets(EdgeInsets()) }
                         ForEach(ShoppingList.grouped(user.data.shopping), id: \.category) { g in
                             Section(IngCategory.title(g.category)) {
                                 ForEach(g.items) { item in

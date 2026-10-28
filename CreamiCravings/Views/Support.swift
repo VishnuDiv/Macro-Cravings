@@ -146,7 +146,7 @@ struct SaveMenu: View {
 
 // MARK: - Navigation state
 
-enum AppTab: Hashable { case recipes, favorites, freezer, shopping, settings }
+enum AppTab: Hashable { case recipes, plan, favorites, freezer, shopping, settings, today, skin, hair, progress }
 
 struct CookRequest: Identifiable {
     let id = UUID()
@@ -166,6 +166,7 @@ final class Router {
     var ssSearch: String?
     var ssAnchor: String?
     var ssOpenFilters = false
+    var ssOpenCheckup = false
     #endif
 
     func open(recipe id: String) {

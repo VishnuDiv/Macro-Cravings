@@ -1,0 +1,3280 @@
+{
+ "_schema": {
+  "version": "1",
+  "benefitIds": [
+   "gut",
+   "skin",
+   "hair",
+   "muscle",
+   "heart",
+   "energy",
+   "bones"
+  ],
+  "ingredientBenefits": "{catalog_key: {benefits: [benefitId], why: one short sentence naming the nutrient, minGrams: grams of that ingredient per serving needed to count it (spices 1-3), tags?: [fermented|legume|whole_grain|omega3|vitamin_c|dairy|egg|soy|plant|vegetable|fruit|spice|prebiotic]}}. Keys are canonical keys from ingredients.json (resolve recipe keys through key_aliases.json first).",
+  "rules[]": "{id, when, benefits: [benefitId], weight: int (ranking weight, 2 = stronger), why: template ({fiber}, {protein}, {count} are filled in), note?}. 'when' conditions are ANDed, all per serving: fiber_g, protein_g, sugar_g, kcal, proteinPer100kcal, satFatShare (optional) as {op: value} with op in >=, <=; hasTag: tag (any non-optional ingredient with that tag over its minGrams); allTags: [tag] (each present); tagGrams: {tag: {op: grams}} (summed grams of tagged ingredients); distinctPlantTagged: {op: n} (count of distinct ingredients tagged 'plant' over minGrams).",
+  "scoring": "Recipe score per benefit = sum of rule weights + 1 per contributing ingredient. Show at most 4 chips, highest score first.",
+  "defaultMinGrams": 10,
+  "spiceMinGrams": 1,
+  "sources[]": "{title, url}"
+ },
+ "ingredientBenefits": {
+  "black_beans": {
+   "benefits": [
+    "gut",
+    "heart",
+    "muscle"
+   ],
+   "why": "Fiber and plant protein; beans feed gut bacteria and help lower LDL cholesterol.",
+   "minGrams": 30,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "kidney_beans": {
+   "benefits": [
+    "gut",
+    "heart",
+    "muscle"
+   ],
+   "why": "Fiber and plant protein; beans feed gut bacteria and help lower LDL cholesterol.",
+   "minGrams": 30,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "pinto_beans": {
+   "benefits": [
+    "gut",
+    "heart",
+    "muscle"
+   ],
+   "why": "Fiber and plant protein; beans feed gut bacteria and help lower LDL cholesterol.",
+   "minGrams": 30,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "cannellini_beans": {
+   "benefits": [
+    "gut",
+    "heart",
+    "muscle"
+   ],
+   "why": "Fiber and plant protein; beans feed gut bacteria and help lower LDL cholesterol.",
+   "minGrams": 30,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "white_beans": {
+   "benefits": [
+    "gut",
+    "heart",
+    "muscle"
+   ],
+   "why": "Fiber and plant protein; beans feed gut bacteria and help lower LDL cholesterol.",
+   "minGrams": 30,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "black_eyed_peas": {
+   "benefits": [
+    "gut",
+    "heart",
+    "muscle"
+   ],
+   "why": "Fiber and plant protein; beans feed gut bacteria and help lower LDL cholesterol.",
+   "minGrams": 30,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "refried_beans": {
+   "benefits": [
+    "gut",
+    "heart",
+    "muscle"
+   ],
+   "why": "Fiber and plant protein; beans feed gut bacteria and help lower LDL cholesterol.",
+   "minGrams": 30,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "canned_refried_beans": {
+   "benefits": [
+    "gut",
+    "heart",
+    "muscle"
+   ],
+   "why": "Fiber and plant protein; beans feed gut bacteria and help lower LDL cholesterol.",
+   "minGrams": 30,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "pinto_beans_dry": {
+   "benefits": [
+    "gut",
+    "heart",
+    "muscle"
+   ],
+   "why": "Dry legumes: fiber and plant protein; feed gut bacteria and help cholesterol.",
+   "minGrams": 15,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "chickpeas_dry": {
+   "benefits": [
+    "gut",
+    "heart",
+    "muscle"
+   ],
+   "why": "Dry legumes: fiber and plant protein; feed gut bacteria and help cholesterol.",
+   "minGrams": 15,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "soybeans_dry": {
+   "benefits": [
+    "gut",
+    "heart",
+    "muscle"
+   ],
+   "why": "Dry legumes: fiber and plant protein; feed gut bacteria and help cholesterol.",
+   "minGrams": 15,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "chickpeas": {
+   "benefits": [
+    "gut",
+    "heart",
+    "muscle"
+   ],
+   "why": "Chickpeas give fiber, plant protein, folate and iron.",
+   "minGrams": 30,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "kala_chana_cooked": {
+   "benefits": [
+    "gut",
+    "heart",
+    "muscle"
+   ],
+   "why": "Chickpeas give fiber, plant protein, folate and iron.",
+   "minGrams": 30,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "hummus": {
+   "benefits": [
+    "gut",
+    "heart",
+    "muscle"
+   ],
+   "why": "Chickpeas give fiber, plant protein, folate and iron.",
+   "minGrams": 30,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "lentils_cooked": {
+   "benefits": [
+    "gut",
+    "muscle",
+    "hair",
+    "heart"
+   ],
+   "why": "Lentils and dals: fiber, protein, iron and folate; iron matters for hair on a vegetarian diet.",
+   "minGrams": 20,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "lentils_green": {
+   "benefits": [
+    "gut",
+    "muscle",
+    "hair",
+    "heart"
+   ],
+   "why": "Lentils and dals: fiber, protein, iron and folate; iron matters for hair on a vegetarian diet.",
+   "minGrams": 20,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "lentils_red": {
+   "benefits": [
+    "gut",
+    "muscle",
+    "hair",
+    "heart"
+   ],
+   "why": "Lentils and dals: fiber, protein, iron and folate; iron matters for hair on a vegetarian diet.",
+   "minGrams": 20,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "moong_dal": {
+   "benefits": [
+    "gut",
+    "muscle",
+    "hair",
+    "heart"
+   ],
+   "why": "Lentils and dals: fiber, protein, iron and folate; iron matters for hair on a vegetarian diet.",
+   "minGrams": 20,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "toor_dal": {
+   "benefits": [
+    "gut",
+    "muscle",
+    "hair",
+    "heart"
+   ],
+   "why": "Lentils and dals: fiber, protein, iron and folate; iron matters for hair on a vegetarian diet.",
+   "minGrams": 20,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "chana_dal": {
+   "benefits": [
+    "gut",
+    "muscle",
+    "hair",
+    "heart"
+   ],
+   "why": "Lentils and dals: fiber, protein, iron and folate; iron matters for hair on a vegetarian diet.",
+   "minGrams": 20,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "urad_dal": {
+   "benefits": [
+    "gut",
+    "muscle",
+    "hair",
+    "heart"
+   ],
+   "why": "Lentils and dals: fiber, protein, iron and folate; iron matters for hair on a vegetarian diet.",
+   "minGrams": 20,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "black_gram_lentils": {
+   "benefits": [
+    "gut",
+    "muscle",
+    "hair",
+    "heart"
+   ],
+   "why": "Lentils and dals: fiber, protein, iron and folate; iron matters for hair on a vegetarian diet.",
+   "minGrams": 20,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "split_peas": {
+   "benefits": [
+    "gut",
+    "muscle",
+    "hair",
+    "heart"
+   ],
+   "why": "Lentils and dals: fiber, protein, iron and folate; iron matters for hair on a vegetarian diet.",
+   "minGrams": 20,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "mung_bean_sprouts": {
+   "benefits": [
+    "gut",
+    "skin"
+   ],
+   "why": "Sprouted mung beans: fiber, folate and vitamin C.",
+   "minGrams": 30,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "green_peas": {
+   "benefits": [
+    "gut",
+    "muscle"
+   ],
+   "why": "Peas: fiber and some plant protein.",
+   "minGrams": 30,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "peas": {
+   "benefits": [
+    "gut",
+    "muscle"
+   ],
+   "why": "Peas: fiber and some plant protein.",
+   "minGrams": 30,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "edamame": {
+   "benefits": [
+    "muscle",
+    "gut",
+    "heart"
+   ],
+   "why": "Whole soybeans: complete plant protein, fiber and folate.",
+   "minGrams": 30,
+   "tags": [
+    "legume",
+    "plant",
+    "soy"
+   ]
+  },
+  "chickpea_flour": {
+   "benefits": [
+    "gut",
+    "muscle"
+   ],
+   "why": "Besan (chickpea flour): fiber and plant protein.",
+   "minGrams": 20,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "chickpea_pasta": {
+   "benefits": [
+    "muscle",
+    "gut"
+   ],
+   "why": "Chickpea pasta: about twice the protein and fiber of wheat pasta.",
+   "minGrams": 30,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "falafel": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Chickpea fiber (fried, so watch the calories).",
+   "minGrams": 40,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "peanuts": {
+   "benefits": [
+    "heart",
+    "muscle"
+   ],
+   "why": "Peanuts: protein, healthy fats, vitamin E and niacin.",
+   "minGrams": 15,
+   "tags": [
+    "plant"
+   ]
+  },
+  "peanut_butter": {
+   "benefits": [
+    "heart",
+    "muscle"
+   ],
+   "why": "Peanuts: protein, healthy fats, vitamin E and niacin.",
+   "minGrams": 15,
+   "tags": [
+    "plant"
+   ]
+  },
+  "peanut_butter_powder": {
+   "benefits": [
+    "muscle"
+   ],
+   "why": "Defatted peanut: lots of protein for the calories.",
+   "minGrams": 10,
+   "tags": [
+    "plant"
+   ]
+  },
+  "peanut_flour": {
+   "benefits": [
+    "muscle"
+   ],
+   "why": "Defatted peanut: lots of protein for the calories.",
+   "minGrams": 10,
+   "tags": [
+    "plant"
+   ]
+  },
+  "tofu": {
+   "benefits": [
+    "muscle",
+    "hair",
+    "bones",
+    "heart"
+   ],
+   "why": "Tofu: complete soy protein, often calcium-set, plus iron.",
+   "minGrams": 50,
+   "tags": [
+    "soy",
+    "plant"
+   ]
+  },
+  "tofu_extra_firm": {
+   "benefits": [
+    "muscle",
+    "hair",
+    "bones",
+    "heart"
+   ],
+   "why": "Tofu: complete soy protein, often calcium-set, plus iron.",
+   "minGrams": 50,
+   "tags": [
+    "soy",
+    "plant"
+   ]
+  },
+  "tofu_super_firm": {
+   "benefits": [
+    "muscle",
+    "hair",
+    "bones",
+    "heart"
+   ],
+   "why": "Tofu: complete soy protein, often calcium-set, plus iron.",
+   "minGrams": 50,
+   "tags": [
+    "soy",
+    "plant"
+   ]
+  },
+  "silken_tofu": {
+   "benefits": [
+    "muscle",
+    "hair",
+    "bones",
+    "heart"
+   ],
+   "why": "Tofu: complete soy protein, often calcium-set, plus iron.",
+   "minGrams": 50,
+   "tags": [
+    "soy",
+    "plant"
+   ]
+  },
+  "smoked_tofu": {
+   "benefits": [
+    "muscle",
+    "hair",
+    "bones",
+    "heart"
+   ],
+   "why": "Tofu: complete soy protein, often calcium-set, plus iron.",
+   "minGrams": 50,
+   "tags": [
+    "soy",
+    "plant"
+   ]
+  },
+  "tempeh": {
+   "benefits": [
+    "gut",
+    "muscle",
+    "hair"
+   ],
+   "why": "Fermented soybeans: complete protein, fiber and iron.",
+   "minGrams": 30,
+   "tags": [
+    "soy",
+    "plant",
+    "fermented"
+   ]
+  },
+  "natto": {
+   "benefits": [
+    "gut",
+    "bones",
+    "muscle"
+   ],
+   "why": "Fermented soybeans with live cultures, protein and vitamin K2.",
+   "minGrams": 20,
+   "tags": [
+    "soy",
+    "plant",
+    "fermented"
+   ]
+  },
+  "miso": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Fermented soybean paste; unpasteurized miso keeps live cultures (add after cooking).",
+   "minGrams": 10,
+   "tags": [
+    "soy",
+    "plant",
+    "fermented"
+   ]
+  },
+  "fermented_tofu": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Fermented tofu: fermented soy, used in small amounts.",
+   "minGrams": 10,
+   "tags": [
+    "soy",
+    "plant",
+    "fermented"
+   ]
+  },
+  "soy_chunks": {
+   "benefits": [
+    "muscle",
+    "hair"
+   ],
+   "why": "Dried soy protein: one of the most protein-dense vegetarian foods.",
+   "minGrams": 15,
+   "tags": [
+    "soy",
+    "plant"
+   ]
+  },
+  "soy_curls": {
+   "benefits": [
+    "muscle",
+    "hair"
+   ],
+   "why": "Dried soy protein: one of the most protein-dense vegetarian foods.",
+   "minGrams": 15,
+   "tags": [
+    "soy",
+    "plant"
+   ]
+  },
+  "soy_protein": {
+   "benefits": [
+    "muscle",
+    "hair"
+   ],
+   "why": "Dried soy protein: one of the most protein-dense vegetarian foods.",
+   "minGrams": 15,
+   "tags": [
+    "soy",
+    "plant"
+   ]
+  },
+  "soy_milk": {
+   "benefits": [
+    "muscle",
+    "bones"
+   ],
+   "why": "Soy milk: protein, and calcium and vitamin D when fortified.",
+   "minGrams": 100,
+   "tags": [
+    "soy",
+    "plant"
+   ]
+  },
+  "seitan": {
+   "benefits": [
+    "muscle"
+   ],
+   "why": "Wheat gluten: very high protein for the calories.",
+   "minGrams": 30,
+   "tags": [
+    "plant"
+   ]
+  },
+  "vital_wheat_gluten": {
+   "benefits": [
+    "muscle"
+   ],
+   "why": "Wheat gluten: very high protein for the calories.",
+   "minGrams": 30,
+   "tags": [
+    "plant"
+   ]
+  },
+  "mycoprotein_pieces": {
+   "benefits": [
+    "muscle",
+    "gut"
+   ],
+   "why": "Mycoprotein (Quorn-type): complete protein plus fiber.",
+   "minGrams": 50
+  },
+  "nutritional_yeast": {
+   "benefits": [
+    "energy",
+    "muscle"
+   ],
+   "why": "B vitamins (B12 when fortified, key for vegetarians) and protein.",
+   "minGrams": 5
+  },
+  "oats": {
+   "benefits": [
+    "gut",
+    "heart",
+    "energy"
+   ],
+   "why": "Oats: beta-glucan fiber that feeds gut bacteria and lowers LDL; slow-release carbs.",
+   "minGrams": 30,
+   "tags": [
+    "whole_grain",
+    "plant"
+   ]
+  },
+  "oat_flour": {
+   "benefits": [
+    "gut",
+    "heart",
+    "energy"
+   ],
+   "why": "Oats: beta-glucan fiber that feeds gut bacteria and lowers LDL; slow-release carbs.",
+   "minGrams": 30,
+   "tags": [
+    "whole_grain",
+    "plant"
+   ]
+  },
+  "brown_rice": {
+   "benefits": [
+    "gut",
+    "energy"
+   ],
+   "why": "Whole grains: fiber, magnesium and slow-digesting carbs.",
+   "minGrams": 30,
+   "tags": [
+    "whole_grain",
+    "plant"
+   ]
+  },
+  "bulgur": {
+   "benefits": [
+    "gut",
+    "energy"
+   ],
+   "why": "Whole grains: fiber, magnesium and slow-digesting carbs.",
+   "minGrams": 30,
+   "tags": [
+    "whole_grain",
+    "plant"
+   ]
+  },
+  "quinoa": {
+   "benefits": [
+    "gut",
+    "energy"
+   ],
+   "why": "Whole grains: fiber, magnesium and slow-digesting carbs.",
+   "minGrams": 30,
+   "tags": [
+    "whole_grain",
+    "plant"
+   ]
+  },
+  "cooked_quinoa": {
+   "benefits": [
+    "gut",
+    "energy"
+   ],
+   "why": "Whole grains: fiber, magnesium and slow-digesting carbs.",
+   "minGrams": 30,
+   "tags": [
+    "whole_grain",
+    "plant"
+   ]
+  },
+  "quinoa_flour": {
+   "benefits": [
+    "gut",
+    "energy"
+   ],
+   "why": "Whole grains: fiber, magnesium and slow-digesting carbs.",
+   "minGrams": 30,
+   "tags": [
+    "whole_grain",
+    "plant"
+   ]
+  },
+  "whole_wheat_flour": {
+   "benefits": [
+    "gut",
+    "energy",
+    "heart"
+   ],
+   "why": "Whole wheat: cereal fiber, linked to lower heart disease risk.",
+   "minGrams": 30,
+   "tags": [
+    "whole_grain",
+    "plant"
+   ]
+  },
+  "whole_wheat_bread": {
+   "benefits": [
+    "gut",
+    "energy",
+    "heart"
+   ],
+   "why": "Whole wheat: cereal fiber, linked to lower heart disease risk.",
+   "minGrams": 30,
+   "tags": [
+    "whole_grain",
+    "plant"
+   ]
+  },
+  "bread_wholemeal": {
+   "benefits": [
+    "gut",
+    "energy",
+    "heart"
+   ],
+   "why": "Whole wheat: cereal fiber, linked to lower heart disease risk.",
+   "minGrams": 30,
+   "tags": [
+    "whole_grain",
+    "plant"
+   ]
+  },
+  "whole_wheat_pasta": {
+   "benefits": [
+    "gut",
+    "energy",
+    "heart"
+   ],
+   "why": "Whole wheat: cereal fiber, linked to lower heart disease risk.",
+   "minGrams": 30,
+   "tags": [
+    "whole_grain",
+    "plant"
+   ]
+  },
+  "whole_wheat_potato_roll": {
+   "benefits": [
+    "gut",
+    "energy",
+    "heart"
+   ],
+   "why": "Whole wheat: cereal fiber, linked to lower heart disease risk.",
+   "minGrams": 30,
+   "tags": [
+    "whole_grain",
+    "plant"
+   ]
+  },
+  "ragi": {
+   "benefits": [
+    "bones",
+    "gut",
+    "energy"
+   ],
+   "why": "Ragi (finger millet): very high in calcium for a grain, plus fiber.",
+   "minGrams": 20,
+   "tags": [
+    "whole_grain",
+    "plant"
+   ]
+  },
+  "ragi_flour": {
+   "benefits": [
+    "bones",
+    "gut",
+    "energy"
+   ],
+   "why": "Ragi (finger millet): very high in calcium for a grain, plus fiber.",
+   "minGrams": 20,
+   "tags": [
+    "whole_grain",
+    "plant"
+   ]
+  },
+  "poha": {
+   "benefits": [
+    "energy"
+   ],
+   "why": "Flattened rice: easy carbs with some iron.",
+   "minGrams": 30,
+   "tags": [
+    "plant"
+   ]
+  },
+  "flattened_rice_poha": {
+   "benefits": [
+    "energy"
+   ],
+   "why": "Flattened rice: easy carbs with some iron.",
+   "minGrams": 30,
+   "tags": [
+    "plant"
+   ]
+  },
+  "cornmeal": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Whole-grain corn: fiber and polyphenols.",
+   "minGrams": 20,
+   "tags": [
+    "whole_grain",
+    "plant"
+   ]
+  },
+  "popcorn_kernels": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Whole-grain corn: fiber and polyphenols.",
+   "minGrams": 20,
+   "tags": [
+    "whole_grain",
+    "plant"
+   ]
+  },
+  "high_fiber_cereal": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "High-fiber cereal: a big dose of bran fiber per bowl.",
+   "minGrams": 30,
+   "tags": [
+    "plant"
+   ]
+  },
+  "soba_noodles": {
+   "benefits": [
+    "energy"
+   ],
+   "why": "Buckwheat noodles: slower-digesting carbs, some fiber.",
+   "minGrams": 40,
+   "tags": [
+    "plant"
+   ]
+  },
+  "dosa_batter": {
+   "benefits": [
+    "gut",
+    "energy"
+   ],
+   "why": "Fermented rice and urad dal batter; fermentation improves digestibility.",
+   "minGrams": 50,
+   "tags": [
+    "fermented",
+    "legume",
+    "plant"
+   ]
+  },
+  "walnuts": {
+   "benefits": [
+    "heart",
+    "skin",
+    "gut"
+   ],
+   "why": "Omega-3 (ALA), polyphenols and fiber; walnuts improve cholesterol in trials.",
+   "minGrams": 10,
+   "tags": [
+    "omega3",
+    "plant"
+   ]
+  },
+  "almonds": {
+   "benefits": [
+    "skin",
+    "heart"
+   ],
+   "why": "Vitamin E (an antioxidant for skin), magnesium and healthy fats.",
+   "minGrams": 10,
+   "tags": [
+    "plant"
+   ]
+  },
+  "salted_almonds": {
+   "benefits": [
+    "skin",
+    "heart"
+   ],
+   "why": "Vitamin E (an antioxidant for skin), magnesium and healthy fats.",
+   "minGrams": 10,
+   "tags": [
+    "plant"
+   ]
+  },
+  "almond_butter": {
+   "benefits": [
+    "skin",
+    "heart"
+   ],
+   "why": "Vitamin E (an antioxidant for skin), magnesium and healthy fats.",
+   "minGrams": 10,
+   "tags": [
+    "plant"
+   ]
+  },
+  "almond_flour": {
+   "benefits": [
+    "heart",
+    "skin"
+   ],
+   "why": "Ground almonds: vitamin E and healthy fats.",
+   "minGrams": 15,
+   "tags": [
+    "plant"
+   ]
+  },
+  "pistachios": {
+   "benefits": [
+    "heart",
+    "skin"
+   ],
+   "why": "Pistachios: protein, fiber and lutein; good fats.",
+   "minGrams": 10,
+   "tags": [
+    "plant"
+   ]
+  },
+  "pistachio_butter": {
+   "benefits": [
+    "heart",
+    "skin"
+   ],
+   "why": "Pistachios: protein, fiber and lutein; good fats.",
+   "minGrams": 10,
+   "tags": [
+    "plant"
+   ]
+  },
+  "cashews": {
+   "benefits": [
+    "heart",
+    "hair"
+   ],
+   "why": "Cashews: zinc, magnesium and copper.",
+   "minGrams": 10,
+   "tags": [
+    "plant"
+   ]
+  },
+  "cashew_butter": {
+   "benefits": [
+    "heart",
+    "hair"
+   ],
+   "why": "Cashews: zinc, magnesium and copper.",
+   "minGrams": 10,
+   "tags": [
+    "plant"
+   ]
+  },
+  "hazelnuts": {
+   "benefits": [
+    "heart",
+    "skin"
+   ],
+   "why": "Nuts: unsaturated fats and vitamin E; regular nut eaters have less heart disease.",
+   "minGrams": 10,
+   "tags": [
+    "plant"
+   ]
+  },
+  "pecans": {
+   "benefits": [
+    "heart",
+    "skin"
+   ],
+   "why": "Nuts: unsaturated fats and vitamin E; regular nut eaters have less heart disease.",
+   "minGrams": 10,
+   "tags": [
+    "plant"
+   ]
+  },
+  "pine_nuts": {
+   "benefits": [
+    "heart",
+    "skin"
+   ],
+   "why": "Nuts: unsaturated fats and vitamin E; regular nut eaters have less heart disease.",
+   "minGrams": 10,
+   "tags": [
+    "plant"
+   ]
+  },
+  "nuts": {
+   "benefits": [
+    "heart",
+    "skin"
+   ],
+   "why": "Nuts: unsaturated fats and vitamin E; regular nut eaters have less heart disease.",
+   "minGrams": 10,
+   "tags": [
+    "plant"
+   ]
+  },
+  "chia_seeds": {
+   "benefits": [
+    "gut",
+    "heart",
+    "skin"
+   ],
+   "why": "Omega-3 (ALA) and lots of soluble fiber.",
+   "minGrams": 5,
+   "tags": [
+    "omega3",
+    "plant"
+   ]
+  },
+  "flaxseed_meal": {
+   "benefits": [
+    "gut",
+    "heart",
+    "skin"
+   ],
+   "why": "Ground flax: the richest plant omega-3 (ALA), plus fiber and lignans.",
+   "minGrams": 5,
+   "tags": [
+    "omega3",
+    "plant"
+   ]
+  },
+  "hemp_seeds": {
+   "benefits": [
+    "muscle",
+    "heart",
+    "skin"
+   ],
+   "why": "Hemp hearts: complete protein, omega-3 (ALA) and zinc.",
+   "minGrams": 10,
+   "tags": [
+    "omega3",
+    "plant"
+   ]
+  },
+  "pumpkin_seeds": {
+   "benefits": [
+    "hair",
+    "skin",
+    "muscle"
+   ],
+   "why": "Pumpkin seeds: one of the best vegetarian sources of zinc, plus iron and protein.",
+   "minGrams": 10,
+   "tags": [
+    "plant"
+   ]
+  },
+  "sunflower_seeds": {
+   "benefits": [
+    "skin",
+    "heart"
+   ],
+   "why": "Sunflower seeds: very high in vitamin E, plus selenium.",
+   "minGrams": 10,
+   "tags": [
+    "plant"
+   ]
+  },
+  "seed_butter": {
+   "benefits": [
+    "skin",
+    "heart"
+   ],
+   "why": "Sunflower seeds: very high in vitamin E, plus selenium.",
+   "minGrams": 10,
+   "tags": [
+    "plant"
+   ]
+  },
+  "sesame_seeds": {
+   "benefits": [
+    "bones",
+    "hair"
+   ],
+   "why": "Sesame: calcium, iron and zinc.",
+   "minGrams": 10,
+   "tags": [
+    "plant"
+   ]
+  },
+  "tahini": {
+   "benefits": [
+    "bones",
+    "hair"
+   ],
+   "why": "Sesame: calcium, iron and zinc.",
+   "minGrams": 10,
+   "tags": [
+    "plant"
+   ]
+  },
+  "poppy_seeds": {
+   "benefits": [
+    "bones"
+   ],
+   "why": "Poppy seeds: calcium and manganese.",
+   "minGrams": 5,
+   "tags": [
+    "plant"
+   ]
+  },
+  "plain_yogurt": {
+   "benefits": [
+    "gut",
+    "bones",
+    "muscle"
+   ],
+   "why": "Live cultures (probiotics), calcium and protein.",
+   "minGrams": 50,
+   "tags": [
+    "fermented",
+    "dairy"
+   ]
+  },
+  "greek_yogurt": {
+   "benefits": [
+    "gut",
+    "muscle",
+    "bones",
+    "hair"
+   ],
+   "why": "Strained yogurt: lots of protein plus live cultures and calcium.",
+   "minGrams": 50,
+   "tags": [
+    "fermented",
+    "dairy"
+   ]
+  },
+  "greek_yogurt_2pct": {
+   "benefits": [
+    "gut",
+    "muscle",
+    "bones",
+    "hair"
+   ],
+   "why": "Strained yogurt: lots of protein plus live cultures and calcium.",
+   "minGrams": 50,
+   "tags": [
+    "fermented",
+    "dairy"
+   ]
+  },
+  "greek_yogurt_full": {
+   "benefits": [
+    "gut",
+    "muscle",
+    "bones",
+    "hair"
+   ],
+   "why": "Strained yogurt: lots of protein plus live cultures and calcium.",
+   "minGrams": 50,
+   "tags": [
+    "fermented",
+    "dairy"
+   ]
+  },
+  "greek_yogurt_nonfat": {
+   "benefits": [
+    "gut",
+    "muscle",
+    "bones",
+    "hair"
+   ],
+   "why": "Strained yogurt: lots of protein plus live cultures and calcium.",
+   "minGrams": 50,
+   "tags": [
+    "fermented",
+    "dairy"
+   ]
+  },
+  "skyr": {
+   "benefits": [
+    "muscle",
+    "gut",
+    "bones"
+   ],
+   "why": "Skyr: very high protein, live cultures, calcium.",
+   "minGrams": 50,
+   "tags": [
+    "fermented",
+    "dairy"
+   ]
+  },
+  "skyr_plain": {
+   "benefits": [
+    "muscle",
+    "gut",
+    "bones"
+   ],
+   "why": "Skyr: very high protein, live cultures, calcium.",
+   "minGrams": 50,
+   "tags": [
+    "fermented",
+    "dairy"
+   ]
+  },
+  "skyr_full": {
+   "benefits": [
+    "muscle",
+    "gut",
+    "bones"
+   ],
+   "why": "Skyr: very high protein, live cultures, calcium.",
+   "minGrams": 50,
+   "tags": [
+    "fermented",
+    "dairy"
+   ]
+  },
+  "kefir": {
+   "benefits": [
+    "gut",
+    "bones"
+   ],
+   "why": "Kefir: many more probiotic strains than yogurt, plus calcium.",
+   "minGrams": 100,
+   "tags": [
+    "fermented",
+    "dairy"
+   ]
+  },
+  "hung_curd": {
+   "benefits": [
+    "gut",
+    "muscle"
+   ],
+   "why": "Hung curd: strained yogurt with protein and live cultures.",
+   "minGrams": 50,
+   "tags": [
+    "fermented",
+    "dairy"
+   ]
+  },
+  "buttermilk": {
+   "benefits": [
+    "gut",
+    "bones"
+   ],
+   "why": "Cultured buttermilk (chaas): fermented, light, calcium.",
+   "minGrams": 100,
+   "tags": [
+    "fermented",
+    "dairy"
+   ]
+  },
+  "quark": {
+   "benefits": [
+    "muscle",
+    "bones"
+   ],
+   "why": "Quark: high-protein fresh cheese with calcium.",
+   "minGrams": 50,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "cottage_cheese": {
+   "benefits": [
+    "muscle",
+    "hair",
+    "bones"
+   ],
+   "why": "Cottage cheese: casein protein and calcium.",
+   "minGrams": 50,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "paneer": {
+   "benefits": [
+    "muscle",
+    "bones",
+    "hair"
+   ],
+   "why": "Paneer: casein protein and calcium; a core vegetarian protein.",
+   "minGrams": 40,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "paneer_low_fat": {
+   "benefits": [
+    "muscle",
+    "bones",
+    "hair"
+   ],
+   "why": "Paneer: casein protein and calcium; a core vegetarian protein.",
+   "minGrams": 40,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "ricotta_part_skim": {
+   "benefits": [
+    "muscle",
+    "bones"
+   ],
+   "why": "Ricotta: whey protein and calcium.",
+   "minGrams": 40,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "parmesan": {
+   "benefits": [
+    "bones"
+   ],
+   "why": "Parmesan: very high calcium per gram.",
+   "minGrams": 10,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "skim_milk": {
+   "benefits": [
+    "bones",
+    "muscle"
+   ],
+   "why": "Milk: calcium, vitamin D (fortified), and protein; ultra-filtered milk has about 60% more protein.",
+   "minGrams": 150,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "one_percent_milk": {
+   "benefits": [
+    "bones",
+    "muscle"
+   ],
+   "why": "Milk: calcium, vitamin D (fortified), and protein; ultra-filtered milk has about 60% more protein.",
+   "minGrams": 150,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "two_percent_milk": {
+   "benefits": [
+    "bones",
+    "muscle"
+   ],
+   "why": "Milk: calcium, vitamin D (fortified), and protein; ultra-filtered milk has about 60% more protein.",
+   "minGrams": 150,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "whole_milk": {
+   "benefits": [
+    "bones",
+    "muscle"
+   ],
+   "why": "Milk: calcium, vitamin D (fortified), and protein; ultra-filtered milk has about 60% more protein.",
+   "minGrams": 150,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "fat_free_ultra_filtered_milk": {
+   "benefits": [
+    "bones",
+    "muscle"
+   ],
+   "why": "Milk: calcium, vitamin D (fortified), and protein; ultra-filtered milk has about 60% more protein.",
+   "minGrams": 150,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "ultra_filtered_milk_1pct": {
+   "benefits": [
+    "bones",
+    "muscle"
+   ],
+   "why": "Milk: calcium, vitamin D (fortified), and protein; ultra-filtered milk has about 60% more protein.",
+   "minGrams": 150,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "ultra_filtered_milk_2pct": {
+   "benefits": [
+    "bones",
+    "muscle"
+   ],
+   "why": "Milk: calcium, vitamin D (fortified), and protein; ultra-filtered milk has about 60% more protein.",
+   "minGrams": 150,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "ultra_filtered_milk_whole": {
+   "benefits": [
+    "bones",
+    "muscle"
+   ],
+   "why": "Milk: calcium, vitamin D (fortified), and protein; ultra-filtered milk has about 60% more protein.",
+   "minGrams": 150,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "ultra_filtered_milk_store_brand": {
+   "benefits": [
+    "bones",
+    "muscle"
+   ],
+   "why": "Milk: calcium, vitamin D (fortified), and protein; ultra-filtered milk has about 60% more protein.",
+   "minGrams": 150,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "lactose_free_skim_milk": {
+   "benefits": [
+    "bones",
+    "muscle"
+   ],
+   "why": "Milk: calcium, vitamin D (fortified), and protein; ultra-filtered milk has about 60% more protein.",
+   "minGrams": 150,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "casein_powder": {
+   "benefits": [
+    "muscle",
+    "hair"
+   ],
+   "why": "Concentrated protein to hit daily protein targets while cutting.",
+   "minGrams": 20,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "protein_powder_unflavored": {
+   "benefits": [
+    "muscle",
+    "hair"
+   ],
+   "why": "Concentrated protein to hit daily protein targets while cutting.",
+   "minGrams": 20,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "protein_powder_vanilla": {
+   "benefits": [
+    "muscle",
+    "hair"
+   ],
+   "why": "Concentrated protein to hit daily protein targets while cutting.",
+   "minGrams": 20,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "protein_powder_chocolate": {
+   "benefits": [
+    "muscle",
+    "hair"
+   ],
+   "why": "Concentrated protein to hit daily protein targets while cutting.",
+   "minGrams": 20,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "protein_powder_dymatize_iso100": {
+   "benefits": [
+    "muscle",
+    "hair"
+   ],
+   "why": "Concentrated protein to hit daily protein targets while cutting.",
+   "minGrams": 20,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "protein_powder_on_gold_standard_whey": {
+   "benefits": [
+    "muscle",
+    "hair"
+   ],
+   "why": "Concentrated protein to hit daily protein targets while cutting.",
+   "minGrams": 20,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "protein_powder_dymatize_elite_casein": {
+   "benefits": [
+    "muscle",
+    "hair"
+   ],
+   "why": "Concentrated protein to hit daily protein targets while cutting.",
+   "minGrams": 20,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "protein_powder_on_gold_standard_casein": {
+   "benefits": [
+    "muscle",
+    "hair"
+   ],
+   "why": "Concentrated protein to hit daily protein targets while cutting.",
+   "minGrams": 20,
+   "tags": [
+    "dairy"
+   ]
+  },
+  "protein_powder_pea": {
+   "benefits": [
+    "muscle"
+   ],
+   "why": "Pea protein: plant protein with iron.",
+   "minGrams": 20,
+   "tags": [
+    "plant"
+   ]
+  },
+  "eggs": {
+   "benefits": [
+    "muscle",
+    "hair",
+    "skin"
+   ],
+   "why": "Eggs: complete protein, biotin, B12, selenium and lutein.",
+   "minGrams": 50,
+   "tags": [
+    "egg"
+   ]
+  },
+  "egg_whites": {
+   "benefits": [
+    "muscle"
+   ],
+   "why": "Egg whites: almost pure protein.",
+   "minGrams": 50,
+   "tags": [
+    "egg"
+   ]
+  },
+  "egg_yolks": {
+   "benefits": [
+    "hair",
+    "skin"
+   ],
+   "why": "Yolks: biotin, vitamin D, B12, lutein and choline.",
+   "minGrams": 15,
+   "tags": [
+    "egg"
+   ]
+  },
+  "spinach": {
+   "benefits": [
+    "skin",
+    "bones",
+    "heart"
+   ],
+   "why": "Leafy greens: vitamin A (beta-carotene), folate, vitamin K and nitrates.",
+   "minGrams": 30,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "swiss_chard": {
+   "benefits": [
+    "skin",
+    "bones",
+    "heart"
+   ],
+   "why": "Leafy greens: vitamin A (beta-carotene), folate, vitamin K and nitrates.",
+   "minGrams": 30,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "leafy_greens": {
+   "benefits": [
+    "skin",
+    "bones",
+    "heart"
+   ],
+   "why": "Leafy greens: vitamin A (beta-carotene), folate, vitamin K and nitrates.",
+   "minGrams": 30,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "salad_leaves": {
+   "benefits": [
+    "skin",
+    "bones",
+    "heart"
+   ],
+   "why": "Leafy greens: vitamin A (beta-carotene), folate, vitamin K and nitrates.",
+   "minGrams": 30,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "kale": {
+   "benefits": [
+    "skin",
+    "bones",
+    "heart"
+   ],
+   "why": "Dark leafy greens: vitamins A, C and K, plus calcium the body absorbs well.",
+   "minGrams": 30,
+   "tags": [
+    "plant",
+    "vegetable",
+    "vitamin_c"
+   ]
+  },
+  "mustard_greens": {
+   "benefits": [
+    "skin",
+    "bones",
+    "heart"
+   ],
+   "why": "Dark leafy greens: vitamins A, C and K, plus calcium the body absorbs well.",
+   "minGrams": 30,
+   "tags": [
+    "plant",
+    "vegetable",
+    "vitamin_c"
+   ]
+  },
+  "bok_choy": {
+   "benefits": [
+    "skin",
+    "bones",
+    "heart"
+   ],
+   "why": "Dark leafy greens: vitamins A, C and K, plus calcium the body absorbs well.",
+   "minGrams": 30,
+   "tags": [
+    "plant",
+    "vegetable",
+    "vitamin_c"
+   ]
+  },
+  "arugula": {
+   "benefits": [
+    "heart",
+    "bones"
+   ],
+   "why": "Vitamin K, folate and nitrates.",
+   "minGrams": 30,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "romaine_lettuce": {
+   "benefits": [
+    "heart",
+    "bones"
+   ],
+   "why": "Vitamin K, folate and nitrates.",
+   "minGrams": 30,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "moringa_drumsticks": {
+   "benefits": [
+    "skin",
+    "bones"
+   ],
+   "why": "Moringa: vitamin C, calcium and beta-carotene.",
+   "minGrams": 30,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "broccoli": {
+   "benefits": [
+    "skin",
+    "gut",
+    "bones"
+   ],
+   "why": "Crucifers: vitamin C (for collagen), vitamin K, fiber and sulforaphane.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable",
+    "vitamin_c"
+   ]
+  },
+  "brussels_sprouts": {
+   "benefits": [
+    "skin",
+    "gut",
+    "bones"
+   ],
+   "why": "Crucifers: vitamin C (for collagen), vitamin K, fiber and sulforaphane.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable",
+    "vitamin_c"
+   ]
+  },
+  "cabbage": {
+   "benefits": [
+    "gut",
+    "skin"
+   ],
+   "why": "Crucifers: fiber and vitamin C; red cabbage adds anthocyanins.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable",
+    "vitamin_c"
+   ]
+  },
+  "red_cabbage": {
+   "benefits": [
+    "gut",
+    "skin"
+   ],
+   "why": "Crucifers: fiber and vitamin C; red cabbage adds anthocyanins.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable",
+    "vitamin_c"
+   ]
+  },
+  "cauliflower": {
+   "benefits": [
+    "gut",
+    "skin"
+   ],
+   "why": "Crucifers: fiber and vitamin C; red cabbage adds anthocyanins.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable",
+    "vitamin_c"
+   ]
+  },
+  "asparagus": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Natural prebiotic fiber (inulin) that feeds gut bacteria.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable",
+    "prebiotic"
+   ]
+  },
+  "artichoke_hearts": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Natural prebiotic fiber (inulin) that feeds gut bacteria.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable",
+    "prebiotic"
+   ]
+  },
+  "green_beans": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Fiber plus folate and vitamin K.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "okra": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Fiber plus folate and vitamin K.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "snow_peas": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Fiber plus folate and vitamin K.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "kimchi": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Fermented cabbage with live cultures (when raw/unpasteurized) and fiber.",
+   "minGrams": 20,
+   "tags": [
+    "fermented",
+    "plant",
+    "vegetable"
+   ]
+  },
+  "sauerkraut": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Fermented cabbage with live cultures (when raw/unpasteurized) and fiber.",
+   "minGrams": 20,
+   "tags": [
+    "fermented",
+    "plant",
+    "vegetable"
+   ]
+  },
+  "carrot": {
+   "benefits": [
+    "skin"
+   ],
+   "why": "Beta-carotene (vitamin A), which the skin needs to renew and protect itself.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "sweet_potato": {
+   "benefits": [
+    "skin"
+   ],
+   "why": "Beta-carotene (vitamin A), which the skin needs to renew and protect itself.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "butternut_squash": {
+   "benefits": [
+    "skin"
+   ],
+   "why": "Beta-carotene (vitamin A), which the skin needs to renew and protect itself.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "canned_pumpkin": {
+   "benefits": [
+    "skin"
+   ],
+   "why": "Beta-carotene (vitamin A), which the skin needs to renew and protect itself.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "bell_pepper": {
+   "benefits": [
+    "skin"
+   ],
+   "why": "Red and yellow peppers are among the richest vitamin C foods, needed to build collagen.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable",
+    "vitamin_c"
+   ]
+  },
+  "red_pepper": {
+   "benefits": [
+    "skin"
+   ],
+   "why": "Red and yellow peppers are among the richest vitamin C foods, needed to build collagen.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable",
+    "vitamin_c"
+   ]
+  },
+  "tomato": {
+   "benefits": [
+    "skin",
+    "heart"
+   ],
+   "why": "Lycopene (best absorbed from cooked tomato), which offers a little protection against UV redness.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "cherry_tomatoes": {
+   "benefits": [
+    "skin",
+    "heart"
+   ],
+   "why": "Lycopene (best absorbed from cooked tomato), which offers a little protection against UV redness.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "chopped_tomatoes": {
+   "benefits": [
+    "skin",
+    "heart"
+   ],
+   "why": "Lycopene (best absorbed from cooked tomato), which offers a little protection against UV redness.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "tomatoes_chopped": {
+   "benefits": [
+    "skin",
+    "heart"
+   ],
+   "why": "Lycopene (best absorbed from cooked tomato), which offers a little protection against UV redness.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "tomato_passata": {
+   "benefits": [
+    "skin",
+    "heart"
+   ],
+   "why": "Lycopene (best absorbed from cooked tomato), which offers a little protection against UV redness.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "tomato_paste": {
+   "benefits": [
+    "skin",
+    "heart"
+   ],
+   "why": "Lycopene (best absorbed from cooked tomato), which offers a little protection against UV redness.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "marinara_sauce": {
+   "benefits": [
+    "skin",
+    "heart"
+   ],
+   "why": "Lycopene (best absorbed from cooked tomato), which offers a little protection against UV redness.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "beetroot": {
+   "benefits": [
+    "heart",
+    "energy"
+   ],
+   "why": "Beets: dietary nitrates (blood flow, exercise) and folate.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "eggplant": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Low-calorie fiber and polyphenols.",
+   "minGrams": 50,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "zucchini": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Low-calorie fiber and polyphenols.",
+   "minGrams": 50,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "mushrooms": {
+   "benefits": [
+    "gut",
+    "bones"
+   ],
+   "why": "Mushrooms: fiber (beta-glucans), selenium and vitamin D if UV-exposed.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "shiitake": {
+   "benefits": [
+    "gut",
+    "bones"
+   ],
+   "why": "Mushrooms: fiber (beta-glucans), selenium and vitamin D if UV-exposed.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "portobello_mushroom": {
+   "benefits": [
+    "gut",
+    "bones"
+   ],
+   "why": "Mushrooms: fiber (beta-glucans), selenium and vitamin D if UV-exposed.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "onion": {
+   "benefits": [
+    "gut",
+    "heart"
+   ],
+   "why": "Prebiotic fiber (inulin, FOS) and quercetin.",
+   "minGrams": 30,
+   "tags": [
+    "plant",
+    "vegetable",
+    "prebiotic"
+   ]
+  },
+  "leek": {
+   "benefits": [
+    "gut",
+    "heart"
+   ],
+   "why": "Prebiotic fiber (inulin, FOS) and quercetin.",
+   "minGrams": 30,
+   "tags": [
+    "plant",
+    "vegetable",
+    "prebiotic"
+   ]
+  },
+  "shallot": {
+   "benefits": [
+    "gut",
+    "heart"
+   ],
+   "why": "Prebiotic fiber (inulin, FOS) and quercetin.",
+   "minGrams": 30,
+   "tags": [
+    "plant",
+    "vegetable",
+    "prebiotic"
+   ]
+  },
+  "garlic": {
+   "benefits": [
+    "heart",
+    "gut"
+   ],
+   "why": "Garlic: allicin and prebiotic fiber; modest blood pressure benefit.",
+   "minGrams": 3,
+   "tags": [
+    "plant",
+    "spice",
+    "prebiotic"
+   ]
+  },
+  "garlic_paste": {
+   "benefits": [
+    "heart",
+    "gut"
+   ],
+   "why": "Garlic: allicin and prebiotic fiber; modest blood pressure benefit.",
+   "minGrams": 3,
+   "tags": [
+    "plant",
+    "spice",
+    "prebiotic"
+   ]
+  },
+  "avocado": {
+   "benefits": [
+    "heart",
+    "skin",
+    "gut"
+   ],
+   "why": "Avocado: monounsaturated fat, fiber, vitamin E and potassium.",
+   "minGrams": 30,
+   "tags": [
+    "plant"
+   ]
+  },
+  "guacamole": {
+   "benefits": [
+    "heart",
+    "skin",
+    "gut"
+   ],
+   "why": "Avocado: monounsaturated fat, fiber, vitamin E and potassium.",
+   "minGrams": 30,
+   "tags": [
+    "plant"
+   ]
+  },
+  "sweetcorn": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Sweetcorn: fiber plus lutein.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "corn": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Sweetcorn: fiber plus lutein.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "frozen_mixed_vegetables": {
+   "benefits": [
+    "gut",
+    "skin"
+   ],
+   "why": "Mixed vegetables: fiber, vitamins A and C.",
+   "minGrams": 50,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "mixed_vegetables": {
+   "benefits": [
+    "gut",
+    "skin"
+   ],
+   "why": "Mixed vegetables: fiber, vitamins A and C.",
+   "minGrams": 50,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "pomegranate": {
+   "benefits": [
+    "heart",
+    "skin"
+   ],
+   "why": "Pomegranate: polyphenols (punicalagins), vitamin C and fiber.",
+   "minGrams": 30,
+   "tags": [
+    "plant",
+    "fruit",
+    "vitamin_c"
+   ]
+  },
+  "blueberries": {
+   "benefits": [
+    "skin",
+    "gut",
+    "heart"
+   ],
+   "why": "Berries: vitamin C, anthocyanin polyphenols and fiber (raspberries and blackberries are very high).",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "fruit",
+    "vitamin_c"
+   ]
+  },
+  "strawberries": {
+   "benefits": [
+    "skin",
+    "gut",
+    "heart"
+   ],
+   "why": "Berries: vitamin C, anthocyanin polyphenols and fiber (raspberries and blackberries are very high).",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "fruit",
+    "vitamin_c"
+   ]
+  },
+  "raspberries": {
+   "benefits": [
+    "skin",
+    "gut",
+    "heart"
+   ],
+   "why": "Berries: vitamin C, anthocyanin polyphenols and fiber (raspberries and blackberries are very high).",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "fruit",
+    "vitamin_c"
+   ]
+  },
+  "blackberries": {
+   "benefits": [
+    "skin",
+    "gut",
+    "heart"
+   ],
+   "why": "Berries: vitamin C, anthocyanin polyphenols and fiber (raspberries and blackberries are very high).",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "fruit",
+    "vitamin_c"
+   ]
+  },
+  "mixed_berries": {
+   "benefits": [
+    "skin",
+    "gut",
+    "heart"
+   ],
+   "why": "Berries: vitamin C, anthocyanin polyphenols and fiber (raspberries and blackberries are very high).",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "fruit",
+    "vitamin_c"
+   ]
+  },
+  "frozen_raspberries": {
+   "benefits": [
+    "skin",
+    "gut",
+    "heart"
+   ],
+   "why": "Berries: vitamin C, anthocyanin polyphenols and fiber (raspberries and blackberries are very high).",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "fruit",
+    "vitamin_c"
+   ]
+  },
+  "acai": {
+   "benefits": [
+    "heart",
+    "skin"
+   ],
+   "why": "Dark fruit: anthocyanin polyphenols.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "fruit"
+   ]
+  },
+  "cherries": {
+   "benefits": [
+    "heart",
+    "skin"
+   ],
+   "why": "Dark fruit: anthocyanin polyphenols.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "fruit"
+   ]
+  },
+  "plums": {
+   "benefits": [
+    "heart",
+    "skin"
+   ],
+   "why": "Dark fruit: anthocyanin polyphenols.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "fruit"
+   ]
+  },
+  "oranges": {
+   "benefits": [
+    "skin"
+   ],
+   "why": "Citrus: vitamin C, which the skin needs to make collagen; also helps absorb plant iron.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "fruit",
+    "vitamin_c"
+   ]
+  },
+  "canned_mandarin_oranges": {
+   "benefits": [
+    "skin"
+   ],
+   "why": "Citrus: vitamin C, which the skin needs to make collagen; also helps absorb plant iron.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "fruit",
+    "vitamin_c"
+   ]
+  },
+  "lemon": {
+   "benefits": [
+    "skin"
+   ],
+   "why": "Citrus: vitamin C, which the skin needs to make collagen; also helps absorb plant iron.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "fruit",
+    "vitamin_c"
+   ]
+  },
+  "lime": {
+   "benefits": [
+    "skin"
+   ],
+   "why": "Citrus: vitamin C, which the skin needs to make collagen; also helps absorb plant iron.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "fruit",
+    "vitamin_c"
+   ]
+  },
+  "lemon_juice": {
+   "benefits": [
+    "skin",
+    "hair"
+   ],
+   "why": "Vitamin C; squeeze over dals and greens to absorb more iron.",
+   "minGrams": 10,
+   "tags": [
+    "plant",
+    "vitamin_c"
+   ]
+  },
+  "lime_juice": {
+   "benefits": [
+    "skin",
+    "hair"
+   ],
+   "why": "Vitamin C; squeeze over dals and greens to absorb more iron.",
+   "minGrams": 10,
+   "tags": [
+    "plant",
+    "vitamin_c"
+   ]
+  },
+  "kiwi": {
+   "benefits": [
+    "skin",
+    "gut"
+   ],
+   "why": "Kiwi: more vitamin C than an orange, plus fiber that helps regularity.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "fruit",
+    "vitamin_c"
+   ]
+  },
+  "mango": {
+   "benefits": [
+    "skin"
+   ],
+   "why": "Mango: vitamin C and beta-carotene.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "fruit",
+    "vitamin_c"
+   ]
+  },
+  "canned_mango": {
+   "benefits": [
+    "skin"
+   ],
+   "why": "Mango: vitamin C and beta-carotene.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "fruit",
+    "vitamin_c"
+   ]
+  },
+  "pineapple": {
+   "benefits": [
+    "skin"
+   ],
+   "why": "Pineapple: vitamin C and manganese.",
+   "minGrams": 40,
+   "tags": [
+    "plant",
+    "fruit",
+    "vitamin_c"
+   ]
+  },
+  "apple": {
+   "benefits": [
+    "gut",
+    "heart"
+   ],
+   "why": "Pectin fiber (keep the skin on) and polyphenols.",
+   "minGrams": 50,
+   "tags": [
+    "plant",
+    "fruit"
+   ]
+  },
+  "pear": {
+   "benefits": [
+    "gut",
+    "heart"
+   ],
+   "why": "Pectin fiber (keep the skin on) and polyphenols.",
+   "minGrams": 50,
+   "tags": [
+    "plant",
+    "fruit"
+   ]
+  },
+  "banana": {
+   "benefits": [
+    "energy",
+    "gut"
+   ],
+   "why": "Banana: quick carbs, potassium; slightly green ones add resistant starch.",
+   "minGrams": 50,
+   "tags": [
+    "plant",
+    "fruit"
+   ]
+  },
+  "dates": {
+   "benefits": [
+    "energy",
+    "gut"
+   ],
+   "why": "Dried fruit: fast carbs with fiber, potassium and iron.",
+   "minGrams": 20,
+   "tags": [
+    "plant",
+    "fruit"
+   ]
+  },
+  "raisins": {
+   "benefits": [
+    "energy",
+    "gut"
+   ],
+   "why": "Dried fruit: fast carbs with fiber, potassium and iron.",
+   "minGrams": 20,
+   "tags": [
+    "plant",
+    "fruit"
+   ]
+  },
+  "apricots": {
+   "benefits": [
+    "energy",
+    "gut"
+   ],
+   "why": "Dried fruit: fast carbs with fiber, potassium and iron.",
+   "minGrams": 20,
+   "tags": [
+    "plant",
+    "fruit"
+   ]
+  },
+  "grapes": {
+   "benefits": [
+    "skin",
+    "energy"
+   ],
+   "why": "Water-rich fruit with vitamin C or polyphenols (watermelon has lycopene).",
+   "minGrams": 50,
+   "tags": [
+    "plant",
+    "fruit"
+   ]
+  },
+  "watermelon": {
+   "benefits": [
+    "skin",
+    "energy"
+   ],
+   "why": "Water-rich fruit with vitamin C or polyphenols (watermelon has lycopene).",
+   "minGrams": 50,
+   "tags": [
+    "plant",
+    "fruit"
+   ]
+  },
+  "cantaloupe": {
+   "benefits": [
+    "skin",
+    "energy"
+   ],
+   "why": "Water-rich fruit with vitamin C or polyphenols (watermelon has lycopene).",
+   "minGrams": 50,
+   "tags": [
+    "plant",
+    "fruit"
+   ]
+  },
+  "dragon_fruit": {
+   "benefits": [
+    "skin",
+    "energy"
+   ],
+   "why": "Water-rich fruit with vitamin C or polyphenols (watermelon has lycopene).",
+   "minGrams": 50,
+   "tags": [
+    "plant",
+    "fruit"
+   ]
+  },
+  "peaches": {
+   "benefits": [
+    "skin",
+    "energy"
+   ],
+   "why": "Water-rich fruit with vitamin C or polyphenols (watermelon has lycopene).",
+   "minGrams": 50,
+   "tags": [
+    "plant",
+    "fruit"
+   ]
+  },
+  "papadum": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Urad and chickpea flour wafers: some fiber and protein.",
+   "minGrams": 15,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "matcha": {
+   "benefits": [
+    "heart",
+    "skin",
+    "energy"
+   ],
+   "why": "Green tea catechins (EGCG) and gentle caffeine with L-theanine.",
+   "minGrams": 1,
+   "tags": [
+    "plant"
+   ]
+  },
+  "cocoa_powder": {
+   "benefits": [
+    "heart",
+    "gut"
+   ],
+   "why": "Cocoa flavanols that improve blood vessel function; natural cocoa keeps more than Dutched.",
+   "minGrams": 5,
+   "tags": [
+    "plant"
+   ]
+  },
+  "cacao_nibs": {
+   "benefits": [
+    "heart",
+    "gut"
+   ],
+   "why": "Cocoa flavanols that improve blood vessel function; natural cocoa keeps more than Dutched.",
+   "minGrams": 5,
+   "tags": [
+    "plant"
+   ]
+  },
+  "dark_chocolate_bar": {
+   "benefits": [
+    "heart"
+   ],
+   "why": "70%+ dark chocolate: cocoa flavanols and iron; still a treat calorie-wise.",
+   "minGrams": 10,
+   "tags": [
+    "plant"
+   ]
+  },
+  "dark_chocolate_chips": {
+   "benefits": [
+    "heart"
+   ],
+   "why": "70%+ dark chocolate: cocoa flavanols and iron; still a treat calorie-wise.",
+   "minGrams": 10,
+   "tags": [
+    "plant"
+   ]
+  },
+  "olive_oil": {
+   "benefits": [
+    "heart",
+    "skin"
+   ],
+   "why": "Extra-virgin olive oil: monounsaturated fat and polyphenols; core of the Mediterranean diet.",
+   "minGrams": 5,
+   "tags": [
+    "plant"
+   ]
+  },
+  "canola_oil": {
+   "benefits": [
+    "heart"
+   ],
+   "why": "Canola: low in saturated fat with some omega-3 (ALA).",
+   "minGrams": 5,
+   "tags": [
+    "omega3",
+    "plant"
+   ]
+  },
+  "avocado_oil": {
+   "benefits": [
+    "heart"
+   ],
+   "why": "Monounsaturated fat; good for high-heat cooking.",
+   "minGrams": 5,
+   "tags": [
+    "plant"
+   ]
+  },
+  "turmeric": {
+   "benefits": [
+    "skin",
+    "heart"
+   ],
+   "why": "Curcumin, an anti-inflammatory polyphenol (absorbed better with black pepper and fat).",
+   "minGrams": 1,
+   "tags": [
+    "spice",
+    "plant"
+   ]
+  },
+  "ginger_paste": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Gingerols: help nausea and digestion.",
+   "minGrams": 1,
+   "tags": [
+    "spice",
+    "plant"
+   ]
+  },
+  "ground_ginger": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Gingerols: help nausea and digestion.",
+   "minGrams": 1,
+   "tags": [
+    "spice",
+    "plant"
+   ]
+  },
+  "cinnamon": {
+   "benefits": [
+    "energy"
+   ],
+   "why": "Cinnamon: polyphenols; may modestly blunt blood-sugar spikes.",
+   "minGrams": 1,
+   "tags": [
+    "spice",
+    "plant"
+   ]
+  },
+  "cumin": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Traditional digestive spices with polyphenols; cumin adds iron.",
+   "minGrams": 1,
+   "tags": [
+    "spice",
+    "plant"
+   ]
+  },
+  "fennel_seeds": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Traditional digestive spices with polyphenols; cumin adds iron.",
+   "minGrams": 1,
+   "tags": [
+    "spice",
+    "plant"
+   ]
+  },
+  "ajwain": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Traditional digestive spices with polyphenols; cumin adds iron.",
+   "minGrams": 1,
+   "tags": [
+    "spice",
+    "plant"
+   ]
+  },
+  "black_pepper": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Piperine boosts absorption of curcumin and some nutrients.",
+   "minGrams": 1,
+   "tags": [
+    "spice",
+    "plant"
+   ]
+  },
+  "kasuri_methi": {
+   "benefits": [
+    "gut",
+    "energy"
+   ],
+   "why": "Fenugreek: soluble fiber that may slow blood-sugar rises.",
+   "minGrams": 2,
+   "tags": [
+    "spice",
+    "plant"
+   ]
+  },
+  "methi_seeds": {
+   "benefits": [
+    "gut",
+    "energy"
+   ],
+   "why": "Fenugreek: soluble fiber that may slow blood-sugar rises.",
+   "minGrams": 2,
+   "tags": [
+    "spice",
+    "plant"
+   ]
+  },
+  "fenugreek_seeds": {
+   "benefits": [
+    "gut",
+    "energy"
+   ],
+   "why": "Fenugreek: soluble fiber that may slow blood-sugar rises.",
+   "minGrams": 2,
+   "tags": [
+    "spice",
+    "plant"
+   ]
+  },
+  "cilantro": {
+   "benefits": [
+    "skin"
+   ],
+   "why": "Fresh herbs: vitamin C, vitamin K and polyphenols.",
+   "minGrams": 3,
+   "tags": [
+    "plant",
+    "vitamin_c"
+   ]
+  },
+  "parsley": {
+   "benefits": [
+    "skin"
+   ],
+   "why": "Fresh herbs: vitamin C, vitamin K and polyphenols.",
+   "minGrams": 3,
+   "tags": [
+    "plant",
+    "vitamin_c"
+   ]
+  },
+  "mint_leaves": {
+   "benefits": [
+    "skin"
+   ],
+   "why": "Fresh herbs: vitamin C, vitamin K and polyphenols.",
+   "minGrams": 3,
+   "tags": [
+    "plant",
+    "vitamin_c"
+   ]
+  },
+  "basil": {
+   "benefits": [
+    "skin"
+   ],
+   "why": "Fresh herbs: vitamin C, vitamin K and polyphenols.",
+   "minGrams": 3,
+   "tags": [
+    "plant",
+    "vitamin_c"
+   ]
+  },
+  "curry_leaves": {
+   "benefits": [
+    "skin"
+   ],
+   "why": "Fresh herbs: vitamin C, vitamin K and polyphenols.",
+   "minGrams": 3,
+   "tags": [
+    "plant",
+    "vitamin_c"
+   ]
+  },
+  "nori": {
+   "benefits": [
+    "energy"
+   ],
+   "why": "Seaweed: iodine for thyroid function (go easy on kombu, which is very high).",
+   "minGrams": 2,
+   "tags": [
+    "plant"
+   ]
+  },
+  "wakame": {
+   "benefits": [
+    "energy"
+   ],
+   "why": "Seaweed: iodine for thyroid function (go easy on kombu, which is very high).",
+   "minGrams": 2,
+   "tags": [
+    "plant"
+   ]
+  },
+  "kombu": {
+   "benefits": [
+    "energy"
+   ],
+   "why": "Seaweed: iodine for thyroid function (go easy on kombu, which is very high).",
+   "minGrams": 2,
+   "tags": [
+    "plant"
+   ]
+  },
+  "seaweed_salad": {
+   "benefits": [
+    "energy"
+   ],
+   "why": "Seaweed: iodine for thyroid function (go easy on kombu, which is very high).",
+   "minGrams": 2,
+   "tags": [
+    "plant"
+   ]
+  },
+  "inulin": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Pure prebiotic fiber that feeds bifidobacteria.",
+   "minGrams": 3,
+   "tags": [
+    "prebiotic"
+   ]
+  },
+  "coconut_yogurt": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Cultured plant yogurt with live cultures (check the label).",
+   "minGrams": 50,
+   "tags": [
+    "fermented",
+    "plant"
+   ]
+  },
+  "plant_yogurt": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Cultured plant yogurt with live cultures (check the label).",
+   "minGrams": 50,
+   "tags": [
+    "fermented",
+    "plant"
+   ]
+  },
+  "bean_sprouts": {
+   "benefits": [
+    "gut",
+    "skin"
+   ],
+   "why": "Sprouts: fiber, folate and vitamin C.",
+   "minGrams": 30,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "jicama": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Crunchy low-calorie vegetables with fiber and water; jicama has inulin.",
+   "minGrams": 50,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "radishes": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Crunchy low-calorie vegetables with fiber and water; jicama has inulin.",
+   "minGrams": 50,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "daikon": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Crunchy low-calorie vegetables with fiber and water; jicama has inulin.",
+   "minGrams": 50,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "celery": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Crunchy low-calorie vegetables with fiber and water; jicama has inulin.",
+   "minGrams": 50,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  },
+  "cucumber": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Crunchy low-calorie vegetables with fiber and water; jicama has inulin.",
+   "minGrams": 50,
+   "tags": [
+    "plant",
+    "vegetable"
+   ]
+  }
+ },
+ "rules": [
+  {
+   "id": "fiber_gut",
+   "when": {
+    "fiber_g": {
+     ">=": 8
+    }
+   },
+   "benefits": [
+    "gut"
+   ],
+   "weight": 2,
+   "why": "{fiber} g fiber per serving feeds gut bacteria (target is 30+ g a day)."
+  },
+  {
+   "id": "fiber_heart",
+   "when": {
+    "fiber_g": {
+     ">=": 6
+    },
+    "satFatShare": {
+     "<=": 0.1
+    }
+   },
+   "benefits": [
+    "heart"
+   ],
+   "weight": 1,
+   "why": "High fiber and low saturated fat, the pattern linked to better cholesterol.",
+   "note": "satFatShare is optional; skip the condition if the catalog has no saturated fat."
+  },
+  {
+   "id": "protein_muscle_hair",
+   "when": {
+    "protein_g": {
+     ">=": 25
+    }
+   },
+   "benefits": [
+    "muscle",
+    "hair"
+   ],
+   "weight": 2,
+   "why": "{protein} g protein per serving: helps keep muscle while cutting, and hair needs steady protein."
+  },
+  {
+   "id": "protein_density",
+   "when": {
+    "proteinPer100kcal": {
+     ">=": 8
+    }
+   },
+   "benefits": [
+    "muscle"
+   ],
+   "weight": 1,
+   "why": "High protein for the calories, ideal for a cut."
+  },
+  {
+   "id": "steady_energy",
+   "when": {
+    "sugar_g": {
+     "<=": 8
+    },
+    "fiber_g": {
+     ">=": 5
+    }
+   },
+   "benefits": [
+    "energy"
+   ],
+   "weight": 1,
+   "why": "Low sugar with plenty of fiber gives steadier energy without a crash."
+  },
+  {
+   "id": "low_glycemic_skin",
+   "when": {
+    "sugar_g": {
+     "<=": 10
+    },
+    "fiber_g": {
+     ">=": 6
+    }
+   },
+   "benefits": [
+    "skin"
+   ],
+   "weight": 1,
+   "why": "Low sugar and high fiber (low glycemic load) is linked to fewer acne breakouts."
+  },
+  {
+   "id": "fermented_gut",
+   "when": {
+    "hasTag": "fermented"
+   },
+   "benefits": [
+    "gut"
+   ],
+   "weight": 2,
+   "why": "Contains a fermented food; in a 10-week trial, eating more fermented foods raised gut microbe diversity and lowered inflammation markers."
+  },
+  {
+   "id": "plant_diversity_gut",
+   "when": {
+    "distinctPlantTagged": {
+     ">=": 5
+    }
+   },
+   "benefits": [
+    "gut"
+   ],
+   "weight": 1,
+   "why": "{count} different plant foods; variety of plants is linked to a more diverse gut microbiome."
+  },
+  {
+   "id": "omega3_heart_skin",
+   "when": {
+    "tagGrams": {
+     "omega3": {
+      ">=": 10
+     }
+    }
+   },
+   "benefits": [
+    "heart",
+    "skin"
+   ],
+   "weight": 1,
+   "why": "Plant omega-3 (ALA) from flax, chia, walnuts or hemp."
+  },
+  {
+   "id": "vitamin_c_skin",
+   "when": {
+    "tagGrams": {
+     "vitamin_c": {
+      ">=": 80
+     }
+    }
+   },
+   "benefits": [
+    "skin"
+   ],
+   "weight": 1,
+   "why": "Vitamin C-rich produce; skin needs vitamin C to make collagen."
+  },
+  {
+   "id": "dairy_bones",
+   "when": {
+    "tagGrams": {
+     "dairy": {
+      ">=": 150
+     }
+    }
+   },
+   "benefits": [
+    "bones"
+   ],
+   "weight": 1,
+   "why": "A good dose of calcium from dairy."
+  },
+  {
+   "id": "iron_absorb",
+   "when": {
+    "allTags": [
+     "legume",
+     "vitamin_c"
+    ]
+   },
+   "benefits": [
+    "hair"
+   ],
+   "weight": 1,
+   "why": "Legumes plus vitamin C: the vitamin C helps absorb plant iron, which matters for hair on a vegetarian diet."
+  }
+ ],
+ "sources": [
+  {
+   "title": "Wastyk HC et al. Gut-microbiota-targeted diets modulate human immune status (Cell 2021): fermented foods vs high fiber",
+   "url": "https://doi.org/10.1016/j.cell.2021.06.019"
+  },
+  {
+   "title": "Reynolds A et al. Carbohydrate quality and human health: systematic reviews and meta-analyses (Lancet 2019)",
+   "url": "https://doi.org/10.1016/S0140-6736(18)31809-9"
+  },
+  {
+   "title": "McDonald D et al. American Gut: an open platform for citizen science microbiome research (mSystems 2018), plant diversity",
+   "url": "https://doi.org/10.1128/mSystems.00031-18"
+  },
+  {
+   "title": "Smith RN et al. A low-glycemic-load diet improves symptoms in acne vulgaris: RCT (Am J Clin Nutr 2007)",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/17616769/"
+  },
+  {
+   "title": "Diet and acne: a systematic review (JAAD International 2022)",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/35373155/"
+  },
+  {
+   "title": "Serum zinc levels and efficacy of zinc treatment in acne vulgaris: meta-analysis (Dermatol Ther 2020)",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/32860489/"
+  },
+  {
+   "title": "Almohanna HM et al. The role of vitamins and minerals in hair loss: a review (Dermatol Ther 2019)",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6380979"
+  },
+  {
+   "title": "Harvard T.H. Chan School of Public Health: The Nutrition Source, Fiber",
+   "url": "https://www.hsph.harvard.edu/nutritionsource/carbohydrates/fiber/"
+  },
+  {
+   "title": "NIH Office of Dietary Supplements: Vitamin C fact sheet",
+   "url": "https://ods.od.nih.gov/factsheets/VitaminC-HealthProfessional/"
+  },
+  {
+   "title": "NIH Office of Dietary Supplements: Zinc fact sheet",
+   "url": "https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/"
+  },
+  {
+   "title": "NIH Office of Dietary Supplements: Iron fact sheet",
+   "url": "https://ods.od.nih.gov/factsheets/Iron-HealthProfessional/"
+  },
+  {
+   "title": "NIH Office of Dietary Supplements: Omega-3 fatty acids fact sheet",
+   "url": "https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/"
+  }
+ ]
+}

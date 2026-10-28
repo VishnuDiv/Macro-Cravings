@@ -28,6 +28,9 @@ struct Catalog {
     var guides: [Guide] = []
     var paneer: PaneerModel?
     var clarity: ClarityNotes?
+    var foodBenefits: FoodBenefits?
+    var skincare: SkincareContent?
+    var haircare: HaircareContent?
     var vegAlts: VegAlternativesData? {
         didSet { vegInfo = Catalog.buildVegInfo(vegAlts); rebuildVegan() }
     }
@@ -119,10 +122,12 @@ struct RecipeIndex {
     var vegAsWritten: Bool
     var hasVegVersion: Bool
     var noEgg: Bool
+    var airFryer: Bool
     var chips: Set<String>
     var highFiber: Bool
     var hasUpgrade: Bool
     var vegan: Bool
+    var benefits: [BenefitResult]          // "Good for", ranked, as written
 }
 
 struct LoadedData {
@@ -202,6 +207,15 @@ final class RecipeStore {
         if let u = findResource("paneer_model", ext: "json", in: dir, bundle: bundle), let data = try? Data(contentsOf: u) {
             out.catalog.paneer = try? JSONDecoder().decode(PaneerModel.self, from: data)
         }
+        if let u = findResource("skincare", ext: "json", in: dir, bundle: bundle), let data = try? Data(contentsOf: u) {
+            out.catalog.skincare = try? JSONDecoder().decode(SkincareContent.self, from: data)
+        }
+        if let u = findResource("haircare", ext: "json", in: dir, bundle: bundle), let data = try? Data(contentsOf: u) {
+            out.catalog.haircare = try? JSONDecoder().decode(HaircareContent.self, from: data)
+        }
+        if let u = findResource("food_benefits", ext: "json", in: dir, bundle: bundle), let data = try? Data(contentsOf: u) {
+            out.catalog.foodBenefits = try? JSONDecoder().decode(FoodBenefits.self, from: data)
+        }
         if let u = findResource("clarity_notes", ext: "json", in: dir, bundle: bundle), let data = try? Data(contentsOf: u) {
             out.catalog.clarity = try? JSONDecoder().decode(ClarityNotes.self, from: data)
         }
@@ -242,7 +256,9 @@ final class RecipeStore {
                 vegAsWritten: r.vegetarian ?? !keys.contains { cat.info($0)?.vegetarian == .no },
                 hasVegVersion: r.vegAdaptation != nil,
                 noEgg: r.containsEgg.map { !$0 } ?? !allergens.contains("egg"),
-                chips: r.mealChipMatches(keys: keys), highFiber: r.isHighFiber, hasUpgrade: r.proteinUpgrade != nil, vegan: VeganRules.isVeganForLists(r, catalog: cat))
+                airFryer: r.isAirFryerRecipe,
+                chips: r.mealChipMatches(keys: keys), highFiber: r.isHighFiber, hasUpgrade: r.proteinUpgrade != nil, vegan: VeganRules.isVeganForLists(r, catalog: cat),
+                benefits: BenefitEngine.compute(r, perServing: r.macros.map { $0 * (1 / r.perServingDivisor) }, catalog: cat))
         }
         return out
     }

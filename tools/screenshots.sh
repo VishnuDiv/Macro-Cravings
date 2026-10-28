@@ -33,6 +33,7 @@ SHOTS=(
   "05-paneer-calculator|-ss;guide;-ssGuide;paneer"
   "07-settings|-ss;settings"
   "08-saved|-ss;saved"
+  "09-plan|-ss;plan"
 )
 for shot in "${SHOTS[@]}"; do
   name="${shot%%|*}"; args="${shot#*|}"

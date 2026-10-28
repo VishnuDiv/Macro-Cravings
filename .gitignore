@@ -32,3 +32,11 @@ CreamiCravings/Resources/books.json
 # Clarity notes contain line-level fixes quoting recipe text (kept local)
 data/catalog/clarity_notes.json
 CreamiCravings/Resources/clarity_notes.json
+# Air-fryer adaptations of recipes (derived from local recipe data)
+data/airfry/*.json
+CreamiCravings/Resources/airfry_adaptations.json
+
+# Clarity and air-fry working files quote recipe text (books and web sources)
+*.bak-clarity
+data/clarity/
+data/airfry/*.md

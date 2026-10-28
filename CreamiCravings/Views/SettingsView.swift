@@ -3,12 +3,15 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(RecipeStore.self) private var store
     @Environment(UserStore.self) private var user
+    @Environment(ProgressLibrary.self) private var progress
+    @State private var confirmWipe = false
     @State private var showAddMilk = false
     @State private var showAddPowder = false
 
     var body: some View {
         NavigationStack {
             Form {
+                Section { ModeSwitch().listRowBackground(Color.clear).listRowInsets(EdgeInsets()) }
                 Section {
                     NavigationLink { GuidesView() } label: { Label("Guides and paneer calculator", systemImage: "book.pages") }
                 }
@@ -21,14 +24,41 @@ struct SettingsView: View {
                     Text("Cut sorts by protein per 100 kcal and badges cut-friendly recipes. Bulk sorts by protein and badges bulk-friendly ones. Maintain changes nothing. A goal never hides recipes.")
                 }
                 Section {
+                    Stepper(value: Binding(get: { user.data.dailyKcal }, set: { user.data.targetCalories = $0 }), in: 1000...5000, step: 50) {
+                        LabeledContent("Calories", value: "\(user.data.dailyKcal) kcal")
+                    }
+                    Stepper(value: Binding(get: { user.data.dailyProtein }, set: { user.data.targetProtein = $0 }), in: 40...300, step: 5) {
+                        LabeledContent("Protein", value: "\(user.data.dailyProtein) g")
+                    }
+                    HStack {
+                        Text("Body weight")
+                        Spacer()
+                        TextField("lb", value: Binding(get: { user.data.weightLb }, set: { user.data.weightLb = $0 }), format: .number)
+                            .decimalKeyboard().multilineTextAlignment(.trailing).frame(width: 80)
+                        Text("lb").foregroundStyle(.secondary)
+                    }
+                    if let w = user.data.weightLb, w > 0 {
+                        let r = DailyTargets.proteinRange(weightLb: w)
+                        Button("Set protein to \(r.upperBound) g (0.8-1 g per lb: \(r.lowerBound)-\(r.upperBound) g)") { user.data.targetProtein = r.upperBound }
+                            .font(.footnote)
+                    }
+                    if user.data.targetCalories != nil || user.data.targetProtein != nil {
+                        Button("Use my goal's defaults", role: .destructive) { user.data.targetCalories = nil; user.data.targetProtein = nil }
+                            .font(.footnote)
+                    }
+                } header: { Text("Food: daily targets") } footer: {
+                    Text("The meal plan aims for these. Defaults follow your goal: Cut 1,900 kcal / 160 g, Maintain 2,300 / 150, Bulk 2,800 / 170.")
+                }
+                Section {
                     Toggle("I'm vegetarian", isOn: Binding(get: { user.data.isVegetarian }, set: { user.data.isVegetarian = $0 }))
                     Toggle("Prefer easy-to-find alternatives", isOn: Binding(get: { user.data.preferEasyAlternatives }, set: { user.data.preferEasyAlternatives = $0 }))
+                    Toggle("Prefer air fryer versions", isOn: Binding(get: { user.data.preferAirFryer }, set: { user.data.preferAirFryer = $0 }))
                     Toggle("I avoid eggs", isOn: Binding(get: { user.data.avoidsEggs }, set: {
                         user.data.avoidsEggs = $0
                         if $0 { user.data.filterState.noEgg = true }
                     }))
                 } header: { Text("Diet") } footer: {
-                    Text("Vegetarian mode shows the vegetarian version of meat recipes by default, and flags non-vegetarian ingredients. Avoiding eggs turns on the No egg filter.")
+                    Text("Vegetarian mode shows the vegetarian version of meat recipes by default, and flags non-vegetarian ingredients. Avoiding eggs turns on the No egg filter. Fried recipes with an air-fryer version open in it when \"Prefer air fryer versions\" is on.")
                 }
                 Section {
                     Picker("My default milk", selection: Binding<String?>(
@@ -116,6 +146,17 @@ struct SettingsView: View {
                         .disabled(user.data.filterState == FilterState())
                 } footer: { Text("Clears every filter and chip and puts the sort back to Featured.") }
 
+                Section {
+                    Toggle("Face ID lock for Health", isOn: Binding(get: { user.data.healthLockEnabled }, set: { user.data.healthLockEnabled = $0 }))
+                    Toggle("Include progress photos in device backup", isOn: Binding(get: { user.data.progressInBackup }, set: { user.data.progressInBackup = $0; progress.store.applyBackupFlag(!$0) }))
+                    #if os(iOS)
+                    NavigationLink { CheckupSettingsView() } label: { Label("AI check-up (optional)", systemImage: "sparkles") }
+                    #endif
+                    Button("Delete all progress photos", role: .destructive) { confirmWipe = true }
+                } header: { Text("Health") } footer: {
+                    Text("Skin, hair and progress photos stay on this device. They are never uploaded, and they are left out of iCloud / device backups unless you turn the second switch on. The lock asks again after 5 minutes away.")
+                }
+
                 Section("About") {
                     LabeledContent("Book", value: "Creami Cravings")
                     LabeledContent("Author", value: "Eli @FitnessProductFinder")
@@ -123,6 +164,9 @@ struct SettingsView: View {
                     LabeledContent("Web recipes", value: "\(store.recipes.filter { !$0.source.isBook }.count) from \(store.webSiteCount) sites")
                     Text("Nutrition lookups use Open Food Facts. Everything else stays on your phone.").font(.footnote).foregroundStyle(.secondary)
                 }
+            }
+            .confirmationDialog("Delete every progress photo from this phone?", isPresented: $confirmWipe, titleVisibility: .visible) {
+                Button("Delete all", role: .destructive) { progress.deleteAll() }
             }
             .navigationTitle("Settings")
             .sheet(isPresented: $showAddPowder) {

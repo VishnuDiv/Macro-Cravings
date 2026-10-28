@@ -7,6 +7,7 @@ struct RecipeConfig {
     var vegActive = false          // use the recipe's vegetarian version
     var vegChoices: [String: String] = [:]   // lineKey -> chosen alternative key
     var preferEasy = true
+    var airFryActive = false       // use the recipe's air-fryer version (applied after the vegetarian version)
     var upgradeKey: String?        // protein upgrade alternative (wings / crispy bites), nil = as written
     var swaps: [String: Int] = [:]
     var pints: Int = 1
@@ -119,7 +120,7 @@ struct NutritionCalculator {
     }
 
     func compute(_ recipe: Recipe, _ cfg: RecipeConfig) -> RecipeNutrition {
-        let r = ProteinUpgrades.effective(recipe, catalog: catalog, vegActive: cfg.vegActive, vegChoices: cfg.vegChoices, preferEasy: cfg.preferEasy, upgradeKey: cfg.upgradeKey)
+        let r = ProteinUpgrades.effective(recipe, catalog: catalog, vegActive: cfg.vegActive, vegChoices: cfg.vegChoices, preferEasy: cfg.preferEasy, upgradeKey: cfg.upgradeKey, airFry: cfg.airFryActive)
         let liquidKey = catalog.liquidLineKey(r)
         let powderKey = catalog.powderLineKey(r)
         var lines: [LineResult] = []

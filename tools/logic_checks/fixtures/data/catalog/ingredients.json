@@ -120,5 +120,50 @@
   "allergens": [
    "soy"
   ]
+ },
+ "lentils": {
+  "name": "Lentils",
+  "category": "other",
+  "per100g": {
+   "calories": 116,
+   "protein": 9,
+   "carbs": 20,
+   "fat": 0.4,
+   "fiber": 8
+  },
+  "swaps": [],
+  "pantryStaple": false,
+  "allergens": [],
+  "vegetarian": true
+ },
+ "kefir": {
+  "name": "Kefir",
+  "category": "dairy",
+  "per100g": {
+   "calories": 60,
+   "protein": 3.5,
+   "carbs": 4.5,
+   "fat": 3
+  },
+  "swaps": [],
+  "pantryStaple": false,
+  "allergens": [
+   "dairy"
+  ],
+  "vegetarian": true
+ },
+ "paprika": {
+  "name": "Paprika",
+  "category": "spice",
+  "per100g": {
+   "calories": 282,
+   "protein": 14,
+   "carbs": 54,
+   "fat": 13
+  },
+  "swaps": [],
+  "pantryStaple": true,
+  "allergens": [],
+  "vegetarian": true
  }
 }

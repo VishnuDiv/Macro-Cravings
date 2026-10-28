@@ -1,0 +1,1946 @@
+{
+ "_schema": {
+  "version": "1",
+  "evidenceScale": {
+   "A": "Strong: several good randomized trials or meta-analyses, used in dermatology guidelines",
+   "B": "Moderate: some randomized trials, consistent but smaller or shorter",
+   "C": "Weak: small trials, lab or mechanism data, mostly expert opinion",
+   "D": "No good evidence in people"
+  },
+  "actives[]": "{id, name, whatItDoes, bestFor: [concern], howToStart, whenToExpect, sideEffects, evidence: A|B|C|D, otc: bool (false = prescription, get it from a dermatologist), rxNote?: string, pairsWellWith: [activeId], avoidWith: [activeId]}",
+  "concerns": "acne | oil | dryness | dark_spots | texture | redness | aging | dark_circles | sensitive | razor_bumps (match the profile quiz)",
+  "routines[]": "{id, name, skinTypes: [oily|dry|combination|normal|sensitive], concerns: [concern], description, am: [step], pm: [step]}; step = {step: cleanser|treatment|moisturizer|spf|spot, activeId?: actives id, frequency: daily|2-3x-week|alternate-nights|ramp-up|as-needed, note}",
+  "rampUps": "{retinoid: [{week, nightsPerWeek}]}: ramp-up schedule referenced by frequency 'ramp-up'",
+  "conflicts[]": "{a: activeId, b: activeId, sameTime: bool (true = warn only when both are used in the same AM or PM session; false = warn whenever both are in the routine at all), severity: info|caution, message}",
+  "guides[]": "{id, title, subtitle, icon (SF Symbol), sections: [{heading, body, bullets?: [string], table?: {columns: [string], rows: [[string]]}}]}: same format as data/catalog/guides.json",
+  "products": "{step: [{name, brand, activeIds: [activeId], skinTypes: [..] , approxPriceUSD, note}]}: examples only, not endorsements",
+  "sources[]": "{title, url}"
+ },
+ "actives": [
+  {
+   "id": "adapalene",
+   "name": "Adapalene 0.1% (Differin)",
+   "whatItDoes": "An over-the-counter retinoid. It keeps pores from clogging, calms acne inflammation and slowly smooths texture. The gentlest retinoid that still works well on acne.",
+   "bestFor": [
+    "acne",
+    "texture",
+    "oil",
+    "dark_spots"
+   ],
+   "howToStart": "Pea-sized amount for the whole face on dry skin at night, 2-3 nights a week for 2 weeks, then every other night, then nightly if your skin is fine. Moisturizer on top. Skip it around the eyes and the corners of the nose and mouth.",
+   "whenToExpect": "Fewer new spots by 6-8 weeks; full effect at about 12 weeks. Acne can look a bit worse in weeks 2-6 (purging).",
+   "sideEffects": "Dryness, flaking, stinging for the first few weeks. More sun sensitivity, so SPF every morning.",
+   "evidence": "A",
+   "otc": true,
+   "pairsWellWith": [
+    "benzoyl_peroxide",
+    "niacinamide",
+    "ceramides",
+    "sunscreen",
+    "azelaic_acid"
+   ],
+   "avoidWith": [
+    "aha",
+    "bha"
+   ]
+  },
+  {
+   "id": "retinol",
+   "name": "Retinol / retinal (OTC retinoids)",
+   "whatItDoes": "Cosmetic vitamin A. The skin converts it to retinoic acid. It speeds cell turnover and builds collagen over months. Weaker than prescription tretinoin; retinal (retinaldehyde) is a step stronger than retinol.",
+   "bestFor": [
+    "aging",
+    "texture",
+    "dark_spots"
+   ],
+   "howToStart": "Start at 0.2-0.3% retinol 2-3 nights a week. Move up to nightly over 4-6 weeks, then to a stronger strength only if needed. Moisturizer on top if it stings.",
+   "whenToExpect": "Smoother texture in 4-8 weeks; fine lines and tone over 3-6 months.",
+   "sideEffects": "Dryness, peeling, redness while you adjust. More sun sensitivity.",
+   "evidence": "B",
+   "otc": true,
+   "pairsWellWith": [
+    "niacinamide",
+    "ceramides",
+    "hyaluronic_acid",
+    "peptides",
+    "sunscreen"
+   ],
+   "avoidWith": [
+    "aha",
+    "bha",
+    "benzoyl_peroxide"
+   ]
+  },
+  {
+   "id": "tretinoin",
+   "name": "Tretinoin (prescription retinoid)",
+   "whatItDoes": "The best-studied anti-aging cream there is, and a strong acne treatment. It's pure retinoic acid, so it works faster and harder than retinol.",
+   "bestFor": [
+    "acne",
+    "aging",
+    "texture",
+    "dark_spots"
+   ],
+   "howToStart": "Prescription only: talk to a dermatologist. Usually 0.025% cream, pea-sized, 2-3 nights a week, building up to nightly over 4-8 weeks.",
+   "whenToExpect": "Acne: 8-12 weeks. Lines and tone: 3-6 months, still improving at a year.",
+   "sideEffects": "More irritating than adapalene: peeling, redness, stinging early on. Sun sensitivity.",
+   "evidence": "A",
+   "otc": false,
+   "rxNote": "Prescription only. Talk to a dermatologist (in person or telehealth).",
+   "pairsWellWith": [
+    "ceramides",
+    "niacinamide",
+    "sunscreen",
+    "azelaic_acid"
+   ],
+   "avoidWith": [
+    "aha",
+    "bha",
+    "benzoyl_peroxide",
+    "adapalene",
+    "retinol"
+   ]
+  },
+  {
+   "id": "aha",
+   "name": "AHA (glycolic / lactic acid)",
+   "whatItDoes": "Water-soluble acids that loosen dead skin on the surface. Brighter, smoother skin and faster fading of marks. Lactic acid is gentler than glycolic.",
+   "bestFor": [
+    "texture",
+    "dark_spots",
+    "dryness",
+    "aging"
+   ],
+   "howToStart": "A 5-10% leave-on (toner or serum) 1-2 nights a week, on nights with no retinoid. Go to 3 nights only if no stinging.",
+   "whenToExpect": "Smoother feel after a few uses; marks fade over 4-8 weeks.",
+   "sideEffects": "Stinging, redness, over-exfoliation if overused. More sun sensitivity for about a week after use.",
+   "evidence": "B",
+   "otc": true,
+   "pairsWellWith": [
+    "hyaluronic_acid",
+    "ceramides",
+    "sunscreen"
+   ],
+   "avoidWith": [
+    "adapalene",
+    "retinol",
+    "tretinoin",
+    "bha",
+    "vitamin_c"
+   ]
+  },
+  {
+   "id": "bha",
+   "name": "BHA / salicylic acid",
+   "whatItDoes": "An oil-soluble acid that gets inside pores and clears the gunk that makes blackheads. Mildly calming.",
+   "bestFor": [
+    "acne",
+    "oil",
+    "texture"
+   ],
+   "howToStart": "Easiest as a 2% cleanser once a day. As a leave-on (2% liquid), start 2-3 times a week on non-retinoid nights.",
+   "whenToExpect": "Fewer blackheads and less oil in 3-6 weeks.",
+   "sideEffects": "Dryness and peeling if overused. Avoid if you are allergic to aspirin.",
+   "evidence": "B",
+   "otc": true,
+   "pairsWellWith": [
+    "niacinamide",
+    "ceramides",
+    "sunscreen"
+   ],
+   "avoidWith": [
+    "adapalene",
+    "retinol",
+    "tretinoin",
+    "aha"
+   ]
+  },
+  {
+   "id": "benzoyl_peroxide",
+   "name": "Benzoyl peroxide (BPO)",
+   "whatItDoes": "Kills acne bacteria and stops resistance to antibiotics. One of the strongest OTC acne ingredients. 2.5-5% works as well as 10% with less irritation.",
+   "bestFor": [
+    "acne"
+   ],
+   "howToStart": "Start with a 4-5% wash: on skin for 1-2 minutes, then rinse, once a day. Or 2.5% gel on acne areas. Body acne: a 10% wash in the shower.",
+   "whenToExpect": "Inflamed spots calm down in 2-4 weeks; best by 8-12 weeks.",
+   "sideEffects": "Dryness, peeling. Bleaches towels, pillowcases and shirts; use white ones.",
+   "evidence": "A",
+   "otc": true,
+   "pairsWellWith": [
+    "adapalene",
+    "ceramides",
+    "niacinamide",
+    "sunscreen"
+   ],
+   "avoidWith": [
+    "tretinoin",
+    "retinol",
+    "vitamin_c"
+   ]
+  },
+  {
+   "id": "azelaic_acid",
+   "name": "Azelaic acid",
+   "whatItDoes": "Calms acne and redness, kills acne bacteria and fades dark marks, including post-acne marks. Gentle enough for sensitive skin. 10% OTC; 15-20% by prescription.",
+   "bestFor": [
+    "acne",
+    "dark_spots",
+    "redness",
+    "sensitive"
+   ],
+   "howToStart": "Once a day (AM or PM) for 2 weeks, then twice a day if you want. Thin layer before moisturizer.",
+   "whenToExpect": "Redness and acne in 4-8 weeks; marks fade over 2-4 months.",
+   "sideEffects": "Brief tingling or itch in the first weeks that usually fades.",
+   "evidence": "A",
+   "otc": true,
+   "rxNote": "10% is OTC; 15% gel and 20% cream are prescription (talk to a dermatologist).",
+   "pairsWellWith": [
+    "adapalene",
+    "tretinoin",
+    "niacinamide",
+    "sunscreen",
+    "benzoyl_peroxide"
+   ],
+   "avoidWith": []
+  },
+  {
+   "id": "niacinamide",
+   "name": "Niacinamide (vitamin B3)",
+   "whatItDoes": "An easy, low-risk all-rounder: less oil and redness, stronger skin barrier, slow fading of dark spots. 2-5% is plenty; 10% is no better and irritates some people.",
+   "bestFor": [
+    "oil",
+    "redness",
+    "dark_spots",
+    "acne",
+    "texture"
+   ],
+   "howToStart": "Daily, AM or PM, in a serum or moisturizer. No ramp-up needed for most people.",
+   "whenToExpect": "Less oil in 2-4 weeks; tone and marks over 8-12 weeks.",
+   "sideEffects": "Rarely, flushing or a tingle at high strengths.",
+   "evidence": "B",
+   "otc": true,
+   "pairsWellWith": [
+    "adapalene",
+    "retinol",
+    "tretinoin",
+    "bha",
+    "azelaic_acid",
+    "sunscreen",
+    "vitamin_c"
+   ],
+   "avoidWith": []
+  },
+  {
+   "id": "vitamin_c",
+   "name": "Vitamin C (L-ascorbic acid and derivatives)",
+   "whatItDoes": "An antioxidant that adds to sunscreen's protection, brightens and slowly fades dark spots. L-ascorbic acid 10-20% has the most data but goes off quickly (turns orange).",
+   "bestFor": [
+    "dark_spots",
+    "aging"
+   ],
+   "howToStart": "A few drops in the morning before moisturizer and SPF. Start every other day if it stings. Keep it cool and closed.",
+   "whenToExpect": "Brighter tone in 4-8 weeks; spots over 3 months.",
+   "sideEffects": "Stinging, especially on fresh-shaved skin. Throw it out once it turns dark orange or brown.",
+   "evidence": "B",
+   "otc": true,
+   "pairsWellWith": [
+    "sunscreen",
+    "niacinamide",
+    "hyaluronic_acid"
+   ],
+   "avoidWith": [
+    "aha",
+    "benzoyl_peroxide"
+   ]
+  },
+  {
+   "id": "sunscreen",
+   "name": "Sunscreen (broad-spectrum SPF 30+)",
+   "whatItDoes": "The highest-value step. It prevents sunburn, skin cancer, dark spots and most visible aging. It also protects the gains from retinoids and acids. Mineral filters (zinc oxide, titanium dioxide) and chemical filters (avobenzone, octisalate, etc.) both work; pick the one you will wear every day.",
+   "bestFor": [
+    "aging",
+    "dark_spots",
+    "redness",
+    "acne",
+    "texture",
+    "oil",
+    "dryness",
+    "sensitive"
+   ],
+   "howToStart": "Every morning, last step, about 2 finger-lengths for the face and neck (around 1/4 teaspoon), ears included. Reapply every 2 hours outside or after sweating. Scalp too if your hair is thin.",
+   "whenToExpect": "Prevention works from day one; spots stop getting darker within weeks.",
+   "sideEffects": "Some leave a white cast (mineral) or sting the eyes (chemical). Gel or fluid textures suit oily skin.",
+   "evidence": "A",
+   "otc": true,
+   "pairsWellWith": [
+    "vitamin_c",
+    "niacinamide",
+    "adapalene",
+    "tretinoin",
+    "retinol",
+    "aha",
+    "azelaic_acid",
+    "tranexamic_acid"
+   ],
+   "avoidWith": []
+  },
+  {
+   "id": "ceramides",
+   "name": "Ceramides (barrier moisturizer)",
+   "whatItDoes": "Lipids that make up your skin barrier. Moisturizers with ceramides, cholesterol and fatty acids repair dryness and make strong actives easier to tolerate.",
+   "bestFor": [
+    "dryness",
+    "sensitive",
+    "redness"
+   ],
+   "howToStart": "Daily, AM and/or PM, as your moisturizer. Apply on slightly damp skin.",
+   "whenToExpect": "Less tightness in days; barrier repair over 2-4 weeks.",
+   "sideEffects": "Rare. Thick creams can feel heavy on oily skin; use a lotion.",
+   "evidence": "B",
+   "otc": true,
+   "pairsWellWith": [
+    "adapalene",
+    "tretinoin",
+    "retinol",
+    "benzoyl_peroxide",
+    "aha",
+    "bha"
+   ],
+   "avoidWith": []
+  },
+  {
+   "id": "hyaluronic_acid",
+   "name": "Hyaluronic acid",
+   "whatItDoes": "A humectant that pulls water into the top layer of skin. Skin looks plumper and feels less tight. Hydration, not treatment.",
+   "bestFor": [
+    "dryness",
+    "aging"
+   ],
+   "howToStart": "On damp skin, then seal with a moisturizer. Daily.",
+   "whenToExpect": "Immediate, temporary plumpness.",
+   "sideEffects": "Can feel tight in very dry air if not sealed with moisturizer.",
+   "evidence": "C",
+   "otc": true,
+   "pairsWellWith": [
+    "retinol",
+    "vitamin_c",
+    "aha",
+    "ceramides"
+   ],
+   "avoidWith": []
+  },
+  {
+   "id": "tranexamic_acid",
+   "name": "Tranexamic acid (topical)",
+   "whatItDoes": "Blocks one of the signals that tells skin to make pigment. Good for stubborn brown patches and post-acne marks; often paired with niacinamide or azelaic acid.",
+   "bestFor": [
+    "dark_spots"
+   ],
+   "howToStart": "2-5% serum once or twice a day. No ramp-up needed.",
+   "whenToExpect": "Visible fading from about 8 weeks; 3 months to judge it.",
+   "sideEffects": "Mild irritation now and then. (Oral tranexamic acid works better for melasma but is prescription-only with clotting risks: talk to a dermatologist.)",
+   "evidence": "B",
+   "otc": true,
+   "pairsWellWith": [
+    "niacinamide",
+    "azelaic_acid",
+    "sunscreen",
+    "vitamin_c"
+   ],
+   "avoidWith": []
+  },
+  {
+   "id": "sulfur",
+   "name": "Sulfur",
+   "whatItDoes": "An old, mild acne and dandruff ingredient. It dries out spots and calms them. Useful as a spot treatment or mask.",
+   "bestFor": [
+    "acne",
+    "oil",
+    "redness"
+   ],
+   "howToStart": "As an overnight spot treatment (e.g. a 10% lotion) or a 10-minute mask 2-3 times a week.",
+   "whenToExpect": "Spots shrink in 1-3 days.",
+   "sideEffects": "Dryness; smells like matches.",
+   "evidence": "C",
+   "otc": true,
+   "pairsWellWith": [
+    "niacinamide",
+    "ceramides"
+   ],
+   "avoidWith": []
+  },
+  {
+   "id": "centella",
+   "name": "Centella asiatica (cica)",
+   "whatItDoes": "A plant extract used in soothing products. Small studies suggest it helps redness and wound healing, but the evidence is thin.",
+   "bestFor": [
+    "redness",
+    "sensitive"
+   ],
+   "howToStart": "In a moisturizer or serum, daily. Nice on days the skin feels raw from retinoids or shaving.",
+   "whenToExpect": "Calmer feel within days, if it helps you.",
+   "sideEffects": "Rare. Some cica products also contain fragrance or essential oils; check the list.",
+   "evidence": "C",
+   "otc": true,
+   "pairsWellWith": [
+    "adapalene",
+    "tretinoin",
+    "retinol",
+    "ceramides"
+   ],
+   "avoidWith": []
+  },
+  {
+   "id": "peptides",
+   "name": "Peptides",
+   "whatItDoes": "Short protein fragments that may signal collagen repair. Mostly lab and small industry-run studies; a nice extra, not a priority.",
+   "bestFor": [
+    "aging"
+   ],
+   "howToStart": "In a moisturizer or serum, daily.",
+   "whenToExpect": "If any: subtle, over 2-3 months.",
+   "sideEffects": "Rare.",
+   "evidence": "C",
+   "otc": true,
+   "pairsWellWith": [
+    "retinol",
+    "hyaluronic_acid",
+    "sunscreen"
+   ],
+   "avoidWith": []
+  },
+  {
+   "id": "clindamycin",
+   "name": "Topical clindamycin (prescription antibiotic)",
+   "whatItDoes": "Kills acne bacteria and calms inflamed spots. Must be used with benzoyl peroxide so the bacteria don't become resistant.",
+   "bestFor": [
+    "acne"
+   ],
+   "howToStart": "Prescription only: talk to a dermatologist, usually as a clindamycin + BPO gel, once a day. Not for long-term solo use.",
+   "whenToExpect": "4-8 weeks.",
+   "sideEffects": "Dryness; rarely, gut upset.",
+   "evidence": "A",
+   "otc": false,
+   "rxNote": "Prescription only. Talk to a dermatologist.",
+   "pairsWellWith": [
+    "benzoyl_peroxide",
+    "adapalene",
+    "tretinoin"
+   ],
+   "avoidWith": []
+  }
+ ],
+ "rampUps": {
+  "retinoid": [
+   {
+    "week": 1,
+    "nightsPerWeek": 2
+   },
+   {
+    "week": 2,
+    "nightsPerWeek": 2
+   },
+   {
+    "week": 3,
+    "nightsPerWeek": 3
+   },
+   {
+    "week": 4,
+    "nightsPerWeek": 3
+   },
+   {
+    "week": 5,
+    "nightsPerWeek": 4
+   },
+   {
+    "week": 6,
+    "nightsPerWeek": 5
+   },
+   {
+    "week": 7,
+    "nightsPerWeek": 7
+   }
+  ]
+ },
+ "routines": [
+  {
+   "id": "minimal_3_step",
+   "name": "Minimal 3-step",
+   "skinTypes": [
+    "oily",
+    "dry",
+    "combination",
+    "normal",
+    "sensitive"
+   ],
+   "concerns": [],
+   "description": "If you only do three things: wash, moisturize, sunscreen. Add one treatment later.",
+   "am": [
+    {
+     "step": "cleanser",
+     "frequency": "daily",
+     "note": "Splash of water or a gentle wash."
+    },
+    {
+     "step": "moisturizer",
+     "frequency": "daily",
+     "note": "Skip if your sunscreen is moisturizing enough."
+    },
+    {
+     "step": "spf",
+     "frequency": "daily",
+     "note": "SPF 30+, last step. Fluid or gel texture if oily.",
+     "activeId": "sunscreen"
+    }
+   ],
+   "pm": [
+    {
+     "step": "cleanser",
+     "frequency": "daily",
+     "note": "Gentle wash; gets sunscreen and sweat off."
+    },
+    {
+     "step": "moisturizer",
+     "frequency": "daily",
+     "note": "Lotion if oily, cream if dry.",
+     "activeId": "ceramides"
+    }
+   ]
+  },
+  {
+   "id": "acne_focused",
+   "name": "Acne-focused",
+   "skinTypes": [
+    "oily",
+    "combination",
+    "normal"
+   ],
+   "concerns": [
+    "acne"
+   ],
+   "description": "The standard first-line plan from dermatology guidelines: benzoyl peroxide in the morning, adapalene at night.",
+   "am": [
+    {
+     "step": "cleanser",
+     "frequency": "daily",
+     "note": "4-5% benzoyl peroxide wash, 1-2 min on the skin, then rinse.",
+     "activeId": "benzoyl_peroxide"
+    },
+    {
+     "step": "moisturizer",
+     "frequency": "daily",
+     "note": "Oil-free, non-comedogenic.",
+     "activeId": "niacinamide"
+    },
+    {
+     "step": "spf",
+     "frequency": "daily",
+     "note": "SPF 30+, last step. Fluid or gel texture if oily.",
+     "activeId": "sunscreen"
+    }
+   ],
+   "pm": [
+    {
+     "step": "cleanser",
+     "frequency": "daily",
+     "note": "Gentle non-medicated wash."
+    },
+    {
+     "step": "treatment",
+     "frequency": "ramp-up",
+     "note": "Pea-sized adapalene for the whole face, not just spots.",
+     "activeId": "adapalene"
+    },
+    {
+     "step": "moisturizer",
+     "frequency": "daily",
+     "note": "On top of adapalene to cut dryness.",
+     "activeId": "ceramides"
+    }
+   ]
+  },
+  {
+   "id": "oily_acne",
+   "name": "Oily skin + breakouts",
+   "skinTypes": [
+    "oily"
+   ],
+   "concerns": [
+    "acne",
+    "oil"
+   ],
+   "description": "Keeps oil and clogged pores down without stripping the skin.",
+   "am": [
+    {
+     "step": "cleanser",
+     "frequency": "daily",
+     "note": "2% salicylic acid wash.",
+     "activeId": "bha"
+    },
+    {
+     "step": "treatment",
+     "frequency": "daily",
+     "note": "Niacinamide serum or a moisturizer that has it.",
+     "activeId": "niacinamide"
+    },
+    {
+     "step": "moisturizer",
+     "frequency": "daily",
+     "note": "Light gel."
+    },
+    {
+     "step": "spf",
+     "frequency": "daily",
+     "note": "SPF 30+, last step. Fluid or gel texture if oily.",
+     "activeId": "sunscreen"
+    }
+   ],
+   "pm": [
+    {
+     "step": "cleanser",
+     "frequency": "daily",
+     "note": "Gentle wash."
+    },
+    {
+     "step": "treatment",
+     "frequency": "ramp-up",
+     "note": "Adapalene, pea-sized.",
+     "activeId": "adapalene"
+    },
+    {
+     "step": "moisturizer",
+     "frequency": "daily",
+     "note": "Light lotion.",
+     "activeId": "ceramides"
+    }
+   ]
+  },
+  {
+   "id": "dry_sensitive",
+   "name": "Dry or sensitive skin",
+   "skinTypes": [
+    "dry",
+    "sensitive"
+   ],
+   "concerns": [
+    "dryness",
+    "redness",
+    "sensitive"
+   ],
+   "description": "Fix the barrier first. Add actives slowly, one at a time.",
+   "am": [
+    {
+     "step": "cleanser",
+     "frequency": "daily",
+     "note": "Rinse with water, or a cream cleanser."
+    },
+    {
+     "step": "moisturizer",
+     "frequency": "daily",
+     "note": "Ceramide cream on damp skin.",
+     "activeId": "ceramides"
+    },
+    {
+     "step": "spf",
+     "frequency": "daily",
+     "note": "Mineral SPF 30+ often stings less.",
+     "activeId": "sunscreen"
+    }
+   ],
+   "pm": [
+    {
+     "step": "cleanser",
+     "frequency": "daily",
+     "note": "Cream or non-foaming cleanser."
+    },
+    {
+     "step": "treatment",
+     "frequency": "daily",
+     "note": "Azelaic acid 10% if you also have redness or spots; otherwise skip.",
+     "activeId": "azelaic_acid"
+    },
+    {
+     "step": "moisturizer",
+     "frequency": "daily",
+     "note": "Thicker cream.",
+     "activeId": "ceramides"
+    }
+   ]
+  },
+  {
+   "id": "combination_texture",
+   "name": "Combination skin, texture and pores",
+   "skinTypes": [
+    "combination",
+    "normal"
+   ],
+   "concerns": [
+    "texture",
+    "oil"
+   ],
+   "description": "Retinoid most nights, a gentle acid on one night off.",
+   "am": [
+    {
+     "step": "cleanser",
+     "frequency": "daily",
+     "note": "Gentle gel cleanser."
+    },
+    {
+     "step": "treatment",
+     "frequency": "daily",
+     "note": "Niacinamide.",
+     "activeId": "niacinamide"
+    },
+    {
+     "step": "moisturizer",
+     "frequency": "daily",
+     "note": "Lotion."
+    },
+    {
+     "step": "spf",
+     "frequency": "daily",
+     "note": "SPF 30+, last step. Fluid or gel texture if oily.",
+     "activeId": "sunscreen"
+    }
+   ],
+   "pm": [
+    {
+     "step": "cleanser",
+     "frequency": "daily",
+     "note": "Gentle wash."
+    },
+    {
+     "step": "treatment",
+     "frequency": "ramp-up",
+     "note": "Retinoid on most nights.",
+     "activeId": "adapalene"
+    },
+    {
+     "step": "treatment",
+     "frequency": "2-3x-week",
+     "note": "On 1-2 nights with NO retinoid: AHA or BHA leave-on.",
+     "activeId": "aha"
+    },
+    {
+     "step": "moisturizer",
+     "frequency": "daily",
+     "note": "Lotion.",
+     "activeId": "ceramides"
+    }
+   ]
+  },
+  {
+   "id": "dark_spots",
+   "name": "Dark spots and post-acne marks",
+   "skinTypes": [
+    "oily",
+    "dry",
+    "combination",
+    "normal",
+    "sensitive"
+   ],
+   "concerns": [
+    "dark_spots"
+   ],
+   "description": "Sunscreen every day does half the work; the actives do the rest.",
+   "am": [
+    {
+     "step": "cleanser",
+     "frequency": "daily",
+     "note": "Gentle wash."
+    },
+    {
+     "step": "treatment",
+     "frequency": "daily",
+     "note": "Vitamin C serum.",
+     "activeId": "vitamin_c"
+    },
+    {
+     "step": "moisturizer",
+     "frequency": "daily",
+     "note": "Niacinamide moisturizer.",
+     "activeId": "niacinamide"
+    },
+    {
+     "step": "spf",
+     "frequency": "daily",
+     "note": "Tinted mineral SPF with iron oxides blocks visible light too, which helps pigment.",
+     "activeId": "sunscreen"
+    }
+   ],
+   "pm": [
+    {
+     "step": "cleanser",
+     "frequency": "daily",
+     "note": "Gentle wash."
+    },
+    {
+     "step": "treatment",
+     "frequency": "daily",
+     "note": "Azelaic acid or tranexamic acid.",
+     "activeId": "azelaic_acid"
+    },
+    {
+     "step": "treatment",
+     "frequency": "ramp-up",
+     "note": "Retinoid, building to most nights.",
+     "activeId": "adapalene"
+    },
+    {
+     "step": "moisturizer",
+     "frequency": "daily",
+     "note": "Ceramide moisturizer.",
+     "activeId": "ceramides"
+    }
+   ]
+  },
+  {
+   "id": "anti_aging",
+   "name": "Early aging and fine lines",
+   "skinTypes": [
+    "normal",
+    "dry",
+    "combination"
+   ],
+   "concerns": [
+    "aging"
+   ],
+   "description": "Sunscreen plus a retinoid: the two things with real evidence against aging.",
+   "am": [
+    {
+     "step": "cleanser",
+     "frequency": "daily",
+     "note": "Water or gentle wash."
+    },
+    {
+     "step": "treatment",
+     "frequency": "daily",
+     "note": "Vitamin C.",
+     "activeId": "vitamin_c"
+    },
+    {
+     "step": "moisturizer",
+     "frequency": "daily",
+     "note": "With peptides or hyaluronic acid if you like.",
+     "activeId": "hyaluronic_acid"
+    },
+    {
+     "step": "spf",
+     "frequency": "daily",
+     "note": "SPF 30+, last step. Fluid or gel texture if oily.",
+     "activeId": "sunscreen"
+    }
+   ],
+   "pm": [
+    {
+     "step": "cleanser",
+     "frequency": "daily",
+     "note": "Gentle wash."
+    },
+    {
+     "step": "treatment",
+     "frequency": "ramp-up",
+     "note": "Retinol; or tretinoin from a dermatologist for stronger results.",
+     "activeId": "retinol"
+    },
+    {
+     "step": "moisturizer",
+     "frequency": "daily",
+     "note": "Ceramide cream.",
+     "activeId": "ceramides"
+    }
+   ]
+  },
+  {
+   "id": "redness",
+   "name": "Redness and irritation",
+   "skinTypes": [
+    "sensitive",
+    "dry",
+    "normal",
+    "combination"
+   ],
+   "concerns": [
+    "redness"
+   ],
+   "description": "Few products, no scrubs, nothing fragranced. Persistent facial redness with bumps may be rosacea: worth a dermatologist visit.",
+   "am": [
+    {
+     "step": "cleanser",
+     "frequency": "daily",
+     "note": "Lukewarm water or cream cleanser."
+    },
+    {
+     "step": "treatment",
+     "frequency": "daily",
+     "note": "Azelaic acid.",
+     "activeId": "azelaic_acid"
+    },
+    {
+     "step": "moisturizer",
+     "frequency": "daily",
+     "note": "Niacinamide or centella moisturizer.",
+     "activeId": "niacinamide"
+    },
+    {
+     "step": "spf",
+     "frequency": "daily",
+     "note": "Mineral SPF.",
+     "activeId": "sunscreen"
+    }
+   ],
+   "pm": [
+    {
+     "step": "cleanser",
+     "frequency": "daily",
+     "note": "Gentle wash."
+    },
+    {
+     "step": "moisturizer",
+     "frequency": "daily",
+     "note": "Ceramide cream.",
+     "activeId": "ceramides"
+    }
+   ]
+  },
+  {
+   "id": "shaving_bumps",
+   "name": "Shaving bumps and ingrowns",
+   "skinTypes": [
+    "oily",
+    "dry",
+    "combination",
+    "normal",
+    "sensitive"
+   ],
+   "concerns": [
+    "razor_bumps"
+   ],
+   "description": "For bumps in the beard area: exfoliate gently and shave smarter.",
+   "am": [
+    {
+     "step": "cleanser",
+     "frequency": "daily",
+     "note": "Wash before shaving to soften hair."
+    },
+    {
+     "step": "moisturizer",
+     "frequency": "daily",
+     "note": "Fragrance-free after-shave moisturizer."
+    },
+    {
+     "step": "spf",
+     "frequency": "daily",
+     "note": "SPF 30+, last step. Fluid or gel texture if oily.",
+     "activeId": "sunscreen"
+    }
+   ],
+   "pm": [
+    {
+     "step": "cleanser",
+     "frequency": "daily",
+     "note": "Gentle wash."
+    },
+    {
+     "step": "treatment",
+     "frequency": "2-3x-week",
+     "note": "Salicylic acid or glycolic acid pads on the beard area.",
+     "activeId": "bha"
+    },
+    {
+     "step": "moisturizer",
+     "frequency": "daily",
+     "note": "Ceramide moisturizer.",
+     "activeId": "ceramides"
+    }
+   ]
+  }
+ ],
+ "conflicts": [
+  {
+   "a": "adapalene",
+   "b": "aha",
+   "sameTime": true,
+   "severity": "caution",
+   "message": "Retinoid and glycolic or lactic acid in the same night is a fast way to irritate your skin. Use the acid on a night off from the retinoid."
+  },
+  {
+   "a": "adapalene",
+   "b": "bha",
+   "sameTime": true,
+   "severity": "caution",
+   "message": "Retinoid plus salicylic acid leave-on in one night is a lot. Alternate nights. A salicylic wash in the morning is fine."
+  },
+  {
+   "a": "retinol",
+   "b": "aha",
+   "sameTime": true,
+   "severity": "caution",
+   "message": "Retinol and AHA in the same session: split them onto different nights."
+  },
+  {
+   "a": "retinol",
+   "b": "bha",
+   "sameTime": true,
+   "severity": "caution",
+   "message": "Retinol and BHA in the same session: split them onto different nights."
+  },
+  {
+   "a": "tretinoin",
+   "b": "aha",
+   "sameTime": true,
+   "severity": "caution",
+   "message": "Tretinoin is strong on its own. Keep acids to other nights, or drop them."
+  },
+  {
+   "a": "tretinoin",
+   "b": "bha",
+   "sameTime": true,
+   "severity": "caution",
+   "message": "Tretinoin and salicylic acid together tend to over-dry. Alternate nights."
+  },
+  {
+   "a": "tretinoin",
+   "b": "benzoyl_peroxide",
+   "sameTime": true,
+   "severity": "caution",
+   "message": "Benzoyl peroxide can break down tretinoin. Use BPO in the morning and tretinoin at night (adapalene doesn't have this problem)."
+  },
+  {
+   "a": "retinol",
+   "b": "benzoyl_peroxide",
+   "sameTime": true,
+   "severity": "info",
+   "message": "Keep benzoyl peroxide in the morning and retinol at night so they don't irritate together."
+  },
+  {
+   "a": "vitamin_c",
+   "b": "aha",
+   "sameTime": true,
+   "severity": "info",
+   "message": "Vitamin C and an AHA together often sting. Vitamin C in the morning, acid at night."
+  },
+  {
+   "a": "vitamin_c",
+   "b": "benzoyl_peroxide",
+   "sameTime": true,
+   "severity": "info",
+   "message": "Benzoyl peroxide oxidizes vitamin C. Use them at different times of day."
+  },
+  {
+   "a": "aha",
+   "b": "bha",
+   "sameTime": true,
+   "severity": "info",
+   "message": "Two acids in one session is usually more exfoliation than you need. Pick one per night."
+  },
+  {
+   "a": "adapalene",
+   "b": "tretinoin",
+   "sameTime": false,
+   "severity": "caution",
+   "message": "Two retinoids in one routine: pick one. They do the same job."
+  },
+  {
+   "a": "adapalene",
+   "b": "retinol",
+   "sameTime": false,
+   "severity": "caution",
+   "message": "Adapalene and retinol are both retinoids. Use one."
+  },
+  {
+   "a": "retinol",
+   "b": "tretinoin",
+   "sameTime": false,
+   "severity": "caution",
+   "message": "Tretinoin replaces retinol; drop the retinol."
+  },
+  {
+   "a": "*new_active",
+   "b": "*new_active",
+   "sameTime": false,
+   "severity": "info",
+   "message": "You started two new actives within 2 weeks. Add one at a time, 2-4 weeks apart, so you know what causes any irritation or breakouts."
+  }
+ ],
+ "guides": [
+  {
+   "id": "skincare_for_guys_start",
+   "title": "Starting Skincare as a Guy",
+   "subtitle": "The short version: wash, moisturize, sunscreen, then one treatment",
+   "icon": "face.smiling",
+   "sections": [
+    {
+     "heading": "What actually matters",
+     "body": "Most of what's sold as skincare is optional. Three things have real evidence behind them: daily sunscreen, a retinoid, and a moisturizer that keeps your barrier intact. Everything else is a nice extra.",
+     "bullets": [
+      "Sunscreen every morning prevents most visible aging and dark spots.",
+      "A retinoid (adapalene OTC, or tretinoin from a dermatologist) handles acne, texture and lines.",
+      "Moisturizer makes the retinoid easier to tolerate.",
+      "A gentle cleanser beats bar soap, which tends to dry the face out."
+     ]
+    },
+    {
+     "heading": "Week 1 routine",
+     "body": "Morning: rinse or gentle wash, moisturizer, SPF 30+. Night: gentle wash, moisturizer. Do only this for a week or two so you know your skin is happy with the basics."
+    },
+    {
+     "heading": "Adding a treatment",
+     "body": "Pick the one thing that bugs you most and add one active for it. Give it 8-12 weeks before you judge it.",
+     "table": {
+      "columns": [
+       "Main concern",
+       "Start with",
+       "Then maybe"
+      ],
+      "rows": [
+       [
+        "Acne",
+        "Benzoyl peroxide wash (AM) + adapalene (PM)",
+        "Azelaic acid; see a dermatologist if no better at 12 weeks"
+       ],
+       [
+        "Oily skin, big pores",
+        "Salicylic acid wash, niacinamide",
+        "Adapalene"
+       ],
+       [
+        "Dark spots / acne marks",
+        "Daily SPF, azelaic acid",
+        "Vitamin C, tranexamic acid, retinoid"
+       ],
+       [
+        "Fine lines",
+        "Daily SPF, retinol",
+        "Tretinoin from a dermatologist"
+       ],
+       [
+        "Redness",
+        "Fragrance-free moisturizer, mineral SPF",
+        "Azelaic acid"
+       ],
+       [
+        "Razor bumps",
+        "Better shaving habits",
+        "Salicylic or glycolic acid 2-3 nights a week"
+       ]
+      ]
+     }
+    },
+    {
+     "heading": "How much to use",
+     "body": "Retinoid: a pea for the whole face. Sunscreen: two finger-lengths for face and neck. Moisturizer: a nickel-sized dab. More retinoid does not work faster; it only irritates."
+    },
+    {
+     "heading": "Common mistakes",
+     "body": "",
+     "bullets": [
+      "Starting five products at once.",
+      "Quitting a retinoid at week 3 because of dryness or purging.",
+      "Skipping sunscreen on cloudy days or when you're mostly indoors near windows.",
+      "Scrubbing with gritty exfoliants or hot water.",
+      "Fragranced aftershaves and colognes on the face."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "purging_vs_breakout",
+   "title": "Purging vs. Breaking Out",
+   "subtitle": "Is the new product working or making things worse?",
+   "icon": "arrow.triangle.2.circlepath",
+   "sections": [
+    {
+     "heading": "What purging is",
+     "body": "Retinoids and acids speed up skin turnover, so clogs that were already forming come to the surface faster. For a few weeks you can get more spots than usual. That's purging, and it means the product is working."
+    },
+    {
+     "heading": "How to tell them apart",
+     "body": "",
+     "table": {
+      "columns": [
+       "",
+       "Purging",
+       "Breakout from the product"
+      ],
+      "rows": [
+       [
+        "Which products",
+        "Retinoids, AHA/BHA, benzoyl peroxide",
+        "Anything, often heavy creams, oils, sunscreens, hair products"
+       ],
+       [
+        "Where",
+        "Where you usually break out",
+        "New places you don't usually get spots"
+       ],
+       [
+        "What they look like",
+        "Small bumps, whiteheads, quicker to heal",
+        "Can be bigger, itchy, red patches or a rash"
+       ],
+       [
+        "How long",
+        "Fades by 4-8 weeks",
+        "Keeps going as long as you use the product"
+       ]
+      ]
+     }
+    },
+    {
+     "heading": "What to do while purging",
+     "body": "Keep going, but slow the ramp-up (fewer nights a week), add moisturizer on top, and don't pick. If it's still worse at 8-10 weeks, it's not a purge."
+    },
+    {
+     "heading": "When to stop",
+     "body": "",
+     "bullets": [
+      "Itchy rash, swelling or hives: stop and switch products.",
+      "Spots in brand-new areas after a non-active product: drop that product.",
+      "Painful deep cysts or scarring: see a dermatologist; prescription treatment works and scars are easier to prevent than fix."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "spf_basics",
+   "title": "Sunscreen Basics",
+   "subtitle": "The one product everyone should use",
+   "icon": "sun.max.fill",
+   "sections": [
+    {
+     "heading": "Why it matters",
+     "body": "UV light causes most visible aging (lines, sagging, spots) and skin cancer. It also undoes the work of retinoids and acids and darkens acne marks. Daily sunscreen is the cheapest, best-proven step."
+    },
+    {
+     "heading": "What to buy",
+     "body": "Broad-spectrum, SPF 30 or higher, water-resistant if you sweat. Mineral (zinc oxide, titanium dioxide) and chemical filters both protect well; pick the one that feels good enough to wear every day.",
+     "bullets": [
+      "Oily or acne-prone: gel, fluid or 'oil-free' labels.",
+      "Dry: lotion or cream.",
+      "Darker skin or dark spots: tinted mineral formulas avoid the white cast and add visible-light protection.",
+      "Bald or thinning scalp: spray or stick SPF on the scalp, or a hat."
+     ]
+    },
+    {
+     "heading": "How to apply",
+     "body": "About two finger-lengths for face and neck, ears included. Apply as the last morning step, about 15 minutes before going out. Reapply every 2 hours in the sun, and after swimming or sweating."
+    },
+    {
+     "heading": "Myths",
+     "body": "",
+     "bullets": [
+      "'I don't burn, so I don't need it.' UV still ages and darkens skin of every color.",
+      "'SPF in my moisturizer is enough.' Only if you apply a full amount; most people use too little.",
+      "'Cloudy days don't count.' Most UV gets through clouds."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "acne_plan",
+   "title": "Your Acne Plan",
+   "subtitle": "What dermatologists use first, and when to step up",
+   "icon": "cross.case",
+   "sections": [
+    {
+     "heading": "Step 1: over the counter",
+     "body": "The first-line combo in the AAD guidelines: benzoyl peroxide plus a retinoid. Adapalene 0.1% is OTC, so you can start today.",
+     "bullets": [
+      "AM: 4-5% benzoyl peroxide wash, oil-free moisturizer, sunscreen.",
+      "PM: gentle wash, pea-sized adapalene for the whole face (ramp up over 6 weeks), moisturizer.",
+      "Optional: azelaic acid if you also have marks or redness."
+     ]
+    },
+    {
+     "heading": "Timeline",
+     "body": "Expect 8-12 weeks. Weeks 2-6 can look worse (purging). Take a progress photo every week in the same light; memory is a bad judge."
+    },
+    {
+     "heading": "Step 2: see a dermatologist",
+     "body": "If it's not clearly better at 12 weeks, or you get deep painful cysts or scars, talk to a dermatologist. Prescription options are very effective.",
+     "table": {
+      "columns": [
+       "Option",
+       "What it is",
+       "Notes"
+      ],
+      "rows": [
+       [
+        "Tretinoin / tazarotene",
+        "Stronger prescription retinoids",
+        "More irritation than adapalene"
+       ],
+       [
+        "Clindamycin + BPO gel",
+        "Topical antibiotic combo",
+        "Always with BPO"
+       ],
+       [
+        "Clascoterone",
+        "Topical anti-androgen cream",
+        "Newer; works on oil glands"
+       ],
+       [
+        "Doxycycline",
+        "Oral antibiotic",
+        "Usually 3-4 months, with a topical"
+       ],
+       [
+        "Isotretinoin",
+        "Oral vitamin A drug",
+        "Strongly recommended for severe, scarring or stubborn acne; needs monitoring"
+       ]
+      ]
+     }
+    },
+    {
+     "heading": "Food and acne",
+     "body": "Evidence is mixed but leans one way: high-glycemic diets (lots of sugar, white bread, sweet drinks) and skim milk are linked to more acne in some studies, and a small trial found a low-glycemic diet helped. Whey protein shakes are a common trigger in case reports. People with acne also tend to have lower zinc. If you have acne, it's reasonable to try: fewer sugary foods, swap whey for casein or plant protein for 6-8 weeks, and see if it changes anything. Food is a helper, not a replacement for treatment."
+    },
+    {
+     "heading": "Habits",
+     "body": "",
+     "bullets": [
+      "Change pillowcases twice a week.",
+      "Wash after workouts.",
+      "Don't pick or squeeze; it makes marks last months.",
+      "Keep hair products (pomades, oils) off the forehead."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "dark_spots",
+   "title": "Fading Dark Spots and Acne Marks",
+   "subtitle": "Sunscreen first, then the right actives",
+   "icon": "circle.lefthalf.filled",
+   "sections": [
+    {
+     "heading": "Types of marks",
+     "body": "Brown or dark marks after a spot heals are post-inflammatory hyperpigmentation; they fade by themselves over months, faster with treatment. Pink or red marks are post-acne redness; they fade with time and calm skin, and acids help less. Indented marks are scars, which need procedures from a dermatologist."
+    },
+    {
+     "heading": "The plan",
+     "body": "",
+     "bullets": [
+      "Daily SPF 30+, tinted if you can. Without it, nothing else works well.",
+      "Azelaic acid once or twice a day.",
+      "A retinoid at night (also prevents new acne, so fewer new marks).",
+      "Optional: vitamin C in the morning, tranexamic acid or niacinamide serum.",
+      "Stop picking."
+     ]
+    },
+    {
+     "heading": "Timeline",
+     "body": "Brown marks usually fade noticeably in 8-12 weeks of treatment; deeper ones take 6-12 months. Melasma (symmetrical brown patches) is stubborn and relapses with sun; a dermatologist can add prescription options like hydroquinone, oral tranexamic acid or peels."
+    },
+    {
+     "heading": "What to avoid",
+     "body": "Harsh scrubs, lemon juice, toothpaste and other DIY fixes irritate and can make marks darker, especially on medium and darker skin."
+    }
+   ]
+  },
+  {
+   "id": "shaving_and_skin",
+   "title": "Shaving and Your Skin",
+   "subtitle": "Fewer bumps, less burn",
+   "icon": "scissors",
+   "sections": [
+    {
+     "heading": "Before",
+     "body": "Shave after a shower or wash, when hair is soft. Use a shaving gel or cream; let it sit a minute."
+    },
+    {
+     "heading": "During",
+     "body": "",
+     "bullets": [
+      "Use a sharp blade; change it every 5-7 shaves.",
+      "Shave with the grain, light pressure, no going over the same spot again and again.",
+      "If you get bumps, fewer blades or an electric trimmer that leaves a little stubble helps a lot; very close shaves make curly hair grow back into the skin.",
+      "Rinse the blade after every stroke."
+     ]
+    },
+    {
+     "heading": "After",
+     "body": "Rinse with cool water, pat dry, then a fragrance-free moisturizer. Skip alcohol aftershaves. Don't put retinoids or acids on freshly shaved skin; apply them at night instead."
+    },
+    {
+     "heading": "Razor bumps (pseudofolliculitis)",
+     "body": "Common with curly beard hair. Things that help: grow it out a bit, trim instead of shave, salicylic or glycolic acid 2-3 nights a week, never pluck ingrowns. If they keep coming back or leave dark marks, a dermatologist can prescribe options or discuss laser hair reduction."
+    },
+    {
+     "heading": "Beard care",
+     "body": "If you keep a beard: wash it with your face wash, and use a little moisturizer or beard oil on the skin underneath. Flaky, itchy beard skin is often seborrheic dermatitis; a ketoconazole or zinc pyrithione wash 2-3 times a week usually fixes it."
+    }
+   ]
+  },
+  {
+   "id": "actives_cheat_sheet",
+   "title": "Actives Cheat Sheet",
+   "subtitle": "What each ingredient does and when to expect results",
+   "icon": "list.bullet.rectangle",
+   "sections": [
+    {
+     "heading": "At a glance",
+     "body": "Evidence grades: A strong, B moderate, C weak.",
+     "table": {
+      "columns": [
+       "Active",
+       "Best for",
+       "When to expect",
+       "Evidence"
+      ],
+      "rows": [
+       [
+        "Adapalene 0.1% (Differin)",
+        "acne, texture, oil",
+        "Fewer new spots by 6-8 weeks",
+        "A"
+       ],
+       [
+        "Retinol / retinal (OTC retinoids)",
+        "aging, texture, dark spots",
+        "Smoother texture in 4-8 weeks",
+        "B"
+       ],
+       [
+        "Tretinoin (prescription retinoid)",
+        "acne, aging, texture",
+        "Acne: 8-12 weeks",
+        "A"
+       ],
+       [
+        "AHA (glycolic / lactic acid)",
+        "texture, dark spots, dryness",
+        "Smoother feel after a few uses",
+        "B"
+       ],
+       [
+        "BHA / salicylic acid",
+        "acne, oil, texture",
+        "Fewer blackheads and less oil in 3-6 weeks",
+        "B"
+       ],
+       [
+        "Benzoyl peroxide (BPO)",
+        "acne",
+        "Inflamed spots calm down in 2-4 weeks",
+        "A"
+       ],
+       [
+        "Azelaic acid",
+        "acne, dark spots, redness",
+        "Redness and acne in 4-8 weeks",
+        "A"
+       ],
+       [
+        "Niacinamide (vitamin B3)",
+        "oil, redness, dark spots",
+        "Less oil in 2-4 weeks",
+        "B"
+       ],
+       [
+        "Vitamin C (L-ascorbic acid and derivatives)",
+        "dark spots, aging",
+        "Brighter tone in 4-8 weeks",
+        "B"
+       ],
+       [
+        "Sunscreen (broad-spectrum SPF 30+)",
+        "aging, dark spots, redness",
+        "Prevention works from day one",
+        "A"
+       ],
+       [
+        "Ceramides (barrier moisturizer)",
+        "dryness, sensitive, redness",
+        "Less tightness in days",
+        "B"
+       ],
+       [
+        "Hyaluronic acid",
+        "dryness, aging",
+        "Immediate, temporary plumpness",
+        "C"
+       ],
+       [
+        "Tranexamic acid (topical)",
+        "dark spots",
+        "Visible fading from about 8 weeks",
+        "B"
+       ],
+       [
+        "Sulfur",
+        "acne, oil, redness",
+        "Spots shrink in 1-3 days",
+        "C"
+       ],
+       [
+        "Centella asiatica (cica)",
+        "redness, sensitive",
+        "Calmer feel within days, if it helps you",
+        "C"
+       ],
+       [
+        "Peptides",
+        "aging",
+        "If any: subtle, over 2-3 months",
+        "C"
+       ],
+       [
+        "Topical clindamycin (prescription antibiotic)",
+        "acne",
+        "4-8 weeks",
+        "A"
+       ]
+      ]
+     }
+    },
+    {
+     "heading": "Simple pairing rules",
+     "body": "",
+     "bullets": [
+      "Retinoid at night, vitamin C and sunscreen in the morning.",
+      "Acids and retinoids on different nights.",
+      "Benzoyl peroxide in the morning if you use tretinoin.",
+      "Niacinamide, azelaic acid, ceramides and sunscreen go with almost anything."
+     ]
+    }
+   ]
+  }
+ ],
+ "products": {
+  "cleanser": [
+   {
+    "name": "Hydrating Facial Cleanser",
+    "brand": "CeraVe",
+    "activeIds": [
+     "ceramides"
+    ],
+    "skinTypes": [
+     "dry",
+     "normal",
+     "sensitive"
+    ],
+    "approxPriceUSD": 16,
+    "note": "Non-foaming, gentle."
+   },
+   {
+    "name": "Foaming Facial Cleanser",
+    "brand": "CeraVe",
+    "activeIds": [
+     "niacinamide",
+     "ceramides"
+    ],
+    "skinTypes": [
+     "oily",
+     "combination"
+    ],
+    "approxPriceUSD": 16,
+    "note": "For oily skin."
+   },
+   {
+    "name": "Toleriane Hydrating Gentle Cleanser",
+    "brand": "La Roche-Posay",
+    "activeIds": [
+     "ceramides"
+    ],
+    "skinTypes": [
+     "dry",
+     "sensitive"
+    ],
+    "approxPriceUSD": 17,
+    "note": ""
+   },
+   {
+    "name": "Renewing SA Cleanser",
+    "brand": "CeraVe",
+    "activeIds": [
+     "bha"
+    ],
+    "skinTypes": [
+     "oily",
+     "combination"
+    ],
+    "approxPriceUSD": 15,
+    "note": "Salicylic acid wash."
+   },
+   {
+    "name": "Acne Foaming Cream Cleanser (4% BPO)",
+    "brand": "CeraVe",
+    "activeIds": [
+     "benzoyl_peroxide"
+    ],
+    "skinTypes": [
+     "oily",
+     "combination",
+     "normal"
+    ],
+    "approxPriceUSD": 15,
+    "note": "Leave on 1-2 min, rinse."
+   },
+   {
+    "name": "PanOxyl Acne Foaming Wash 4% / 10%",
+    "brand": "PanOxyl",
+    "activeIds": [
+     "benzoyl_peroxide"
+    ],
+    "skinTypes": [
+     "oily",
+     "combination",
+     "normal"
+    ],
+    "approxPriceUSD": 11,
+    "note": "4% for face, 10% for chest and back."
+   }
+  ],
+  "treatment": [
+   {
+    "name": "Differin Gel (adapalene 0.1%)",
+    "brand": "Differin",
+    "activeIds": [
+     "adapalene"
+    ],
+    "skinTypes": [
+     "oily",
+     "combination",
+     "normal"
+    ],
+    "approxPriceUSD": 15,
+    "note": "Store brands (adapalene gel 0.1%) are the same drug, cheaper."
+   },
+   {
+    "name": "Niacinamide 10% + Zinc 1%",
+    "brand": "The Ordinary",
+    "activeIds": [
+     "niacinamide"
+    ],
+    "skinTypes": [
+     "oily",
+     "combination"
+    ],
+    "approxPriceUSD": 6,
+    "note": "10% irritates some people; a moisturizer with niacinamide is enough for many."
+   },
+   {
+    "name": "Azelaic Acid Suspension 10%",
+    "brand": "The Ordinary",
+    "activeIds": [
+     "azelaic_acid"
+    ],
+    "skinTypes": [
+     "oily",
+     "dry",
+     "combination",
+     "normal",
+     "sensitive"
+    ],
+    "approxPriceUSD": 12,
+    "note": ""
+   },
+   {
+    "name": "Skin Perfecting 2% BHA Liquid Exfoliant",
+    "brand": "Paula's Choice",
+    "activeIds": [
+     "bha"
+    ],
+    "skinTypes": [
+     "oily",
+     "combination"
+    ],
+    "approxPriceUSD": 35,
+    "note": "2-3 nights a week."
+   },
+   {
+    "name": "Glycolic Acid 7% Exfoliating Toner",
+    "brand": "The Ordinary",
+    "activeIds": [
+     "aha"
+    ],
+    "skinTypes": [
+     "normal",
+     "combination",
+     "oily"
+    ],
+    "approxPriceUSD": 13,
+    "note": "1-2 nights a week."
+   },
+   {
+    "name": "Resurfacing Retinol Serum",
+    "brand": "CeraVe",
+    "activeIds": [
+     "retinol",
+     "niacinamide",
+     "ceramides"
+    ],
+    "skinTypes": [
+     "normal",
+     "dry",
+     "combination"
+    ],
+    "approxPriceUSD": 22,
+    "note": "Gentle retinol."
+   },
+   {
+    "name": "Retinal 0.2% Emulsion",
+    "brand": "The Ordinary",
+    "activeIds": [
+     "retinol"
+    ],
+    "skinTypes": [
+     "normal",
+     "combination"
+    ],
+    "approxPriceUSD": 15,
+    "note": "Retinaldehyde, a step stronger than retinol."
+   },
+   {
+    "name": "Vitamin C 10% Serum",
+    "brand": "La Roche-Posay",
+    "activeIds": [
+     "vitamin_c"
+    ],
+    "skinTypes": [
+     "normal",
+     "dry",
+     "combination"
+    ],
+    "approxPriceUSD": 40,
+    "note": "Pure vitamin C; keep it closed and cool."
+   },
+   {
+    "name": "Tranexamic Acid serum (e.g. Naturium Tranexamic Topical Acid 5%)",
+    "brand": "Naturium",
+    "activeIds": [
+     "tranexamic_acid",
+     "niacinamide"
+    ],
+    "skinTypes": [
+     "oily",
+     "dry",
+     "combination",
+     "normal"
+    ],
+    "approxPriceUSD": 20,
+    "note": ""
+   },
+   {
+    "name": "Medicated Acne Spot Treatment (sulfur 3%)",
+    "brand": "Mario Badescu / De La Cruz",
+    "activeIds": [
+     "sulfur"
+    ],
+    "skinTypes": [
+     "oily",
+     "combination",
+     "normal"
+    ],
+    "approxPriceUSD": 10,
+    "note": "Overnight on single spots."
+   }
+  ],
+  "moisturizer": [
+   {
+    "name": "PM Facial Moisturizing Lotion",
+    "brand": "CeraVe",
+    "activeIds": [
+     "niacinamide",
+     "ceramides"
+    ],
+    "skinTypes": [
+     "oily",
+     "combination",
+     "normal"
+    ],
+    "approxPriceUSD": 17,
+    "note": "Light, good over adapalene."
+   },
+   {
+    "name": "Moisturizing Cream",
+    "brand": "CeraVe",
+    "activeIds": [
+     "ceramides"
+    ],
+    "skinTypes": [
+     "dry",
+     "sensitive"
+    ],
+    "approxPriceUSD": 18,
+    "note": "Thick; face and body."
+   },
+   {
+    "name": "Toleriane Double Repair Face Moisturizer",
+    "brand": "La Roche-Posay",
+    "activeIds": [
+     "ceramides",
+     "niacinamide"
+    ],
+    "skinTypes": [
+     "dry",
+     "normal",
+     "sensitive"
+    ],
+    "approxPriceUSD": 23,
+    "note": ""
+   },
+   {
+    "name": "Hydro Boost Water Gel",
+    "brand": "Neutrogena",
+    "activeIds": [
+     "hyaluronic_acid"
+    ],
+    "skinTypes": [
+     "oily",
+     "combination"
+    ],
+    "approxPriceUSD": 20,
+    "note": "Pick the fragrance-free version."
+   },
+   {
+    "name": "Cicaplast Baume B5",
+    "brand": "La Roche-Posay",
+    "activeIds": [
+     "centella"
+    ],
+    "skinTypes": [
+     "dry",
+     "sensitive"
+    ],
+    "approxPriceUSD": 16,
+    "note": "For raw, irritated patches."
+   }
+  ],
+  "spf": [
+   {
+    "name": "Anthelios Melt-in Milk / Clear Skin SPF 60",
+    "brand": "La Roche-Posay",
+    "activeIds": [
+     "sunscreen"
+    ],
+    "skinTypes": [
+     "oily",
+     "combination",
+     "normal"
+    ],
+    "approxPriceUSD": 25,
+    "note": "Clear Skin is the oily-skin version."
+   },
+   {
+    "name": "UV Clear SPF 46",
+    "brand": "EltaMD",
+    "activeIds": [
+     "sunscreen",
+     "niacinamide"
+    ],
+    "skinTypes": [
+     "oily",
+     "sensitive",
+     "combination"
+    ],
+    "approxPriceUSD": 43,
+    "note": "Favorite for acne-prone skin."
+   },
+   {
+    "name": "AM Facial Moisturizing Lotion SPF 30",
+    "brand": "CeraVe",
+    "activeIds": [
+     "sunscreen",
+     "ceramides",
+     "niacinamide"
+    ],
+    "skinTypes": [
+     "normal",
+     "dry"
+    ],
+    "approxPriceUSD": 18,
+    "note": "Moisturizer and SPF in one."
+   },
+   {
+    "name": "Clear Face Oil-Free SPF 50",
+    "brand": "Neutrogena",
+    "activeIds": [
+     "sunscreen"
+    ],
+    "skinTypes": [
+     "oily",
+     "combination"
+    ],
+    "approxPriceUSD": 12,
+    "note": ""
+   },
+   {
+    "name": "Hydrating Mineral Sunscreen SPF 30 (tinted)",
+    "brand": "CeraVe",
+    "activeIds": [
+     "sunscreen"
+    ],
+    "skinTypes": [
+     "dry",
+     "sensitive"
+    ],
+    "approxPriceUSD": 17,
+    "note": "Mineral; tinted cuts the white cast."
+   }
+  ]
+ },
+ "sources": [
+  {
+   "title": "Reynolds RV et al. Guidelines of care for the management of acne vulgaris. J Am Acad Dermatol 2024",
+   "url": "https://www.jaad.org/article/S0190-9622(23)03389-3/fulltext"
+  },
+  {
+   "title": "AAD: Updated guidelines for acne management (news release)",
+   "url": "https://www.aad.org/news/updated-guidelines-acne-management"
+  },
+  {
+   "title": "AAD: Acne diagnosis and treatment",
+   "url": "https://www.aad.org/public/diseases/acne/derm-treat/treat"
+  },
+  {
+   "title": "AAD: How to apply sunscreen",
+   "url": "https://www.aad.org/public/everyday-care/sun-protection/shade-clothing-sunscreen/how-to-apply-sunscreen"
+  },
+  {
+   "title": "AAD: Skin care tips for men",
+   "url": "https://www.aad.org/public/everyday-care/skin-care-basics/care/skin-care-for-men"
+  },
+  {
+   "title": "Topical retinoids in acne vulgaris: a systematic review (Am J Clin Dermatol 2019)",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/30674002/"
+  },
+  {
+   "title": "Topical tretinoin for treating photoaging: a systematic review of RCTs (2022)",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/35620028/"
+  },
+  {
+   "title": "Safety and efficacy of fixed-dose adapalene + benzoyl peroxide: systematic review of clinical trials (2024)",
+   "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11472206/"
+  },
+  {
+   "title": "The role of nicotinamide in acne treatment (review)",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/28220628/"
+  },
+  {
+   "title": "Efficacy and safety of tranexamic acid in melasma: meta-analysis and systematic review (Acta Derm Venereol 2017)",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/28374042/"
+  },
+  {
+   "title": "Diet and acne: a systematic review (JAAD International 2022)",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/35373155/"
+  },
+  {
+   "title": "Serum zinc levels and efficacy of zinc treatment in acne vulgaris: systematic review and meta-analysis (Dermatol Ther 2020)",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/32860489/"
+  },
+  {
+   "title": "Smith RN et al. A low-glycemic-load diet improves symptoms in acne vulgaris patients: RCT (Am J Clin Nutr 2007)",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/17616769/"
+  },
+  {
+   "title": "Topical azelaic acid effective for acne, melasma, rosacea (systematic review summary, HCPLive 2023)",
+   "url": "https://www.hcplive.com/view/topical-azelaic-acid-effective-for-treatment-of-acne-melasma-rosacea"
+  }
+ ]
+}

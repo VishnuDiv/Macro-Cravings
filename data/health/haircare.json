@@ -1,0 +1,1867 @@
+{
+ "_schema": {
+  "version": "1",
+  "evidenceScale": {
+   "A": "Strong: several good randomized trials or meta-analyses; standard dermatology treatment",
+   "B": "Moderate: randomized trials that agree, but smaller, shorter or with some bias",
+   "C": "Weak: one small trial, observational data or mechanism only",
+   "D": "No good evidence for hair growth (or only helps if you are deficient)"
+  },
+  "interventions[]": "{id, name, evidence: A|B|C|D, type: Rx|OTC|procedure|lifestyle|supplement, rxNote?: string (how to get it: talk to a dermatologist), whatItDoes, howToUse, whenToExpect, sideEffects, cost (USD, rough), regrowVsMaintain: maintain|maintain+regrow|regrow|moves-hair|supportive, rank: int (1 = strongest for typical male pattern loss)}",
+  "myths[]": "{myth, truth}",
+  "norwood[]": "{stage: 1..7, label, description, typicalAdvice}",
+  "plans[]": "{id, name, norwoodRange: [min, max], goal, steps: [{interventionId, how, priority: core|add-on|optional}], notes}",
+  "styles[]": "{id, name, description, suits: {faceShapes: [oval|round|square|oblong|heart|diamond], hairTypes: [straight|wavy|curly|coily], norwoodMax: 1..7, lengths: [buzz|short|medium|long]}, receding: great|ok|avoid, barberAsk: exact words for the barber, maintenance: low|med|high, productTips}",
+  "faceShapeGuide": "{howToMeasure: [string], shapes: [{id, name, howToTell, aimFor, goodStyles: [styleId], avoid}]}",
+  "routineItems[]": "{id, name, schedule: daily|every-2-days|2x-week|weekly, timeOfDay?: am|pm|any, linkedIntervention: interventionId, note}",
+  "guides[]": "{id, title, subtitle, icon (SF Symbol), sections: [{heading, body, bullets?, table?: {columns, rows}}]}: same format as data/catalog/guides.json",
+  "sources[]": "{title, url}"
+ },
+ "interventions": [
+  {
+   "id": "finasteride_oral",
+   "name": "Finasteride 1 mg (oral)",
+   "evidence": "A",
+   "type": "Rx",
+   "rank": 2,
+   "rxNote": "Prescription. Talk to a dermatologist (in person or telehealth). Generic is cheap.",
+   "whatItDoes": "Blocks the enzyme that turns testosterone into DHT, the hormone that shrinks follicles on the top of the head. Cuts scalp DHT by about 60%. It's the main way to stop the hairline from moving further back, and many men regrow some hair.",
+   "howToUse": "One 1 mg tablet a day, any time, with or without food. Taking it every day matters more than the time. Has to be continued: if you stop, the loss resumes over about a year.",
+   "whenToExpect": "Shedding slows at 3-6 months; visible regrowth at 6-12 months. In the 2-year trials about 83% of men on finasteride had no further visible loss (vs about 28% on placebo), and about two-thirds looked better. Best at the crown; the front hairline responds less but usually stops receding.",
+   "sideEffects": "In the original 1-year trials, sexual side effects were slightly more common than placebo: lower libido 1.8% vs 1.3%, erection problems 1.3% vs 0.7%, ejaculation problems about 1.2% vs 0.7%. Overall roughly 1-2 extra men in 100. Most went away after stopping, and many went away while still taking it (by year 5 each was 0.3% or less). A 2018 meta-analysis of 15 trials found about a 1.7x relative risk of sexual dysfunction. Trial reporting of these effects was often poor, so true rates may be somewhat higher. Other: mood changes and depression (now on the label), breast tenderness (rare), and it halves PSA readings (tell your doctor). 'Post-finasteride syndrome': some men report sexual, mental or physical symptoms that last after stopping. The FDA label mentions persistent sexual side effects and suicidal thoughts. Whether finasteride causes it, how often, and by what mechanism is not established: there are case reports and patient surveys but no controlled studies showing it. Worth knowing, and a reason to stop and talk to your doctor if anything changes.",
+   "cost": "About $10-30/month generic",
+   "regrowVsMaintain": "maintain+regrow"
+  },
+  {
+   "id": "finasteride_topical",
+   "name": "Finasteride (topical spray/solution)",
+   "evidence": "B",
+   "type": "Rx",
+   "rank": 4,
+   "rxNote": "Prescription (compounded in the US). Talk to a dermatologist or a telehealth hair clinic.",
+   "whatItDoes": "Finasteride applied to the scalp. Trials show hair results close to the pill with much less drop in blood DHT. An option for men worried about the pill's side effects.",
+   "howToUse": "Usually 1 spray pump or 1 mL to thinning areas once a day, often combined with minoxidil in one solution.",
+   "whenToExpect": "Like the pill: 6-12 months.",
+   "sideEffects": "It still gets into the blood (less than the pill), so systemic side effects are less likely but possible. Scalp itch or redness.",
+   "cost": "About $25-60/month",
+   "regrowVsMaintain": "maintain+regrow"
+  },
+  {
+   "id": "dutasteride",
+   "name": "Dutasteride 0.5 mg (oral)",
+   "evidence": "A",
+   "type": "Rx",
+   "rank": 1,
+   "rxNote": "Prescription, off-label for hair in the US (approved for hair loss in Korea and Japan). Talk to a dermatologist; usually a step up after finasteride.",
+   "whatItDoes": "Blocks both forms of the DHT-making enzyme, so it drops DHT further than finasteride. In head-to-head trials and a 2022 network meta-analysis it regrew more hair than finasteride.",
+   "howToUse": "0.5 mg capsule daily. Some dermatologists use lower or weekly doses, or scalp injections (mesotherapy).",
+   "whenToExpect": "6-12 months.",
+   "sideEffects": "Similar types to finasteride, roughly similar or slightly higher rates. It stays in the body for months after stopping, so side effects can take longer to fade. Less long-term data at hair-loss use than finasteride. No blood donation while on it.",
+   "cost": "About $15-40/month generic",
+   "regrowVsMaintain": "maintain+regrow"
+  },
+  {
+   "id": "minoxidil_topical",
+   "name": "Minoxidil 5% (topical foam or liquid)",
+   "evidence": "A",
+   "type": "OTC",
+   "rank": 5,
+   "whatItDoes": "Keeps follicles in the growing phase longer and thickens thin hairs. It doesn't touch DHT, so it works best with finasteride. Works better at the crown and mid-scalp than at the temples.",
+   "howToUse": "Foam: half a capful once a day on a dry scalp. Liquid: 1 mL twice a day. Rub into the scalp, not the hair. Let it dry before bed or styling (or apply before a shower-free night). Must be continued.",
+   "whenToExpect": "Shedding phase: in weeks 2-8 many men shed more as old hairs are pushed out by new ones. That's a sign it's working; don't quit. Visible results at 3-6 months, full effect at about 12 months. If you stop, the gains fall out over 3-4 months.",
+   "sideEffects": "Itchy or flaky scalp (usually from propylene glycol in the liquid; the foam avoids it). Unwanted hair growth on the forehead or face if it drips. Rarely dizziness or fast heartbeat. Toxic to cats: keep pets away from wet hair and pillows.",
+   "cost": "About $10-25/month (Kirkland, Rogaine, store brands)",
+   "regrowVsMaintain": "maintain+regrow"
+  },
+  {
+   "id": "minoxidil_oral",
+   "name": "Low-dose oral minoxidil (LDOM)",
+   "evidence": "B",
+   "type": "Rx",
+   "rank": 3,
+   "rxNote": "Prescription, off-label. Talk to a dermatologist; they'll check your blood pressure and heart history first.",
+   "whatItDoes": "Minoxidil as a small pill (usually 1.25-5 mg a day for men, versus 10-40 mg for blood pressure). Easier than daily scalp application and often works better, especially for men who don't respond to the topical. Increasingly first-line in dermatology.",
+   "howToUse": "One tablet daily, often starting at 1.25-2.5 mg. Commonly combined with finasteride.",
+   "whenToExpect": "Same shedding phase as topical in the first 2 months; results at 3-6 months, more at 12.",
+   "sideEffects": "Extra body and facial hair (the most common, roughly 15-25%, dose-dependent). Ankle swelling, dizziness on standing, fast heartbeat in a few percent. Rare serious heart effects at higher doses. Not for people with heart disease or low blood pressure. Same shedding phase.",
+   "cost": "About $5-20/month generic",
+   "regrowVsMaintain": "maintain+regrow"
+  },
+  {
+   "id": "ketoconazole_shampoo",
+   "name": "Ketoconazole shampoo (1% OTC, 2% Rx)",
+   "evidence": "C",
+   "type": "OTC",
+   "rank": 8,
+   "rxNote": "1% (Nizoral) is OTC; 2% is prescription. A dermatologist can prescribe 2%.",
+   "whatItDoes": "Antifungal shampoo that clears dandruff and scalp inflammation. Small studies suggest a mild anti-androgen effect on the scalp and a small boost to hair density. Cheap, low-risk add-on, not a main treatment.",
+   "howToUse": "2-3 times a week. Lather onto the scalp, leave 3-5 minutes, rinse. Regular shampoo on other days.",
+   "whenToExpect": "Dandruff: 2-4 weeks. Any hair effect: 3-6 months.",
+   "sideEffects": "Dryness of hair; use conditioner on the lengths.",
+   "cost": "About $10-20 per bottle (2-3 months)",
+   "regrowVsMaintain": "supportive"
+  },
+  {
+   "id": "microneedling",
+   "name": "Microneedling (with minoxidil)",
+   "evidence": "B",
+   "type": "procedure",
+   "rank": 6,
+   "whatItDoes": "Tiny needles make micro-injuries in the scalp, which trigger growth signals and help minoxidil absorb. Several randomized trials and meta-analyses show microneedling + minoxidil beats minoxidil alone; it helps less on its own.",
+   "howToUse": "At home: a 1.0-1.5 mm dermaroller or derma-stamp once a week (0.5 mm can be used more often). Clean scalp, roll each area 4-6 times in each direction until mildly pink, not bleeding heavily. Sanitize with alcohol after. Wait 24 hours before applying minoxidil. Replace the roller every 10-15 uses.",
+   "whenToExpect": "12 weeks in most trials; 6 months to judge.",
+   "sideEffects": "Redness, tenderness and pinpoint bleeding for a day. Infection if tools aren't clean. Don't roll over acne or irritated scalp.",
+   "cost": "$15-40 for a roller; clinic sessions $150-400",
+   "regrowVsMaintain": "regrow"
+  },
+  {
+   "id": "lllt",
+   "name": "Low-level laser / LED (LLLT)",
+   "evidence": "B",
+   "type": "OTC",
+   "rank": 9,
+   "whatItDoes": "Red light (about 650 nm) from a cap, helmet or comb. Thought to boost follicle energy. Several sham-controlled trials show modest density gains and devices are FDA-cleared, but trials are mostly industry-funded and quality is low.",
+   "howToUse": "Usually 3 times a week, 10-30 minutes depending on the device. Add-on to medication, not a replacement.",
+   "whenToExpect": "4-6 months.",
+   "sideEffects": "Few: mild scalp warmth or itch. The main downside is price and time.",
+   "cost": "$200-1,000+ one-time",
+   "regrowVsMaintain": "supportive"
+  },
+  {
+   "id": "prp",
+   "name": "PRP (platelet-rich plasma injections)",
+   "evidence": "B",
+   "type": "procedure",
+   "rank": 7,
+   "whatItDoes": "Your own blood is spun down and the platelet-rich part is injected into the scalp. Small randomized trials show more hair density than placebo at 3-6 months, but protocols vary a lot and the effect needs repeat sessions.",
+   "howToUse": "Usually 3 sessions a month apart, then a touch-up every 4-6 months. Done in a dermatology or hair clinic.",
+   "whenToExpect": "3-6 months after the first round.",
+   "sideEffects": "Scalp pain, swelling, a brief shed. Low risk otherwise.",
+   "cost": "$500-1,500 per session",
+   "regrowVsMaintain": "regrow"
+  },
+  {
+   "id": "hair_transplant",
+   "name": "Hair transplant (FUE / FUT)",
+   "evidence": "A",
+   "type": "procedure",
+   "rank": 10,
+   "whatItDoes": "Moves DHT-resistant follicles from the back of the head to the hairline or crown. The only way to rebuild a hairline that's fully gone. Transplanted hair usually lasts, but the hair around it keeps thinning without medication.",
+   "howToUse": "Consult a hair-restoration surgeon. Most want you stable on finasteride (or similar) for 6-12 months first and are cautious under age 25. Results depend heavily on the surgeon.",
+   "whenToExpect": "Transplanted hairs shed at 2-6 weeks, grow from about month 4, final result at 12-18 months.",
+   "sideEffects": "Scarring at the donor area (linear with FUT, dotted with FUE), swelling, numbness, shock loss of nearby hair, unnatural results with poor surgeons.",
+   "cost": "$4,000-15,000+ in the US (cheaper abroad, with more risk)",
+   "regrowVsMaintain": "moves-hair"
+  },
+  {
+   "id": "rosemary_oil",
+   "name": "Rosemary oil",
+   "evidence": "C",
+   "type": "OTC",
+   "rank": 11,
+   "whatItDoes": "One 6-month trial in 100 people found rosemary oil about as good as 2% minoxidil (both modest), with less itch. Only one trial, compared to the weak strength of minoxidil, not to placebo. Fine as an extra if you like it; not a substitute for proven treatment.",
+   "howToUse": "A few drops of rosemary essential oil diluted in a carrier oil (or a ready-made rosemary hair oil), massaged into the scalp daily or a few times a week, washed out after a few hours.",
+   "whenToExpect": "6 months in the trial.",
+   "sideEffects": "Scalp irritation or allergy; always dilute. Patch-test first.",
+   "cost": "$10-20",
+   "regrowVsMaintain": "supportive"
+  },
+  {
+   "id": "pumpkin_seed_oil",
+   "name": "Pumpkin seed oil (oral)",
+   "evidence": "C",
+   "type": "supplement",
+   "rank": 12,
+   "whatItDoes": "One randomized trial (76 men, 400 mg a day for 24 weeks) found a bigger hair-count increase than placebo (about 40% vs 10%). The capsule used also had other ingredients. Promising but unconfirmed.",
+   "howToUse": "400 mg capsule daily with food, if you want to try it.",
+   "whenToExpect": "6 months.",
+   "sideEffects": "Mild stomach upset.",
+   "cost": "$10-20/month",
+   "regrowVsMaintain": "supportive"
+  },
+  {
+   "id": "saw_palmetto",
+   "name": "Saw palmetto",
+   "evidence": "C",
+   "type": "supplement",
+   "rank": 13,
+   "whatItDoes": "A plant extract with a weak DHT-blocking effect. Small trials show some benefit, clearly less than finasteride. Supplement quality varies a lot.",
+   "howToUse": "Usually 320 mg a day orally, or in topical products.",
+   "whenToExpect": "4-6 months.",
+   "sideEffects": "Stomach upset, headache; may affect PSA readings. Not proven safer than finasteride for sexual side effects.",
+   "cost": "$10-20/month",
+   "regrowVsMaintain": "supportive"
+  },
+  {
+   "id": "biotin",
+   "name": "Biotin",
+   "evidence": "D",
+   "type": "supplement",
+   "rank": 16,
+   "whatItDoes": "Only helps hair if you're actually deficient, which is rare. No evidence it helps male pattern hair loss.",
+   "howToUse": "Skip it unless a doctor finds a deficiency. If you take it, stop 2-3 days before blood tests: biotin can make thyroid and heart lab results wrong (FDA warning).",
+   "whenToExpect": "Not applicable for pattern loss.",
+   "sideEffects": "Interferes with lab tests; acne in some people.",
+   "cost": "$5-15/month (usually wasted)",
+   "regrowVsMaintain": "supportive"
+  },
+  {
+   "id": "nutrition_basics",
+   "name": "Protein, iron, vitamin D, zinc, B12 (fix deficiencies)",
+   "evidence": "C",
+   "type": "lifestyle",
+   "rank": 14,
+   "whatItDoes": "Hair is protein and is one of the first things the body cuts when short on calories, protein or iron. Deficiency can cause diffuse shedding (telogen effluvium) on top of pattern loss. Fixing a real deficiency helps; extra supplements when levels are normal don't. Being vegetarian and cutting raises the odds of low iron, B12, zinc or protein.",
+   "howToUse": "Hit your protein target daily (about 0.7-1 g per lb of body weight while cutting). Avoid crash cuts (more than about 1% of body weight per week). Ask your doctor to check ferritin, vitamin D, B12 and a blood count if you notice shedding. Supplement only what's low.",
+   "whenToExpect": "Shedding from a deficiency settles 3-6 months after it's fixed.",
+   "sideEffects": "Too much iron, zinc or vitamin A is harmful; don't megadose without a test.",
+   "cost": "Blood test via your doctor",
+   "regrowVsMaintain": "supportive"
+  },
+  {
+   "id": "stress_sleep",
+   "name": "Stress, sleep and crash dieting",
+   "evidence": "C",
+   "type": "lifestyle",
+   "rank": 15,
+   "whatItDoes": "Big stressors (illness, fever, surgery, rapid weight loss, severe stress) can push many hairs into shedding at once, 2-3 months later. This shedding is temporary, but it makes pattern loss look worse. Sleep and stress don't cause male pattern baldness.",
+   "howToUse": "Steady cut rather than crash cut; 7-9 hours of sleep; if you suddenly shed handfuls, think back 3 months for a trigger.",
+   "whenToExpect": "Telogen shedding usually recovers in 6-9 months once the trigger is gone.",
+   "sideEffects": "None.",
+   "cost": "Free",
+   "regrowVsMaintain": "supportive"
+  },
+  {
+   "id": "scalp_massage",
+   "name": "Scalp massage",
+   "evidence": "C",
+   "type": "lifestyle",
+   "rank": 17,
+   "whatItDoes": "A tiny study found daily 4-minute scalp massage thickened hair over 24 weeks, and a survey of people doing it reported less loss. Free and harmless; a good habit to pair with applying minoxidil or rosemary oil.",
+   "howToUse": "Fingertips (not nails), firm pressure, small circles, 4-5 minutes a day.",
+   "whenToExpect": "If any: 4-6 months.",
+   "sideEffects": "None, unless you pull hair.",
+   "cost": "Free",
+   "regrowVsMaintain": "supportive"
+  }
+ ],
+ "myths": [
+  {
+   "myth": "Hats, helmets or wearing your hair up cause baldness.",
+   "truth": "No. Only tight hairstyles that pull for years (tight buns, braids) cause traction loss, which is different from male pattern loss."
+  },
+  {
+   "myth": "Baldness comes from your mother's side only.",
+   "truth": "The main gene is on the X chromosome (from your mother), but many genes from both sides contribute. Look at both families."
+  },
+  {
+   "myth": "Washing your hair often makes it fall out.",
+   "truth": "Hairs you see in the shower were already shed. Washing just collects them. Normal shedding is 50-100 hairs a day."
+  },
+  {
+   "myth": "Biotin and hair vitamins regrow hair.",
+   "truth": "Only if you're deficient. For pattern loss they do nothing measurable."
+  },
+  {
+   "myth": "Minoxidil's shedding means it's making you bald.",
+   "truth": "Early shedding in weeks 2-8 is old hairs making way for new ones. It's a sign it's working. Push through to at least month 6."
+  },
+  {
+   "myth": "Rosemary oil is as good as minoxidil.",
+   "truth": "One trial compared it to the weak 2% minoxidil and both did modestly. It hasn't been tested against 5% minoxidil, oral minoxidil or finasteride."
+  },
+  {
+   "myth": "Finasteride ruins everyone's sex life.",
+   "truth": "In trials, sexual side effects were 1-2 percentage points more common than placebo and mostly went away. Some men report lasting effects; that's debated and not well understood. It's a real but small risk to weigh with a doctor."
+  },
+  {
+   "myth": "Once it's gone, nothing can bring it back.",
+   "truth": "Thinned hair can often be thickened again with medication, especially at the crown. Fully bald areas that have been smooth for years usually need a transplant."
+  },
+  {
+   "myth": "Caffeine shampoos and 'DHT-blocking' shampoos regrow hair.",
+   "truth": "Shampoo is rinsed off in minutes. Evidence is weak to none, except some support for ketoconazole as an add-on."
+  },
+  {
+   "myth": "Shaving your head makes hair grow back thicker.",
+   "truth": "No. Shaving doesn't change follicles. Regrowth just has a blunt tip, so it feels coarser."
+  },
+  {
+   "myth": "You can stop treatment once your hair is back.",
+   "truth": "Finasteride and minoxidil only work while you use them. Stop and the loss catches up over 6-12 months."
+  }
+ ],
+ "norwood": [
+  {
+   "stage": 1,
+   "label": "Norwood 1",
+   "description": "No real recession. Adult hairline sits about where it was in your teens, or with a slight, even rise.",
+   "typicalAdvice": "Nothing needed. Take baseline hairline and crown photos if baldness runs in the family."
+  },
+  {
+   "stage": 2,
+   "label": "Norwood 2",
+   "description": "Slight recession at the temples, roughly 1-2 cm, often symmetrical. Many men's 'mature hairline' stops here.",
+   "typicalAdvice": "Watch it with monthly photos. If it keeps moving over 6-12 months, this is the best time to start treatment."
+  },
+  {
+   "stage": 3,
+   "label": "Norwood 3",
+   "description": "Clear M or V shape: deep temple recession with bare or thinly covered skin. First stage counted as balding. 'Norwood 3 vertex' adds thinning at the crown.",
+   "typicalAdvice": "Treatment works best from here. Finasteride + minoxidil is the standard core."
+  },
+  {
+   "stage": 4,
+   "label": "Norwood 4",
+   "description": "Further recession at the front plus a visible bald or thin spot at the crown, still separated by a solid band of hair across the top.",
+   "typicalAdvice": "Medication to keep what you have and regrow at the crown; transplant consult is reasonable once stable."
+  },
+  {
+   "stage": 5,
+   "label": "Norwood 5",
+   "description": "Front and crown areas are bigger and the band between them is thin and narrowing.",
+   "typicalAdvice": "Medication still helps keep the remaining hair. Short styles or a buzz look best. Transplant possible but limited by donor hair."
+  },
+  {
+   "stage": 6,
+   "label": "Norwood 6",
+   "description": "The band across the top is gone: the front and crown bald areas have joined. Hair remains on the sides and back.",
+   "typicalAdvice": "Regrowth is unlikely. A clean buzz or shaved head looks sharp. Transplant only partial coverage."
+  },
+  {
+   "stage": 7,
+   "label": "Norwood 7",
+   "description": "Only a horseshoe band of hair remains around the sides and back, often thin.",
+   "typicalAdvice": "Shaved head or very short buzz, a good beard and scalp sunscreen."
+  }
+ ],
+ "plans": [
+  {
+   "id": "nw1_2_watch",
+   "name": "Early signs: watch and protect",
+   "norwoodRange": [
+    1,
+    2
+   ],
+   "goal": "Find out if it's moving, and protect the hairline cheaply.",
+   "steps": [
+    {
+     "interventionId": "ketoconazole_shampoo",
+     "how": "2-3 times a week, leave on 3-5 minutes",
+     "priority": "core"
+    },
+    {
+     "interventionId": "nutrition_basics",
+     "how": "Protein target daily, steady cut, check ferritin, vitamin D and B12",
+     "priority": "core"
+    },
+    {
+     "interventionId": "minoxidil_topical",
+     "how": "5% foam once a day if photos show recession over 6 months",
+     "priority": "add-on"
+    },
+    {
+     "interventionId": "finasteride_oral",
+     "how": "Ask a dermatologist if recession is clearly progressing; earlier start keeps more hair",
+     "priority": "add-on"
+    },
+    {
+     "interventionId": "scalp_massage",
+     "how": "4-5 minutes a day",
+     "priority": "optional"
+    }
+   ],
+   "notes": "Take hairline photos monthly in the same light. A Norwood 2 that stays put for a year is often just a mature hairline."
+  },
+  {
+   "id": "nw2_3_stop_regrow",
+   "name": "Receding: stop it and regrow",
+   "norwoodRange": [
+    2,
+    3
+   ],
+   "goal": "Stop further recession and thicken the temples and front.",
+   "steps": [
+    {
+     "interventionId": "finasteride_oral",
+     "how": "1 mg daily via a dermatologist (or topical finasteride if you prefer)",
+     "priority": "core"
+    },
+    {
+     "interventionId": "minoxidil_topical",
+     "how": "5% foam once a day on temples and front; or ask about low-dose oral minoxidil",
+     "priority": "core"
+    },
+    {
+     "interventionId": "ketoconazole_shampoo",
+     "how": "2-3 times a week",
+     "priority": "core"
+    },
+    {
+     "interventionId": "microneedling",
+     "how": "1.0-1.5 mm once a week; minoxidil skipped for 24 h after",
+     "priority": "add-on"
+    },
+    {
+     "interventionId": "nutrition_basics",
+     "how": "Protein target, no crash cut",
+     "priority": "core"
+    }
+   ],
+   "notes": "Expect a shed in months 1-2 from minoxidil. Judge at 6 months, decide at 12. The temples respond less than the crown; stopping recession there is already a win."
+  },
+  {
+   "id": "nw3v_4_crown",
+   "name": "Front and crown thinning",
+   "norwoodRange": [
+    3,
+    4
+   ],
+   "goal": "Keep what you have and regrow the crown, where medication works best.",
+   "steps": [
+    {
+     "interventionId": "finasteride_oral",
+     "how": "1 mg daily (a dermatologist may suggest dutasteride if response is weak after a year)",
+     "priority": "core"
+    },
+    {
+     "interventionId": "minoxidil_oral",
+     "how": "Low-dose oral minoxidil via a dermatologist, or 5% topical twice daily",
+     "priority": "core"
+    },
+    {
+     "interventionId": "ketoconazole_shampoo",
+     "how": "2-3 times a week",
+     "priority": "core"
+    },
+    {
+     "interventionId": "microneedling",
+     "how": "Weekly on the crown",
+     "priority": "add-on"
+    },
+    {
+     "interventionId": "lllt",
+     "how": "3 times a week if budget allows",
+     "priority": "optional"
+    },
+    {
+     "interventionId": "prp",
+     "how": "Only if you have the budget and want extra density",
+     "priority": "optional"
+    }
+   ],
+   "notes": "Crown photos (top-down, same light) monthly. A transplant consult makes sense after 12 months stable on meds."
+  },
+  {
+   "id": "nw5_7_keep_or_embrace",
+   "name": "Advanced: keep what's left, or own the look",
+   "norwoodRange": [
+    5,
+    7
+   ],
+   "goal": "Decide between holding remaining hair and going short or shaved.",
+   "steps": [
+    {
+     "interventionId": "finasteride_oral",
+     "how": "Keeps remaining hair if you want to keep it",
+     "priority": "add-on"
+    },
+    {
+     "interventionId": "minoxidil_oral",
+     "how": "Via a dermatologist, if keeping hair",
+     "priority": "add-on"
+    },
+    {
+     "interventionId": "hair_transplant",
+     "how": "Consult for partial coverage (front third) if donor hair is good",
+     "priority": "optional"
+    },
+    {
+     "interventionId": "ketoconazole_shampoo",
+     "how": "2x a week if the scalp gets flaky or itchy",
+     "priority": "optional"
+    }
+   ],
+   "notes": "A confident buzz or shaved head with a groomed beard often looks better than holding on to thin hair. Scalp SPF matters at this stage."
+  },
+  {
+   "id": "no_meds",
+   "name": "No prescription meds",
+   "norwoodRange": [
+    1,
+    4
+   ],
+   "goal": "Do the most you can with OTC options.",
+   "steps": [
+    {
+     "interventionId": "minoxidil_topical",
+     "how": "5% foam daily: the strongest OTC option",
+     "priority": "core"
+    },
+    {
+     "interventionId": "microneedling",
+     "how": "Weekly, to boost minoxidil",
+     "priority": "core"
+    },
+    {
+     "interventionId": "ketoconazole_shampoo",
+     "how": "1% OTC, 2-3 times a week",
+     "priority": "core"
+    },
+    {
+     "interventionId": "lllt",
+     "how": "Optional cap or comb",
+     "priority": "optional"
+    },
+    {
+     "interventionId": "rosemary_oil",
+     "how": "Optional, diluted, a few times a week",
+     "priority": "optional"
+    },
+    {
+     "interventionId": "pumpkin_seed_oil",
+     "how": "Optional 400 mg daily",
+     "priority": "optional"
+    }
+   ],
+   "notes": "Without a DHT blocker, minoxidil slows loss but usually doesn't stop it long-term. Revisit finasteride (topical is an option) if photos keep slipping."
+  }
+ ],
+ "styles": [
+  {
+   "id": "textured_crop",
+   "name": "Textured crop",
+   "description": "Short choppy top pushed forward with a short fringe, faded sides. The forward texture covers temple recession naturally.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "square",
+     "round",
+     "diamond",
+     "heart"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy"
+    ],
+    "norwoodMax": 4,
+    "lengths": [
+     "short"
+    ]
+   },
+   "receding": "great",
+   "barberAsk": "Skin or low fade on the sides, a number 1 or 2 blending up. Leave about 1.5 to 2 inches on top, point-cut and textured so it sits forward. Short, blunt fringe just above the brows, slightly choppy.",
+   "maintenance": "low",
+   "productTips": "Pea-sized matte clay or texture powder, rubbed in and pushed forward with fingers."
+  },
+  {
+   "id": "french_crop",
+   "name": "French crop",
+   "description": "Like a textured crop with a cleaner, straighter fringe. Very good for hiding a receding hairline.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "square",
+     "oblong",
+     "diamond",
+     "heart"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy"
+    ],
+    "norwoodMax": 4,
+    "lengths": [
+     "short"
+    ]
+   },
+   "receding": "great",
+   "barberAsk": "Mid fade or taper on the sides starting at a number 2. Keep about 1 to 2 inches on top, combed forward. Cut the fringe straight across, about a finger above the eyebrows, with a little texture.",
+   "maintenance": "low",
+   "productTips": "Light matte paste. Comb forward when damp, then rough up with fingers."
+  },
+  {
+   "id": "buzz_cut",
+   "name": "Buzz cut",
+   "description": "One length all over. Makes recession much less noticeable because there's no contrast between hair and skin. Strong look with a beard.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "square",
+     "diamond",
+     "oblong"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy",
+     "curly",
+     "coily"
+    ],
+    "norwoodMax": 6,
+    "lengths": [
+     "buzz"
+    ]
+   },
+   "receding": "great",
+   "barberAsk": "Clipper cut all over with a number 2 guard (go 3 for softer, 1 for sharper). Line up the neckline and around the ears; keep the front natural, no hard line-up.",
+   "maintenance": "low",
+   "productTips": "None. Moisturizer and SPF on the scalp."
+  },
+  {
+   "id": "buzz_fade",
+   "name": "Buzz cut with fade",
+   "description": "A buzz on top with a fade down the sides. Sharper and more styled than a plain buzz.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "square",
+     "round",
+     "diamond"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy",
+     "curly",
+     "coily"
+    ],
+    "norwoodMax": 6,
+    "lengths": [
+     "buzz"
+    ]
+   },
+   "receding": "great",
+   "barberAsk": "Number 2 on top, mid skin fade on the sides and back blending into the 2. Clean neckline, natural front.",
+   "maintenance": "med",
+   "productTips": "None. Touch up every 2-3 weeks to keep the fade crisp."
+  },
+  {
+   "id": "crew_cut",
+   "name": "Crew cut",
+   "description": "Classic short cut: slightly longer at the front, short sides. Clean and works almost everywhere.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "round",
+     "square",
+     "oblong",
+     "heart",
+     "diamond"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy",
+     "curly"
+    ],
+    "norwoodMax": 5,
+    "lengths": [
+     "short"
+    ]
+   },
+   "receding": "great",
+   "barberAsk": "Number 2 or 3 on the sides and back, tapered at the neckline. Scissor cut on top, about 1 inch at the front graduating shorter toward the crown. Light texture at the front.",
+   "maintenance": "low",
+   "productTips": "Small amount of matte paste, or nothing."
+  },
+  {
+   "id": "ivy_league",
+   "name": "Ivy League",
+   "description": "A longer crew cut you can part to the side. Polished, good for work.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "square",
+     "oblong",
+     "diamond"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy"
+    ],
+    "norwoodMax": 3,
+    "lengths": [
+     "short"
+    ]
+   },
+   "receding": "ok",
+   "barberAsk": "Number 3 on the sides, tapered. Leave about 2 inches at the front and 1 inch at the crown, long enough to side part. Soft part line, no shaved part.",
+   "maintenance": "med",
+   "productTips": "Light cream or pomade with a low shine; comb into a side part."
+  },
+  {
+   "id": "short_quiff",
+   "name": "Short quiff",
+   "description": "Front lifted up and slightly back, short sides. Height draws the eye up and away from the temples when kept short.",
+   "suits": {
+    "faceShapes": [
+     "round",
+     "square",
+     "oval",
+     "diamond",
+     "heart"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy"
+    ],
+    "norwoodMax": 3,
+    "lengths": [
+     "short"
+    ]
+   },
+   "receding": "ok",
+   "barberAsk": "Low or mid taper on the sides with a number 2. Leave about 2 to 2.5 inches at the front, shorter toward the crown. Texturize the front so it lifts. Don't leave it too long or it will show the temples.",
+   "maintenance": "med",
+   "productTips": "Blow-dry the front up, then matte clay. Sea-salt spray before drying adds volume."
+  },
+  {
+   "id": "side_part_low_taper",
+   "name": "Side part with low taper",
+   "description": "A classic side part with a low, gentle taper. Part on the side with more recession to make it look natural.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "square",
+     "oblong",
+     "round"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy"
+    ],
+    "norwoodMax": 3,
+    "lengths": [
+     "short"
+    ]
+   },
+   "receding": "ok",
+   "barberAsk": "Low taper on the sides starting with a number 2, scissor-blended at the temples. About 2 inches on top. Part on my weaker side; no hard part line. Keep the front soft, not too heavy.",
+   "maintenance": "med",
+   "productTips": "Light-hold cream or matte pomade; comb into place."
+  },
+  {
+   "id": "caesar",
+   "name": "Caesar cut",
+   "description": "Short with a straight, horizontal fringe brushed forward. Made for receding hairlines.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "square",
+     "oblong",
+     "heart",
+     "diamond"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy",
+     "curly",
+     "coily"
+    ],
+    "norwoodMax": 4,
+    "lengths": [
+     "short"
+    ]
+   },
+   "receding": "great",
+   "barberAsk": "Number 2 or 3 on the sides with a taper. About 1 inch on top, all brushed forward. Cut the fringe straight across, short.",
+   "maintenance": "low",
+   "productTips": "Little or no product; maybe a dab of matte paste."
+  },
+  {
+   "id": "butch_cut",
+   "name": "Butch cut",
+   "description": "Very short all over but a touch longer than a buzz, the same length on top and sides. Rugged, easy.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "square",
+     "diamond"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy",
+     "curly",
+     "coily"
+    ],
+    "norwoodMax": 6,
+    "lengths": [
+     "buzz"
+    ]
+   },
+   "receding": "great",
+   "barberAsk": "Number 3 or 4 all over, square up the neckline, natural front.",
+   "maintenance": "low",
+   "productTips": "None."
+  },
+  {
+   "id": "high_and_tight",
+   "name": "High and tight",
+   "description": "Very short sides faded high, a little more length on top. Clean, athletic.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "square",
+     "oblong",
+     "diamond"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy",
+     "curly"
+    ],
+    "norwoodMax": 5,
+    "lengths": [
+     "buzz",
+     "short"
+    ]
+   },
+   "receding": "great",
+   "barberAsk": "High skin fade on the sides and back. Number 3 or 4 on top, or scissor about half an inch. Blend the top into the fade.",
+   "maintenance": "med",
+   "productTips": "None."
+  },
+  {
+   "id": "induction_shaved",
+   "name": "Shaved head / induction",
+   "description": "Zero guard or razor-shaved. The cleanest option for Norwood 5-7. Best with a beard or strong stubble.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "square",
+     "diamond",
+     "oblong"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy",
+     "curly",
+     "coily"
+    ],
+    "norwoodMax": 7,
+    "lengths": [
+     "buzz"
+    ]
+   },
+   "receding": "great",
+   "barberAsk": "Clippers with no guard (a 0) all over, or shaved with a razor. Line up the neck. Usually done yourself with a head shaver.",
+   "maintenance": "med",
+   "productTips": "Scalp moisturizer and daily SPF. Matte moisturizer if the scalp shines."
+  },
+  {
+   "id": "comb_over_fade",
+   "name": "Comb-over with fade",
+   "description": "Hair swept to one side over a fade. Styled and sharp, but needs a fairly full hairline.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "round",
+     "square",
+     "diamond"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy"
+    ],
+    "norwoodMax": 2,
+    "lengths": [
+     "short",
+     "medium"
+    ]
+   },
+   "receding": "avoid",
+   "barberAsk": "Mid skin fade, hard part on my natural side optional. Leave 3 inches on top, combed over to the side and slightly back.",
+   "maintenance": "high",
+   "productTips": "Medium-hold pomade; blow-dry in the direction of the part."
+  },
+  {
+   "id": "slick_back",
+   "name": "Slick back",
+   "description": "Hair combed straight back. Shows the full hairline, so it highlights recession.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "square",
+     "heart",
+     "diamond"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy"
+    ],
+    "norwoodMax": 2,
+    "lengths": [
+     "medium"
+    ]
+   },
+   "receding": "avoid",
+   "barberAsk": "Low taper on the sides at a number 3 or scissor-only. Leave 3 to 4 inches on top, weighted so it lies back.",
+   "maintenance": "high",
+   "productTips": "Pomade with medium shine, combed back."
+  },
+  {
+   "id": "pompadour",
+   "name": "Pompadour",
+   "description": "Big volume swept up and back. Exposes the temples; skip it if receding.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "round",
+     "square",
+     "heart"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy"
+    ],
+    "norwoodMax": 2,
+    "lengths": [
+     "medium"
+    ]
+   },
+   "receding": "avoid",
+   "barberAsk": "Mid fade on the sides. 4 inches at the front, graduating shorter to the crown. Texture the front for volume.",
+   "maintenance": "high",
+   "productTips": "Blow-dry with a round brush, then strong pomade."
+  },
+  {
+   "id": "messy_fringe",
+   "name": "Messy fringe",
+   "description": "Medium-short, tousled and pushed forward. Casual, and the fringe hides the temples.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "oblong",
+     "heart",
+     "diamond",
+     "square"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy"
+    ],
+    "norwoodMax": 3,
+    "lengths": [
+     "short",
+     "medium"
+    ]
+   },
+   "receding": "great",
+   "barberAsk": "Scissor cut or a number 3 taper on the sides. About 3 inches on top, heavily textured, falling forward. Choppy fringe at eyebrow level.",
+   "maintenance": "med",
+   "productTips": "Sea-salt spray on damp hair, air-dry or rough-dry, a little matte paste."
+  },
+  {
+   "id": "curtains",
+   "name": "Curtains / middle part",
+   "description": "Middle part falling to the sides. Needs a full front; a receding hairline shows at the part.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "oblong",
+     "heart",
+     "diamond",
+     "square"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy"
+    ],
+    "norwoodMax": 1,
+    "lengths": [
+     "medium",
+     "long"
+    ]
+   },
+   "receding": "avoid",
+   "barberAsk": "Scissor cut, about 4 to 5 inches on top, longer at the front so it reaches the cheekbones when parted in the middle. Sides tapered over the ears.",
+   "maintenance": "med",
+   "productTips": "Light cream; blow-dry the part in."
+  },
+  {
+   "id": "curly_top_taper",
+   "name": "Curly top with taper fade",
+   "description": "Natural curls on top, clean taper on the sides. Curls add volume and cover thinning well.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "round",
+     "square",
+     "oblong",
+     "diamond",
+     "heart"
+    ],
+    "hairTypes": [
+     "curly",
+     "wavy"
+    ],
+    "norwoodMax": 3,
+    "lengths": [
+     "short",
+     "medium"
+    ]
+   },
+   "receding": "great",
+   "barberAsk": "Low or mid taper on the sides starting at a number 1. Leave 2 to 3 inches on top, cut dry or with curls defined, shaped so the curls fall slightly forward.",
+   "maintenance": "med",
+   "productTips": "Curl cream or leave-in on wet hair, scrunch, air-dry or diffuse. Don't brush dry."
+  },
+  {
+   "id": "short_curly_crop",
+   "name": "Short curly crop",
+   "description": "Very short curls on top with a fade. Low effort, curls do the work.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "round",
+     "square",
+     "oblong",
+     "heart",
+     "diamond"
+    ],
+    "hairTypes": [
+     "curly",
+     "coily"
+    ],
+    "norwoodMax": 4,
+    "lengths": [
+     "short"
+    ]
+   },
+   "receding": "great",
+   "barberAsk": "Mid or high fade. About 1 to 1.5 inches on top, shaped round, slightly forward at the front.",
+   "maintenance": "low",
+   "productTips": "Leave-in conditioner or curl cream."
+  },
+  {
+   "id": "afro_taper",
+   "name": "Afro with taper",
+   "description": "Rounded afro on top with tapered sides and nape. Shape keeps it neat.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "oblong",
+     "square",
+     "diamond"
+    ],
+    "hairTypes": [
+     "coily",
+     "curly"
+    ],
+    "norwoodMax": 3,
+    "lengths": [
+     "medium"
+    ]
+   },
+   "receding": "ok",
+   "barberAsk": "Taper the sides and nape with a number 1 to 2, keep the top 2 to 4 inches, shaped round with a pick. Natural or soft line-up at the front.",
+   "maintenance": "med",
+   "productTips": "Leave-in conditioner and a light oil; pick out daily; satin pillowcase or durag at night."
+  },
+  {
+   "id": "waves",
+   "name": "360 waves",
+   "description": "Short coily hair brushed into a wave pattern. Very clean and tolerant of a slightly receding front.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "round",
+     "square",
+     "diamond",
+     "oblong"
+    ],
+    "hairTypes": [
+     "coily"
+    ],
+    "norwoodMax": 4,
+    "lengths": [
+     "buzz",
+     "short"
+    ]
+   },
+   "receding": "ok",
+   "barberAsk": "Number 1.5 or 2 on top with the grain, low taper on the sides, soft line-up (don't push the hairline back).",
+   "maintenance": "high",
+   "productTips": "Wave pomade or butter, brush daily in the pattern, durag at night."
+  },
+  {
+   "id": "twists",
+   "name": "Twists / short locs",
+   "description": "Two-strand twists or starter locs on top with a taper. Needs a full hairline; tension at the front can cause traction loss.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "oblong",
+     "square",
+     "diamond"
+    ],
+    "hairTypes": [
+     "coily",
+     "curly"
+    ],
+    "norwoodMax": 2,
+    "lengths": [
+     "medium"
+    ]
+   },
+   "receding": "avoid",
+   "barberAsk": "Taper the sides, keep 3 inches or more on top for twists. Don't twist the front too tightly.",
+   "maintenance": "high",
+   "productTips": "Twisting cream; refresh every 1-2 weeks; light oil on the scalp."
+  },
+  {
+   "id": "medium_flow",
+   "name": "Medium flow",
+   "description": "Hair grown to the ears or collar and swept back or to the side. Needs density at the front.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "oblong",
+     "square",
+     "heart"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy"
+    ],
+    "norwoodMax": 2,
+    "lengths": [
+     "medium",
+     "long"
+    ]
+   },
+   "receding": "avoid",
+   "barberAsk": "Scissor cut only. Long layers, about 5 to 6 inches on top, trim the ends and tidy around the ears and neck so it grows out evenly.",
+   "maintenance": "med",
+   "productTips": "Light cream or sea-salt spray; air-dry."
+  },
+  {
+   "id": "long_layered",
+   "name": "Long layered",
+   "description": "Shoulder-length layers. Good for thick wavy or curly hair; thinning shows more at length.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "oblong",
+     "heart",
+     "square"
+    ],
+    "hairTypes": [
+     "wavy",
+     "curly",
+     "straight"
+    ],
+    "norwoodMax": 2,
+    "lengths": [
+     "long"
+    ]
+   },
+   "receding": "avoid",
+   "barberAsk": "Long layers, keep length at the shoulders, remove bulk at the back, face-framing layers at the front. Trim the ends half an inch.",
+   "maintenance": "med",
+   "productTips": "Leave-in conditioner, air-dry; curl cream for curls."
+  },
+  {
+   "id": "man_bun",
+   "name": "Man bun / top knot",
+   "description": "Long hair tied up. Constant pulling at the front can cause traction loss, and it shows the hairline.",
+   "suits": {
+    "faceShapes": [
+     "oval",
+     "oblong",
+     "square"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy",
+     "curly"
+    ],
+    "norwoodMax": 1,
+    "lengths": [
+     "long"
+    ]
+   },
+   "receding": "avoid",
+   "barberAsk": "Keep length on top at least 6 inches; undercut or taper the sides if you want. Tie loosely.",
+   "maintenance": "med",
+   "productTips": "Soft elastic, loose tie, change position often."
+  },
+  {
+   "id": "faux_hawk",
+   "name": "Short faux hawk",
+   "description": "Center pushed up into a short ridge, sides shorter. Height at the middle distracts from the temples when kept short.",
+   "suits": {
+    "faceShapes": [
+     "round",
+     "oval",
+     "square",
+     "heart"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy",
+     "curly"
+    ],
+    "norwoodMax": 3,
+    "lengths": [
+     "short"
+    ]
+   },
+   "receding": "ok",
+   "barberAsk": "Mid fade on the sides. Leave 2 inches through the center strip, shorter toward the edges, texturize so it can be pushed up to the middle.",
+   "maintenance": "med",
+   "productTips": "Matte clay, push to the center."
+  },
+  {
+   "id": "textured_spiky",
+   "name": "Short textured spikes",
+   "description": "Short top with messy, pointed texture. Breaks up the hairline so recession reads less.",
+   "suits": {
+    "faceShapes": [
+     "round",
+     "oval",
+     "square",
+     "diamond"
+    ],
+    "hairTypes": [
+     "straight",
+     "wavy"
+    ],
+    "norwoodMax": 4,
+    "lengths": [
+     "short"
+    ]
+   },
+   "receding": "great",
+   "barberAsk": "Number 2 on the sides, low taper. About 1.5 inches on top, point-cut for texture, front slightly forward.",
+   "maintenance": "low",
+   "productTips": "Fiber or texture powder, rough it up with fingertips."
+  }
+ ],
+ "faceShapeGuide": {
+  "howToMeasure": [
+   "Pull your hair back and take a straight-on photo at eye level, or look in a mirror.",
+   "Compare four things: forehead width, cheekbone width, jaw width, and face length (hairline to chin).",
+   "Look at the jaw: is it angular or rounded? And the chin: pointed or broad?",
+   "Pick the shape that fits most; many faces are a mix, so pick the closest two."
+  ],
+  "shapes": [
+   {
+    "id": "oval",
+    "name": "Oval",
+    "howToTell": "Face is longer than it is wide, cheekbones slightly the widest part, jaw rounded and a bit narrower than the forehead.",
+    "aimFor": "Almost anything works. Keep the forehead not fully covered if you want to show balance.",
+    "goodStyles": [
+     "textured_crop",
+     "crew_cut",
+     "french_crop",
+     "side_part_low_taper"
+    ],
+    "avoid": "Heavy fringes that hide the whole forehead (unless covering recession)."
+   },
+   {
+    "id": "round",
+    "name": "Round",
+    "howToTell": "Length and width are about the same, soft rounded jaw, full cheeks, no sharp angles.",
+    "aimFor": "Height on top and short, tight sides to make the face look longer.",
+    "goodStyles": [
+     "short_quiff",
+     "faux_hawk",
+     "textured_spiky",
+     "high_and_tight"
+    ],
+    "avoid": "Round, bowl-like cuts and bulky sides. A beard with a little length at the chin helps."
+   },
+   {
+    "id": "square",
+    "name": "Square",
+    "howToTell": "Forehead, cheekbones and jaw are about the same width; strong, angular jaw.",
+    "aimFor": "Short, clean cuts that show off the jaw. Textured tops soften it a little.",
+    "goodStyles": [
+     "buzz_cut",
+     "crew_cut",
+     "caesar",
+     "high_and_tight"
+    ],
+    "avoid": "Very heavy, long hair on the sides that hides the jaw."
+   },
+   {
+    "id": "oblong",
+    "name": "Oblong / long",
+    "howToTell": "Face is clearly longer than wide; forehead, cheeks and jaw similar width; long chin.",
+    "aimFor": "Avoid extra height. Fringes and a bit of fullness on the sides shorten the face.",
+    "goodStyles": [
+     "french_crop",
+     "caesar",
+     "messy_fringe",
+     "crew_cut"
+    ],
+    "avoid": "Tall quiffs, pompadours and very short sides with a tall top."
+   },
+   {
+    "id": "heart",
+    "name": "Heart / triangle",
+    "howToTell": "Wide forehead and cheekbones, narrow jaw and pointed chin.",
+    "aimFor": "Medium length and texture; fringes that cut the forehead width; a beard adds jaw width.",
+    "goodStyles": [
+     "messy_fringe",
+     "textured_crop",
+     "french_crop",
+     "side_part_low_taper"
+    ],
+    "avoid": "Very tight sides with lots of volume on top."
+   },
+   {
+    "id": "diamond",
+    "name": "Diamond",
+    "howToTell": "Cheekbones are the widest point; narrow forehead and narrow chin.",
+    "aimFor": "Fringes and texture on top to add forehead width; keep some length at the sides.",
+    "goodStyles": [
+     "textured_crop",
+     "french_crop",
+     "caesar",
+     "messy_fringe"
+    ],
+    "avoid": "Very high skin fades that make the cheekbones look wider."
+   }
+  ]
+ },
+ "routineItems": [
+  {
+   "id": "ri_finasteride",
+   "name": "Finasteride 1 mg",
+   "schedule": "daily",
+   "timeOfDay": "any",
+   "linkedIntervention": "finasteride_oral",
+   "note": "Same time each day helps you remember."
+  },
+  {
+   "id": "ri_finasteride_topical",
+   "name": "Topical finasteride",
+   "schedule": "daily",
+   "timeOfDay": "pm",
+   "linkedIntervention": "finasteride_topical",
+   "note": "On a dry scalp."
+  },
+  {
+   "id": "ri_dutasteride",
+   "name": "Dutasteride 0.5 mg",
+   "schedule": "daily",
+   "timeOfDay": "any",
+   "linkedIntervention": "dutasteride",
+   "note": "As prescribed."
+  },
+  {
+   "id": "ri_minoxidil_topical",
+   "name": "Minoxidil 5% foam",
+   "schedule": "daily",
+   "timeOfDay": "pm",
+   "linkedIntervention": "minoxidil_topical",
+   "note": "Half a capful to the scalp. Skip for 24 h after microneedling."
+  },
+  {
+   "id": "ri_minoxidil_oral",
+   "name": "Oral minoxidil",
+   "schedule": "daily",
+   "timeOfDay": "any",
+   "linkedIntervention": "minoxidil_oral",
+   "note": "As prescribed."
+  },
+  {
+   "id": "ri_ketoconazole",
+   "name": "Ketoconazole shampoo (leave 3-5 min)",
+   "schedule": "2x-week",
+   "timeOfDay": "any",
+   "linkedIntervention": "ketoconazole_shampoo",
+   "note": "Conditioner on the lengths after."
+  },
+  {
+   "id": "ri_microneedling",
+   "name": "Microneedling scalp",
+   "schedule": "weekly",
+   "timeOfDay": "pm",
+   "linkedIntervention": "microneedling",
+   "note": "Clean roller; no minoxidil for 24 h after."
+  },
+  {
+   "id": "ri_lllt",
+   "name": "Laser cap session",
+   "schedule": "every-2-days",
+   "timeOfDay": "any",
+   "linkedIntervention": "lllt",
+   "note": "Per device instructions."
+  },
+  {
+   "id": "ri_scalp_massage",
+   "name": "Scalp massage (4-5 min)",
+   "schedule": "daily",
+   "timeOfDay": "any",
+   "linkedIntervention": "scalp_massage",
+   "note": "Pair with applying minoxidil."
+  },
+  {
+   "id": "ri_rosemary",
+   "name": "Rosemary oil (diluted)",
+   "schedule": "2x-week",
+   "timeOfDay": "pm",
+   "linkedIntervention": "rosemary_oil",
+   "note": "Wash out after a few hours."
+  },
+  {
+   "id": "ri_pumpkin_seed",
+   "name": "Pumpkin seed oil 400 mg",
+   "schedule": "daily",
+   "timeOfDay": "any",
+   "linkedIntervention": "pumpkin_seed_oil",
+   "note": "With food."
+  },
+  {
+   "id": "ri_protein",
+   "name": "Hit protein target",
+   "schedule": "daily",
+   "timeOfDay": "any",
+   "linkedIntervention": "nutrition_basics",
+   "note": "From the Food side's daily targets."
+  }
+ ],
+ "guides": [
+  {
+   "id": "understanding_receding_hairline",
+   "title": "Understanding a Receding Hairline",
+   "subtitle": "Is it a mature hairline or male pattern hair loss?",
+   "icon": "person.crop.circle.badge.questionmark",
+   "sections": [
+    {
+     "heading": "What's happening",
+     "body": "Male pattern hair loss is genetic sensitivity to DHT, a hormone made from testosterone. In sensitive follicles at the temples and crown, DHT shrinks each new hair a bit more: thinner, shorter, lighter, until it stops showing. The sides and back are resistant, which is why transplants use that hair. It affects about half of men by 50, and starts in the 20s for many."
+    },
+    {
+     "heading": "Mature hairline vs. balding",
+     "body": "Nearly every man's hairline rises a little between the late teens and late 20s, often by about 1-2 cm and evenly. That's a mature hairline (Norwood 2), and it often stops there.",
+     "bullets": [
+      "More likely mature: even rise, hairs at the front still thick, no change over a year of photos.",
+      "More likely balding: deepening temple points, thin wispy hairs at the edge, thinning at the crown, more scalp showing under bright light, family history."
+     ]
+    },
+    {
+     "heading": "Track it, don't guess",
+     "body": "Use the Hairline series in Progress: same spot, same light, hair pushed back, once a month. The hairline tracker gives you a number that doesn't depend on the photo's distance. A change over 4 or more photos tells you more than a mirror on a bad day."
+    },
+    {
+     "heading": "When it's something else",
+     "body": "Patchy round bald spots, a scaly or painful scalp, sudden heavy shedding all over, or loss of eyebrows means it's probably not pattern loss. See a dermatologist; conditions like alopecia areata, telogen effluvium or scarring alopecias need different treatment."
+    },
+    {
+     "heading": "Timing matters",
+     "body": "Medication is much better at keeping hair than at bringing back hair that's long gone. The earlier you start once it's clearly progressing, the more you keep."
+    }
+   ]
+  },
+  {
+   "id": "building_hair_loss_plan",
+   "title": "Building a Hair-Loss Plan",
+   "subtitle": "What works, ranked by evidence",
+   "icon": "chart.bar.doc.horizontal",
+   "sections": [
+    {
+     "heading": "The short version",
+     "body": "Two things have the strongest evidence: a DHT blocker (finasteride, or dutasteride) and minoxidil (topical or low-dose oral). Together they're better than either alone. Everything else is an add-on. Prescription items: talk to a dermatologist; telehealth works fine for this."
+    },
+    {
+     "heading": "Evidence ranking",
+     "body": "A = strong, B = moderate, C = weak, D = none.",
+     "table": {
+      "columns": [
+       "Option",
+       "Evidence",
+       "Type",
+       "Role"
+      ],
+      "rows": [
+       [
+        "Dutasteride 0.5 mg (oral)",
+        "A",
+        "Rx",
+        "maintain+regrow"
+       ],
+       [
+        "Finasteride 1 mg (oral)",
+        "A",
+        "Rx",
+        "maintain+regrow"
+       ],
+       [
+        "Low-dose oral minoxidil (LDOM)",
+        "B",
+        "Rx",
+        "maintain+regrow"
+       ],
+       [
+        "Finasteride (topical spray/solution)",
+        "B",
+        "Rx",
+        "maintain+regrow"
+       ],
+       [
+        "Minoxidil 5% (topical foam or liquid)",
+        "A",
+        "OTC",
+        "maintain+regrow"
+       ],
+       [
+        "Microneedling (with minoxidil)",
+        "B",
+        "procedure",
+        "regrow"
+       ],
+       [
+        "PRP (platelet-rich plasma injections)",
+        "B",
+        "procedure",
+        "regrow"
+       ],
+       [
+        "Ketoconazole shampoo (1% OTC, 2% Rx)",
+        "C",
+        "OTC",
+        "supportive"
+       ],
+       [
+        "Low-level laser / LED (LLLT)",
+        "B",
+        "OTC",
+        "supportive"
+       ],
+       [
+        "Hair transplant (FUE / FUT)",
+        "A",
+        "procedure",
+        "moves-hair"
+       ],
+       [
+        "Rosemary oil",
+        "C",
+        "OTC",
+        "supportive"
+       ],
+       [
+        "Pumpkin seed oil (oral)",
+        "C",
+        "supplement",
+        "supportive"
+       ],
+       [
+        "Saw palmetto",
+        "C",
+        "supplement",
+        "supportive"
+       ],
+       [
+        "Protein, iron, vitamin D, zinc, B12 (fix deficiencies)",
+        "C",
+        "lifestyle",
+        "supportive"
+       ],
+       [
+        "Stress, sleep and crash dieting",
+        "C",
+        "lifestyle",
+        "supportive"
+       ],
+       [
+        "Biotin",
+        "D",
+        "supplement",
+        "supportive"
+       ],
+       [
+        "Scalp massage",
+        "C",
+        "lifestyle",
+        "supportive"
+       ]
+      ]
+     }
+    },
+    {
+     "heading": "A typical starting plan (Norwood 2-3)",
+     "body": "",
+     "bullets": [
+      "Finasteride 1 mg daily (from a dermatologist).",
+      "Minoxidil 5% foam daily, or ask about low-dose oral minoxidil.",
+      "Ketoconazole shampoo 2-3 times a week.",
+      "Optional: microneedling once a week.",
+      "Protein target met, no crash cut."
+     ]
+    },
+    {
+     "heading": "Timeline",
+     "body": "",
+     "table": {
+      "columns": [
+       "When",
+       "What to expect"
+      ],
+      "rows": [
+       [
+        "Weeks 2-8",
+        "Minoxidil shed: more hair in the shower. Normal; keep going."
+       ],
+       [
+        "Month 3-4",
+        "Shedding settles; fine new hairs may show."
+       ],
+       [
+        "Month 6",
+        "First fair judgment. Compare photos to baseline."
+       ],
+       [
+        "Month 12",
+        "Full effect. Decide whether to step up (dutasteride, oral minoxidil, transplant)."
+       ],
+       [
+        "Ongoing",
+        "Keep going. Stopping loses the gains over 6-12 months."
+       ]
+      ]
+     }
+    },
+    {
+     "heading": "Finasteride side effects, honestly",
+     "body": "In trials, about 1-2 extra men in 100 had sexual side effects compared with placebo, and most resolved. A small number of men report symptoms that persist after stopping (post-finasteride syndrome); this is debated and not proven to be caused by the drug, but it's on the label. If you notice changes, stop and talk to your doctor. Topical finasteride is an option with less drug in the blood."
+    }
+   ]
+  },
+  {
+   "id": "styling_receding_hairline",
+   "title": "Styling a Receding Hairline",
+   "subtitle": "Cuts that make it look intentional",
+   "icon": "scissors",
+   "sections": [
+    {
+     "heading": "The principle",
+     "body": "Recession shows when there's contrast: long hair next to bare temples, or hair pulled back to show the whole hairline. Shorter hair and forward texture shrink that contrast."
+    },
+    {
+     "heading": "Go-to cuts",
+     "body": "",
+     "bullets": [
+      "Textured crop or French crop: forward fringe covers the temples.",
+      "Caesar: straight, short fringe.",
+      "Crew cut: short and classic.",
+      "Buzz cut: no contrast at all; very clean.",
+      "Short quiff or side part: OK at Norwood 2-3 if kept short."
+     ]
+    },
+    {
+     "heading": "Cuts to skip",
+     "body": "Slick backs, pompadours, middle parts, long flowing hair and tight man buns all put the hairline on display, and tight styles can add traction loss."
+    },
+    {
+     "heading": "Tips that help",
+     "body": "",
+     "bullets": [
+      "Matte products, not shiny ones; shine shows scalp.",
+      "Texture powder or sea-salt spray adds volume without weight.",
+      "Ask the barber for a soft, natural front: no line-up that pushes the hairline back.",
+      "A beard or stubble balances a shorter top.",
+      "Get trims every 3-5 weeks; short cuts look best fresh.",
+      "Hair fibers (like Toppik) can hide thin spots for a day if you want."
+     ]
+    },
+    {
+     "heading": "How to talk to your barber",
+     "body": "Use the 'barberAsk' text on each style. Say how much length you want on top in inches, the guard number on the sides, where the fade starts (low, mid, high), and that you want texture so it sits forward. Show a photo."
+    }
+   ]
+  },
+  {
+   "id": "scalp_health_dandruff",
+   "title": "Scalp Health and Dandruff",
+   "subtitle": "Itchy, flaky scalp and what fixes it",
+   "icon": "drop.circle",
+   "sections": [
+    {
+     "heading": "What dandruff is",
+     "body": "Usually a mild form of seborrheic dermatitis: a yeast that lives on everyone's scalp (Malassezia) irritates oily skin, causing flakes and itch. It isn't from a dry scalp or bad hygiene, and it comes and goes with stress, weather and oil."
+    },
+    {
+     "heading": "What works",
+     "body": "Medicated shampoos, used 2-3 times a week and left on 3-5 minutes:",
+     "bullets": [
+      "Ketoconazole 1-2% (Nizoral): the strongest, and also an add-on for hair loss.",
+      "Zinc pyrithione (Head & Shoulders).",
+      "Selenium sulfide (Selsun Blue).",
+      "Rotate two of them if one stops working.",
+      "The same shampoo works on flaky eyebrows and beard skin."
+     ]
+    },
+    {
+     "heading": "Minoxidil itch",
+     "body": "If the scalp got itchy after starting liquid minoxidil, it's usually the propylene glycol. Switching to the foam usually fixes it."
+    },
+    {
+     "heading": "When to see a dermatologist",
+     "body": "Thick scales, redness beyond the hairline, bleeding, or no change after 4 weeks of medicated shampoo could be psoriasis or another condition; prescription options work well."
+    },
+    {
+     "heading": "Everyday scalp care",
+     "body": "",
+     "bullets": [
+      "Wash often enough to control oil; for oily scalps that's daily or every other day.",
+      "Rinse out heavy pomades.",
+      "Sunscreen on thin or shaved scalp."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "haircare_by_type",
+   "title": "Hair Care for Your Hair Type",
+   "subtitle": "Straight, wavy, curly or coily",
+   "icon": "wind",
+   "sections": [
+    {
+     "heading": "Find your type",
+     "body": "",
+     "table": {
+      "columns": [
+       "Type",
+       "How it looks dry",
+       "Main issue"
+      ],
+      "rows": [
+       [
+        "Straight",
+        "Lies flat, no bend",
+        "Gets oily fast, falls flat"
+       ],
+       [
+        "Wavy",
+        "Loose S-bends",
+        "Frizz, gets weighed down"
+       ],
+       [
+        "Curly",
+        "Clear ringlets or spirals",
+        "Dryness, frizz"
+       ],
+       [
+        "Coily",
+        "Tight coils or zig-zags",
+        "Dryness, breakage, shrinkage"
+       ]
+      ]
+     }
+    },
+    {
+     "heading": "Straight",
+     "body": "",
+     "bullets": [
+      "Shampoo daily or every other day if oily.",
+      "Light conditioner on the ends only.",
+      "Matte clay or powder for volume; avoid heavy creams.",
+      "Blow-dry up at the roots for lift."
+     ]
+    },
+    {
+     "heading": "Wavy",
+     "body": "",
+     "bullets": [
+      "Shampoo 2-4 times a week; condition every wash.",
+      "Sea-salt spray or light cream on damp hair, scrunch, air-dry.",
+      "Don't brush dry; it turns to frizz."
+     ]
+    },
+    {
+     "heading": "Curly",
+     "body": "",
+     "bullets": [
+      "Shampoo 1-2 times a week with a gentle (sulfate-free) shampoo; co-wash or rinse between.",
+      "Leave-in conditioner and curl cream on soaking wet hair.",
+      "Diffuse or air-dry; don't touch while it dries.",
+      "Get cuts from someone who cuts curls dry."
+     ]
+    },
+    {
+     "heading": "Coily",
+     "body": "",
+     "bullets": [
+      "Wash weekly or every 2 weeks; deep condition.",
+      "Leave-in, then an oil or butter to seal moisture.",
+      "Satin pillowcase or durag at night.",
+      "Avoid tight styles that pull at the front (traction loss)."
+     ]
+    },
+    {
+     "heading": "If you're using minoxidil",
+     "body": "Apply to a dry scalp, then style once it's dry (2-4 hours for the liquid, less for foam). Heavy pomades on top of wet minoxidil make it greasy. Foam is easier to style over."
+    }
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "title": "AAD: What is male pattern hair loss, and can it be treated?",
+   "url": "https://www.aad.org/public/diseases/hair-loss/treatment/male-pattern-hair-loss-treatment"
+  },
+  {
+   "title": "AAD: Hair loss diagnosis and treatment",
+   "url": "https://www.aad.org/public/diseases/hair-loss/treatment/diagnosis-treat"
+  },
+  {
+   "title": "British Association of Dermatologists: Male pattern hair loss patient leaflet (2024)",
+   "url": "https://www.skinhealthinfo.org.uk/condition/male-pattern-hair-loss/"
+  },
+  {
+   "title": "Gupta AK et al. Relative efficacy of minoxidil and the 5-alpha reductase inhibitors in male androgenetic alopecia: network meta-analysis (JAMA Dermatol 2022), summary",
+   "url": "https://hcplive.com/view/minoxidil-5-a-reductase-inhibitors-relatively-androgenetic-alopecia"
+  },
+  {
+   "title": "Lee S et al. Sexual dysfunction with 5-alpha-reductase inhibitors in male pattern hair loss: meta-analysis (Acta Derm Venereol 2019)",
+   "url": "https://www.medicaljournals.se/acta/content/html/10.2340/00015555-3035"
+  },
+  {
+   "title": "Belknap SM et al. Adverse event reporting in clinical trials of finasteride for androgenic alopecia (JAMA Dermatol 2015)",
+   "url": "https://jamanetwork.com/journals/jamadermatology/fullarticle/2212246"
+  },
+  {
+   "title": "Propecia (finasteride) prescribing information: adverse reactions",
+   "url": "https://www.drugs.com/pro/propecia.html"
+  },
+  {
+   "title": "Gupta AK et al. Dose-dependent association of low-dose oral minoxidil and efficacy in AGA: systematic review with meta-regression (2022)",
+   "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9485924/"
+  },
+  {
+   "title": "Low-dose oral minoxidil as treatment for non-scarring alopecia: systematic review (Int J Dermatol 2020)",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/32516434/"
+  },
+  {
+   "title": "Combined microneedling versus topical minoxidil in androgenetic alopecia: systematic review and meta-analysis (2025)",
+   "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11890238/"
+  },
+  {
+   "title": "Efficacy of non-surgical treatments for androgenetic alopecia: systematic review and network meta-analysis (2018)",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/29797431/"
+  },
+  {
+   "title": "Platelet-rich plasma for androgenetic alopecia: systematic review and meta-analysis of RCTs (2023)",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/37533146/"
+  },
+  {
+   "title": "Panahi Y et al. Rosemary oil vs minoxidil 2% for androgenetic alopecia: randomized comparative trial (Skinmed 2015)",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/25842469/"
+  },
+  {
+   "title": "Comment on the pumpkin seed oil RCT in men with androgenetic alopecia (Cho 2014)",
+   "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4396906/"
+  },
+  {
+   "title": "Almohanna HM et al. The role of vitamins and minerals in hair loss: a review (Dermatol Ther 2019)",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6380979"
+  },
+  {
+   "title": "Harvard Health: Vitamins, minerals, and hair loss",
+   "url": "https://www.health.harvard.edu/staying-healthy/vitamins-minerals-and-hair-loss-is-there-a-connection"
+  }
+ ]
+}

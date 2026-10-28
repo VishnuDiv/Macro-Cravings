@@ -244,5 +244,23 @@ df.fix_yogurt_fat_keys([yg])
 check([l["key"] for l in yg["base"]] == ["greek_yogurt_full", "greek_yogurt_2pct", "greek_yogurt", "greek_yogurt", "plain_yogurt", "skyr_full", "skyr", "labneh"],
       "yogurt keys carry the fat level (five-percent -> full, two-percent -> 2pct, nonfat / regular yogurt / zero-percent skyr / labneh untouched): " + str([l["key"] for l in yg["base"]]))
 
+
+# Creami type
+def cr(name, tags=(), keys=(), kcal=None, **kw):
+    r = rec("c_" + name, name=name, section="creami", base=[ing("x", k, 100) for k in keys], macros={"calories": kcal, "protein": 20, "carbs": 30, "fat": 5} if kcal is not None else None)
+    r["tags"] = list(tags)
+    r.update(kw)
+    return r
+check(df.creami_type(cr("Mango Dream", keys=["mango", "water"])) == "sorbet", "creami type: a fruit base with no dairy is a sorbet")
+check(df.creami_type(cr("Lemon Sherbet", keys=["lemon_juice", "milk"])) == "sorbet", "creami type: 'sherbet' counts as sorbet")
+check(df.creami_type(cr("Vanilla Bomb", keys=["protein_shake_vanilla"], kcal=300)) == "lite_ice_cream", "creami type: a protein-shake base at <= 450 kcal is lite ice cream")
+check(df.creami_type(cr("Heavy Bomb", keys=["protein_shake_vanilla"], kcal=520)) == "ice_cream", "creami type: a protein-shake base over 450 kcal falls through to ice cream")
+check(df.creami_type(cr("Oreo Milkshake", tags=["lite-ice-cream"], keys=["milk"])) == "milkshake", "creami type: milkshake wins over the lite tag")
+check(df.creami_type(cr("Protein Shake Cookies", keys=["milk"])) != "milkshake", "creami type: 'protein shake' in a name is not a milkshake")
+check(df.creami_type(cr("Cold Brew Creamiccino")) == "frozen_drink" and df.creami_type(cr("Grape Italian Ice")) == "italian_ice" and df.creami_type(cr("Peanut Butter Acai Bowl")) == "smoothie_bowl", "creami type: drink, Italian ice and bowl names")
+check(df.creami_type(cr("Pistachio Gelato", keys=["milk"])) == "gelato", "creami type: gelato by name")
+check(df.creami_type(cr("Tart Thing", keys=["greek_yogurt", "honey"])) == "frozen_yogurt" and df.creami_type(cr("Yogurt Milk", keys=["greek_yogurt", "milk"])) == "ice_cream", "creami type: yogurt-dominated base is frozen yogurt unless milk is in it")
+check(df.creami_type(rec("m", section="meal")) is None, "creami type: meals have none")
+
 print("data fixes: %d checks, %d failed" % (n, bad))
 sys.exit(1 if bad else 0)

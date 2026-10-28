@@ -1,0 +1,104 @@
+{
+ "_schema": {
+  "version": "fixture",
+  "defaultMinGrams": 10,
+  "spiceMinGrams": 1
+ },
+ "ingredientBenefits": {
+  "lentils": {
+   "benefits": [
+    "gut",
+    "muscle"
+   ],
+   "why": "Lentils bring fiber for gut bacteria and plant protein for muscle.",
+   "minGrams": 30,
+   "tags": [
+    "legume",
+    "plant"
+   ]
+  },
+  "kefir": {
+   "benefits": [
+    "gut"
+   ],
+   "why": "Fermented milk with live cultures.",
+   "minGrams": 50,
+   "tags": [
+    "fermented",
+    "dairy"
+   ]
+  },
+  "paprika": {
+   "benefits": [
+    "skin"
+   ],
+   "why": "Carotenoids and vitamin A support skin.",
+   "minGrams": 1,
+   "tags": [
+    "spice",
+    "plant"
+   ]
+  },
+  "cauliflower": {
+   "benefits": [
+    "heart"
+   ],
+   "why": "Fiber and vitamin K.",
+   "tags": [
+    "vegetable",
+    "plant"
+   ]
+  }
+ },
+ "rules": [
+  {
+   "id": "fiber_gut",
+   "when": {
+    "fiber_g": {
+     ">=": 8
+    }
+   },
+   "benefits": [
+    "gut"
+   ],
+   "weight": 2,
+   "why": "{fiber} g fiber per serving feeds gut bacteria."
+  },
+  {
+   "id": "protein_muscle_hair",
+   "when": {
+    "protein_g": {
+     ">=": 25
+    }
+   },
+   "benefits": [
+    "muscle",
+    "hair"
+   ],
+   "weight": 2,
+   "why": "{protein} g protein per serving supports muscle and hair."
+  },
+  {
+   "id": "fermented_gut",
+   "when": {
+    "hasTag": "fermented"
+   },
+   "benefits": [
+    "gut"
+   ],
+   "weight": 2,
+   "why": "Fermented food: live cultures."
+  },
+  {
+   "id": "legume_gut",
+   "when": {
+    "hasTag": "legume"
+   },
+   "benefits": [
+    "gut"
+   ],
+   "weight": 1,
+   "why": "Legumes feed gut bacteria."
+  }
+ ]
+}

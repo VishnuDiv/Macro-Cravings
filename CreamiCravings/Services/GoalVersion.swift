@@ -47,7 +47,7 @@ enum GoalVersion {
         guard goal != .maintain else { return GoalResolution(goal: goal, changes: [], cfg: cfg, portion: 1, portionLabel: nil) }
 
         let calc = NutritionCalculator(catalog: catalog)
-        let eff = ProteinUpgrades.effective(recipe, catalog: catalog, vegActive: base.vegActive, vegChoices: base.vegChoices, preferEasy: base.preferEasy, upgradeKey: base.upgradeKey)
+        let eff = ProteinUpgrades.effective(recipe, catalog: catalog, vegActive: base.vegActive, vegChoices: base.vegChoices, preferEasy: base.preferEasy, upgradeKey: base.upgradeKey, airFry: base.airFryActive)
         let liquidKey = catalog.liquidLineKey(eff), powderKey = catalog.powderLineKey(eff)
         let divisor = recipe.perServingDivisor
         let prefix = goal == .cut ? "cut" : "bulk"

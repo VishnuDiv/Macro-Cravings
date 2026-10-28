@@ -170,6 +170,44 @@ def book_tags(r):
     return tags
 
 
+# Recipes whose printed macros leave out the main ingredient: both the as-written and the air-fry numbers come from the ingredient lines.
+AIRFRY_CALCULATED = {"web-meal-paneer-manchurian-recipe-hebbarskitchen"}
+
+
+def merge_airfry(out):
+    """Embeds data/airfry/batch*.json as `airFry` on each recipe: {summary, swaps, steps, macrosPerServing, ...}.
+    Every `replaces` must match an existing (post-fix) ingredient line, or be "" for an added line; fails loudly otherwise."""
+    files = sorted(glob.glob(os.path.join(DATA, "airfry", "batch[0-9]*.json")))
+    byid = {r["id"]: r for r in out}
+    cls = load(os.path.join(DATA, "airfry", "classification.json"), {})
+    n = 0
+    for fp in files:
+        for a in load(fp, []):
+            rid = a.get("recipeId")
+            r = byid.get(rid)
+            if r is None:
+                raise SystemExit("airfry: unknown recipe id %s in %s" % (rid, os.path.basename(fp)))
+            if not a.get("convertible", True) or not a.get("steps"):
+                continue
+            va_lines = [sw["with"]["text"] for sw in ((r.get("vegAdaptation") or {}).get("swaps") or []) if isinstance(sw.get("with"), dict)]
+            lines = {i["text"] for i in all_ings(r)} | set(va_lines)
+            for sw in a.get("swaps") or []:
+                if sw["replaces"] and sw["replaces"] not in lines:
+                    raise SystemExit("airfry: %s: replaces line not found: %r" % (rid, sw["replaces"]))
+            m = a.get("macrosPerServing")
+            if rid in AIRFRY_CALCULATED:
+                m = None
+                r["macros"] = None
+            r["airFry"] = {"summary": a.get("summary", ""), "swaps": a.get("swaps") or [], "steps": a["steps"], "macrosPerServing": m,
+                           "macroNotes": a.get("macroNotes"), "textureNote": a.get("textureNote"),
+                           "foodType": a.get("foodType") or (cls.get(rid) or {}).get("foodType")}
+            n += 1
+    for rid, c in cls.items():
+        if c.get("class") == "already_baked_or_air" and rid in byid:
+            byid[rid]["alreadyAirFried"] = True
+    return n
+
+
 def main():
     book = load(os.path.join(DATA, "book_recipes.json"), [])
     qr = load(os.path.join(DATA, "qr_links.json"), {})
@@ -283,6 +321,10 @@ def main():
     valts = load(os.path.join(DATA, "catalog", "veg_alternatives.json"), {})
     upgraded = data_fixes.mark_protein_upgrades(out, catalog_for_marks, valts)
     boostable = data_fixes.mark_protein_boost(out)
+    airfried = merge_airfry(out)
+    creami_types = data_fixes.assign_creami_types(out)
+    for t, names in creami_types.items():
+        print("creamiType %-15s %3d  e.g. %s" % (t, len(names), "; ".join(names[:5])))
 
     # Photos: bundled Resources/Photos/<id>.jpg first (books), else a remote photoURL for web recipes (data/web_images.json).
     web_images = load(os.path.join(DATA, "web_images.json"), {})
@@ -304,8 +346,15 @@ def main():
         json.dump(out, f, ensure_ascii=False, indent=1)
 
     copied = []
-    for fn in ("ingredients.json", "base_liquids.json", "protein_powders.json", "source_powder_brands.json", "guides.json", "paneer_model.json", "veg_alternatives.json", "clarity_notes.json"):
+    for fn in ("ingredients.json", "base_liquids.json", "protein_powders.json", "source_powder_brands.json", "guides.json", "paneer_model.json", "veg_alternatives.json", "clarity_notes.json", "food_benefits.json"):
         src = os.path.join(DATA, "catalog", fn)
+        if os.path.exists(src):
+            shutil.copyfile(src, os.path.join(RES, fn))
+            copied.append(fn)
+
+    # health content (original content files): data/health -> Resources
+    for fn in ("skincare.json", "haircare.json"):
+        src = os.path.join(DATA, "health", fn)
         if os.path.exists(src):
             shutil.copyfile(src, os.path.join(RES, fn))
             copied.append(fn)
@@ -331,6 +380,7 @@ def main():
     for r in boostable[:10]:
         m = r.get("macros")
         print("    - %s [%s]" % (r["name"], ("%d g P/serving" % round(m["protein"] / max(1, r.get("servings") or 1))) if m else "no printed macros"))
+    print("air-fryer versions: %d recipes" % airfried)
     print("key aliases: %d loaded, %d ingredient keys rewritten" % (len(aliases), aliased))
     print("catalog files copied: %s" % (", ".join(copied) or "none"))
     cat = load(os.path.join(RES, "ingredients.json"))

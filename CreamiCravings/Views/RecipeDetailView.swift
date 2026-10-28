@@ -61,6 +61,7 @@ struct RecipeDetailView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     header
                     if hasVegChoice { vegToggle }
+                    if recipe.airFry != nil { airFryToggle.id("airfry") }
                     versionSection(goalRes).id("versionCard")
                     if let up = user.upgradeCard(recipe, catalog: store.catalog) { UpgradeCard(card: up) { user.setUpgrade(recipe.id, $0) }.id("upgrade") }
                     macroSection(res).id("macros")
@@ -161,6 +162,12 @@ struct RecipeDetailView: View {
                 Text([recipe.course?.capitalized, recipe.bookCategory].compactMap { $0 }.joined(separator: " · "))
                     .font(.subheadline).foregroundStyle(.secondary)
             }
+            if user.airFryActive(recipe) {
+                Label("Air-fried", systemImage: "wind")
+                    .font(.subheadline.weight(.bold)).foregroundStyle(.white)
+                    .padding(.horizontal, 10).padding(.vertical, 4)
+                    .background(Color.orange, in: Capsule())
+            }
             if veganNow {
                 Label("Vegan", systemImage: "leaf.fill")
                     .font(.subheadline.weight(.bold)).foregroundStyle(.white)
@@ -171,6 +178,8 @@ struct RecipeDetailView: View {
                 else if recipe.vegAdaptation != nil { Text(vegOn ? "🌱 Vegetarian version" : "Contains meat or fish as written")
                     .font(.subheadline.weight(.semibold)).foregroundStyle(vegOn ? .green : .orange) }
             }
+            GoodForRow(results: BenefitEngine.compute(shown, perServing: user.display(for: recipe, catalog: store.catalog).displayed * (1 / recipe.perServingDivisor), catalog: store.catalog),
+                       maxChips: store.catalog.foodBenefits?.maxChips ?? 4)
             if !recipe.tags.isEmpty {
                 FlowLayout(spacing: 6) {
                     ForEach(recipe.tags, id: \.self) { t in
@@ -277,6 +286,23 @@ struct RecipeDetailView: View {
         }
         .padding()
         .background(Color.green.opacity(0.10), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    private var airFryToggle: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Picker("Cooking", selection: Binding(get: { user.airFryActive(recipe) }, set: { user.setAirFry(recipe, $0) })) {
+                Text("Fried").tag(false)
+                Text("Air fryer").tag(true)
+            }
+            .pickerStyle(.segmented)
+            .sensoryFeedback(.selection, trigger: user.airFryActive(recipe))
+            if user.airFryActive(recipe) {
+                if let s = recipe.airFry?.summary, !s.isEmpty { Label(s, systemImage: "wind").font(.subheadline).foregroundStyle(.orange) }
+                if let t = recipe.airFry?.textureNote, !t.isEmpty { Text(t).font(.caption).foregroundStyle(.secondary) }
+            }
+        }
+        .padding()
+        .background(Color.orange.opacity(0.10), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     @ViewBuilder private var sourceLine: some View {

@@ -35,9 +35,10 @@ enum ProteinUpgrades {
         return (role, ref.lineIndex)
     }
 
-    /// Vegetarian version first, then the protein upgrade.
-    static func effective(_ recipe: Recipe, catalog: Catalog, vegActive: Bool, vegChoices: [String: String], preferEasy: Bool, upgradeKey: String?) -> Recipe {
-        let veg = vegActive ? VegAlternatives.resolve(recipe, catalog: catalog, choices: vegChoices, preferEasy: preferEasy).recipe : recipe
+    /// Vegetarian version first, then the air-fryer version, then the protein upgrade.
+    static func effective(_ recipe: Recipe, catalog: Catalog, vegActive: Bool, vegChoices: [String: String], preferEasy: Bool, upgradeKey: String?, airFry: Bool = false) -> Recipe {
+        var veg = vegActive ? VegAlternatives.resolve(recipe, catalog: catalog, choices: vegChoices, preferEasy: preferEasy).recipe : recipe
+        if airFry { veg = veg.airFryVersion() }
         guard let key = upgradeKey else { return veg }
         return apply(veg, catalog: catalog, choice: key)
     }

@@ -44,6 +44,7 @@ struct RecipesView: View {
         NavigationStack(path: path) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 12) {
+                    ModeSwitch()
                     if mode == .all {
                         Picker("Section", selection: Binding(get: { user.data.filterState.section ?? "creami" },
                                                               set: { user.data.filterState.section = $0 })) {
@@ -269,6 +270,7 @@ struct RecipeCard: View {
                     SmallPill(text: "\(Int(shown.calories.rounded())) kcal", color: .calorieRed)
                     SmallPill(text: "\(Int(shown.protein.rounded())) g P", color: .proteinGreen)
                     if d.estimated { Text("est.").font(.caption2).foregroundStyle(.secondary) }
+                    if let t = recipe.creamiTypeTitle, recipe.section == "creami" { Text(t).font(.system(size: 9, weight: .medium)).foregroundStyle(.secondary).lineLimit(1) }
                     if rating > 0 { Text("★\(rating)").font(.caption2.weight(.bold)).foregroundStyle(.yellow) }
                     Spacer(minLength: 0)
                     Circle().fill(original.color).frame(width: 9, height: 9)
@@ -276,7 +278,11 @@ struct RecipeCard: View {
                 }
                 HStack(spacing: 6) {
                     if let badge = vegBadge { Text(badge).font(.caption2.weight(.bold)).foregroundStyle(badge.contains("Vegan") ? Color.veganGreen : Color.green) }
+                    if user.airFryActive(recipe) { SmallPill(text: "Air-fried", color: .orange) }
                     if recipe.proteinUpgrade != nil { SmallPill(text: "+Protein", color: .green) }
+                    ForEach((store.index[recipe.id]?.benefits ?? []).prefix(2)) { b in
+                        Image(systemName: b.benefit.symbol).font(.caption2).foregroundStyle(.green).accessibilityLabel("Good for \(b.benefit.title)")
+                    }
                     if let g = goalBadge(shown) { SmallPill(text: g, color: user.data.goal == .cut ? .carbBlue : .fatOrange) }
                 }
             }

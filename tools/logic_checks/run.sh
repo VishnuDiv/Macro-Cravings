@@ -26,3 +26,9 @@ CREAMI_DATA="$HERE/fixtures/data" CREAMI_RES="$OUT/fixture_res" "$PY" -I "$PKG/t
 
 # build-time data fix unit tests
 "$PY" -I "$PKG/tools/test_data_fixes.py"
+
+# clarity audit gate: fail above 20 flagged steps (13 at the time of writing)
+AUDIT="$("$PY" -I "$PKG/tools/clarity_audit.py" 2>&1)" || true
+FLAGGED="$(echo "$AUDIT" | grep -E '^Flagged:' | sed -E 's/.*, ([0-9]+) steps.*/\1/')"
+echo "clarity audit: ${FLAGGED:-?} flagged steps (limit 20)"
+if ! [[ "$FLAGGED" =~ ^[0-9]+$ ]] || [ "$FLAGGED" -gt 20 ]; then echo "FAIL: clarity audit"; exit 1; fi

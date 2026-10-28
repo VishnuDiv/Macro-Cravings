@@ -895,6 +895,65 @@ def mark_protein_boost(recipes):
     return marked
 
 
+
+# ---------------------------------------------------------------- Creami type (filter chip)
+
+CREAMI_TYPES = ["ice_cream", "lite_ice_cream", "sorbet", "gelato", "frozen_yogurt", "milkshake", "smoothie_bowl", "italian_ice", "frozen_drink"]
+_DAIRYISH = re.compile(r"milk|cream|shake|yogurt|yoghurt|kefir|ice_cream|custard|skyr|cottage|cheese|butter|whey|casein", I)
+_FRUITISH = re.compile(r"fruit|juice|berry|berries|mango|pineapple|peach|banana|apple|orange|lemon|lime|watermelon|melon|cherry|grape|strawberr|coconut_water|puree|pear|kiwi|papaya|guava|pomegranate", I)
+_LITE_BASE = re.compile(r"protein_shake|fat_free_ultra_filtered_milk|skim", I)
+
+
+def _base_amount(l):
+    return l.get("grams") or l.get("ml") or 0
+
+
+def creami_type(r):
+    """Type of a Creami recipe, first match wins (see the filter spec). Returns None for non-Creami recipes."""
+    if not is_creami(r):
+        return None
+    name = (r.get("name") or "").lower()
+    name_ns = name.replace("protein shake", "")
+    tags = {t.lower() for t in (r.get("tags") or [])}
+    base = r.get("base") or []
+    keys = [(l.get("key") or "") for l in base]
+    if "milkshake" in tags or re.search(r"\bmilkshakes?\b|\bshakes?\b", name_ns):
+        return "milkshake"
+    if re.search(r"creamiccino|frappe|frappé|frozen drink|slushi|slushie", name):
+        return "frozen_drink"
+    if "italian ice" in name:
+        return "italian_ice"
+    if "smoothie bowl" in name or "acai" in name or "açaí" in name:
+        return "smoothie_bowl"
+    if "gelato" in tags or "gelato" in name:
+        return "gelato"
+    total = sum(_base_amount(l) for l in base)
+    yog = sum(_base_amount(l) for l in base if re.search(r"yogurt|yoghurt", l.get("key") or "", I))
+    other_dairy = any(re.search(r"milk|cream|shake|kefir", k, I) for k in keys)
+    if "frozen-yogurt" in tags or "froyo" in name or "frozen yogurt" in name or (total > 0 and yog / total >= 0.5 and not other_dairy):
+        return "frozen_yogurt"
+    dairy_base = any(_DAIRYISH.search(k) for k in keys)
+    if "sorbet" in tags or "sorbet" in name or "sherbet" in name or (not dairy_base and any(_FRUITISH.search(k) for k in keys)):
+        return "sorbet"
+    kcal = (r.get("macros") or {}).get("calories")
+    if "lite-ice-cream" in tags or (any(_LITE_BASE.search(k) for k in keys) and kcal is not None and kcal <= 450):
+        return "lite_ice_cream"
+    return "ice_cream"
+
+
+def assign_creami_types(recipes):
+    """Sets r["creamiType"] on every Creami recipe. Returns {type: [names]}."""
+    out = {t: [] for t in CREAMI_TYPES}
+    for r in recipes:
+        t = creami_type(r)
+        if t:
+            r["creamiType"] = t
+            out[t].append(r.get("name") or r.get("id"))
+        else:
+            r.pop("creamiType", None)
+    return out
+
+
 # ---------------------------------------------------------------- entry point
 
 def apply(recipes, catalog=None, clarity=None, parse=None):

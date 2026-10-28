@@ -84,6 +84,25 @@ struct VegAdaptation: Codable, Hashable {
     }
 }
 
+/// The air-fryer version of a fried recipe: swapped lines (oil, coatings), new steps and per-serving macros.
+struct AirFry: Codable, Hashable {
+    var summary: String
+    var swaps: [VegSwap]
+    var steps: [String]
+    var macrosPerServing: Nutrition?   // nil = calculated from the ingredient lines
+    var textureNote: String?
+
+    enum CodingKeys: String, CodingKey { case summary, swaps, steps, macrosPerServing, textureNote }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        summary = (try? c.decodeIfPresent(String.self, forKey: .summary)) ?? ""
+        steps = (try? c.decodeIfPresent([String].self, forKey: .steps)) ?? []
+        macrosPerServing = (try? c.decodeIfPresent(Nutrition.self, forKey: .macrosPerServing)) ?? nil
+        textureNote = (try? c.decodeIfPresent(String.self, forKey: .textureNote)) ?? nil
+        swaps = decodeLenientArray(from: c, key: .swaps)
+    }
+}
+
 struct Recipe: Codable, Hashable, Identifiable {
     var id: String
     var name: String
@@ -102,6 +121,7 @@ struct Recipe: Codable, Hashable, Identifiable {
     var tags: [String]
     var section: String            // "creami" | "dessert"
     var dessertType: String?
+    var creamiType: String?        // Creami only: ice_cream | lite_ice_cream | sorbet | gelato | frozen_yogurt | milkshake | smoothie_bowl | italian_ice | frozen_drink
     var method: String?
     var servings: Int?
     var cookMinutes: Int?
@@ -114,6 +134,8 @@ struct Recipe: Codable, Hashable, Identifiable {
     var vegetarian: Bool?          // nil = not stated (Creami recipes)
     var containsEgg: Bool?
     var vegAdaptation: VegAdaptation?
+    var airFry: AirFry?            // air-fryer version of a fried recipe
+    var alreadyAirFried: Bool?     // cooked in the air fryer or oven as written (no fried version needed)
     var proteinUpgrade: ProteinUpgradeRef?
     var proteinBoost: Bool?        // overnight oats under 20 g protein: offers the optional "Add protein" boosts
 
@@ -174,8 +196,8 @@ struct Recipe: Codable, Hashable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case id, name, source, photo, photoURL, videoURL, macros, pintSize, prepMinutes, freezeHours
         case base, mixIns, instructions, proTip, tags
-        case proteinUpgrade, proteinBoost, servingLabel, course, cuisine, bookCategory, vegetarian, containsEgg, vegAdaptation
-        case section, dessertType, method, servings, cookMinutes, chillHours, evidence
+        case proteinUpgrade, proteinBoost, servingLabel, course, cuisine, bookCategory, vegetarian, containsEgg, vegAdaptation, airFry, alreadyAirFried
+        case section, dessertType, creamiType, method, servings, cookMinutes, chillHours, evidence
     }
 
     init(from decoder: Decoder) throws {
@@ -199,6 +221,7 @@ struct Recipe: Codable, Hashable, Identifiable {
         section = (try? c.decodeIfPresent(String.self, forKey: .section)) ?? "creami"
         if !Recipe.sections.contains(section) { section = "creami" }
         dessertType = (try? c.decodeIfPresent(String.self, forKey: .dessertType)) ?? nil
+        creamiType = (try? c.decodeIfPresent(String.self, forKey: .creamiType)) ?? nil
         method = (try? c.decodeIfPresent(String.self, forKey: .method)) ?? nil
         servings = (try? c.decodeIfPresent(Int.self, forKey: .servings)) ?? nil
         cookMinutes = (try? c.decodeIfPresent(Int.self, forKey: .cookMinutes)) ?? nil
@@ -213,6 +236,8 @@ struct Recipe: Codable, Hashable, Identifiable {
         vegetarian = (try? c.decodeIfPresent(Bool.self, forKey: .vegetarian)) ?? nil
         containsEgg = (try? c.decodeIfPresent(Bool.self, forKey: .containsEgg)) ?? nil
         vegAdaptation = (try? c.decodeIfPresent(VegAdaptation.self, forKey: .vegAdaptation)) ?? nil
+        airFry = (try? c.decodeIfPresent(AirFry.self, forKey: .airFry)) ?? nil
+        alreadyAirFried = (try? c.decodeIfPresent(Bool.self, forKey: .alreadyAirFried)) ?? nil
     }
 
     /// Stable key for a line, used by swaps: "b0", "m2".
@@ -239,6 +264,23 @@ struct Recipe: Codable, Hashable, Identifiable {
         r.vegetarian = true
         return r
     }
+
+    /// The air-fryer version, applied on top of whatever version is current (vegetarian first): oil and coating lines swapped, new
+    /// lines (`replaces` = "") appended to the base, air-fry steps and macros (per serving x servings). Macros nil = calculated.
+    func airFryVersion() -> Recipe {
+        guard let a = airFry, !a.steps.isEmpty else { return self }
+        var r = self
+        func rep(_ lines: [Ing]) -> [Ing] { lines.map { ing in a.swaps.first { !$0.replaces.isEmpty && $0.replaces == ing.text }?.with ?? ing } }
+        r.base = rep(base) + a.swaps.filter { $0.replaces.isEmpty }.map(\.with)
+        r.mixIns = rep(mixIns)
+        r.instructions = a.steps
+        if let m = a.macrosPerServing { r.macros = m * Double(max(1, servings ?? 1)) }
+        if !r.tags.contains("air-fryer") { r.tags.append("air-fryer") }
+        return r
+    }
+
+    /// In the Filters "Air fryer" option: has an air-fryer version, or is air-fried / baked as written.
+    var isAirFryerRecipe: Bool { airFry != nil || alreadyAirFried == true || tags.contains("air-fryer") }
 
     static let cuisines = ["pizza", "wings", "indian", "indo-chinese", "chinese", "thai", "korean", "japanese", "mexican", "italian", "american", "mediterranean", "other"]
 
@@ -286,6 +328,10 @@ struct Recipe: Codable, Hashable, Identifiable {
         return m.fiber / perServingDivisor >= Recipe.highFiberGrams
     }
 
+    static let creamiTypes: [(id: String, title: String)] = [
+        ("ice_cream", "Ice cream"), ("lite_ice_cream", "Lite ice cream"), ("sorbet", "Sorbet"), ("gelato", "Gelato"), ("frozen_yogurt", "Frozen yogurt"),
+        ("milkshake", "Milkshake"), ("smoothie_bowl", "Smoothie bowl"), ("italian_ice", "Italian ice"), ("frozen_drink", "Frozen drink")]
+    var creamiTypeTitle: String? { creamiType.flatMap { t in Recipe.creamiTypes.first { $0.id == t }?.title } }
     static let dessertTypes = ["cheesecake", "brownie", "cookie", "mousse", "pudding", "bar", "cake", "other"]
     static let verdicts = ["proven", "promising", "unverified"]
 

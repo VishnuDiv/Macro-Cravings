@@ -60,6 +60,7 @@ enum FilterEngine {
             guard let idx = store.index[r.id] else { return false }
             if !q.isEmpty && !matches(query: q, haystack: idx.haystack) { return false }
             if let s = f.section, r.section != s { return false }
+            if !f.creamiTypes.isEmpty && (r.section != "creami" || !f.creamiTypes.contains(r.creamiType ?? "ice_cream")) { return false }
             if !f.dessertTypes.isEmpty && !f.dessertTypes.contains(r.dessertType ?? "other") { return false }
             if !f.verdicts.isEmpty && !f.verdicts.contains(r.evidence?.verdict ?? "unverified") { return false }
             if !f.courses.isEmpty && !f.courses.contains(r.course ?? "") { return false }
@@ -68,9 +69,11 @@ enum FilterEngine {
             if f.highFiber && !idx.highFiber { return false }
             if f.hasUpgrade && !idx.hasUpgrade { return false }
             if f.vegan && !idx.vegan { return false }
+            if !f.goodFor.isEmpty && !idx.benefits.contains(where: { f.goodFor.contains($0.benefit.rawValue) }) { return false }
             if f.vegAsWritten && !idx.vegAsWritten { return false }
             if f.hasVegVersion && !idx.hasVegVersion { return false }
             if f.noEgg && !idx.noEgg { return false }
+            if f.airFryer && !idx.airFryer { return false }
             if f.favoritesOnly && !ctx.favorites.contains(r.id) { return false }
             if !f.sources.isEmpty && !f.sources.contains(r.source.kind) { return false }
             if !f.tags.isEmpty && f.tags.isDisjoint(with: r.tags) { return false }
@@ -112,6 +115,10 @@ enum FilterEngine {
             return 2
         }
         switch f.sort {
+        case .bestSkin, .bestGut:
+            let key = f.sort == .bestSkin ? Benefit.skin : Benefit.gut
+            func score(_ r: Recipe) -> Double { store.index[r.id]?.benefits.first { $0.benefit == key }?.score ?? 0 }
+            return out.sorted { score($0) != score($1) ? score($0) > score($1) : byName($0, $1) }
         case .quickest:
             // total time = prep + cook (chill and freeze excluded); unknown times last
             func total(_ r: Recipe) -> Int? { (r.prepMinutes == nil && r.cookMinutes == nil) ? nil : (r.prepMinutes ?? 0) + (r.cookMinutes ?? 0) }

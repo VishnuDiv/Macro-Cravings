@@ -34,12 +34,14 @@ enum Goal: String, Codable, CaseIterable, Identifiable {
 }
 
 enum SortOption: String, Codable, CaseIterable, Identifiable {
-    case featured, quickest, name, caloriesAsc, proteinDesc, proteinPer100Desc, recentlyMade, rating, highFiber, healthiest
+    case featured, quickest, bestSkin, bestGut, name, caloriesAsc, proteinDesc, proteinPer100Desc, recentlyMade, rating, highFiber, healthiest
     var id: String { rawValue }
     var title: String {
         switch self {
         case .featured: return "Featured"
         case .quickest: return "Quickest"
+        case .bestSkin: return "Best for skin"
+        case .bestGut: return "Best for gut"
         case .name: return "Name"
         case .caloriesAsc: return "Calories (low first)"
         case .proteinDesc: return "Protein (high first)"
@@ -108,13 +110,16 @@ struct FilterState: Codable, Equatable {
     var books: Set<String> = []             // source book titles
     var vegAsWritten = false
     var hasVegVersion = false
+    var airFryer = false
     var noEgg = false
     var section: String? = "creami"        // nil = both
     var dessertTypes: Set<String> = []
+    var creamiTypes: Set<String> = []        // Creami type chips (ice_cream, sorbet ...), OR
     var verdicts: Set<String> = []
     var proteinDensity: Double = 0           // g protein per 100 kcal, 0 = off
     var cutOnly = false
     var hasUpgrade = false
+    var goodFor: Set<String> = []            // "Good for" filter (gut, skin ...)
     var vegan = false
     var bulkOnly = false
 
@@ -143,9 +148,11 @@ struct FilterState: Codable, Equatable {
         if cutOnly { add("flag", "cutOnly", "Cut-friendly") }
         if bulkOnly { add("flag", "bulkOnly", "Bulk-friendly") }
         if proteinDensity > 0 { add("flag", "proteinDensity", "≥ \(FilterState.number(proteinDensity)) g P/100 kcal") }
+        for g in goodFor.sorted() { add("goodfor", g, "Good for \(g.capitalized)") }
         for c in courses.sorted() { add("course", c, FilterState.pretty(c)) }
         for c in mealChips.sorted() { add("chip", c, Recipe.mealChips.first { $0.id == c }?.title ?? FilterState.pretty(c)) }
         for b in books.sorted() { add("book", b, b.replacingOccurrences(of: "The Ultimate ", with: "")) }
+        for t in creamiTypes.sorted() { add("creamiType", t, Recipe.creamiTypes.first { $0.id == t }?.title ?? FilterState.pretty(t)) }
         for d in dessertTypes.sorted() { add("dessertType", d, FilterState.pretty(d)) }
         for v in verdicts.sorted() { add("verdict", v, FilterState.pretty(v)) }
         for t in tags.sorted() { add("tag", t, FilterState.pretty(t)) }
@@ -159,6 +166,7 @@ struct FilterState: Codable, Equatable {
         if vegAsWritten { add("flag", "vegAsWritten", "Vegetarian as written") }
         if hasVegVersion { add("flag", "hasVegVersion", "Has veg version") }
         if noEgg { add("flag", "noEgg", "No egg") }
+        if airFryer { add("flag", "airFryer", "Air fryer") }
         if highFiber { add("flag", "highFiber", "High fiber") }
         if maxCalories < FilterState.maxCaloriesCeiling { add("flag", "maxCalories", "Max \(Int(maxCalories)) kcal") }
         if minProtein > 0 { add("flag", "minProtein", "Min \(Int(minProtein)) g protein") }
@@ -176,8 +184,10 @@ struct FilterState: Codable, Equatable {
         switch kind {
         case "source": sources.remove(v)
         case "course": courses.remove(v)
+        case "goodfor": goodFor.remove(v)
         case "chip": mealChips.remove(v)
         case "book": books.remove(v)
+        case "creamiType": creamiTypes.remove(v)
         case "dessertType": dessertTypes.remove(v)
         case "verdict": verdicts.remove(v)
         case "tag": tags.remove(v)
@@ -199,6 +209,7 @@ struct FilterState: Codable, Equatable {
             case "vegAsWritten": vegAsWritten = false
             case "hasVegVersion": hasVegVersion = false
             case "noEgg": noEgg = false
+            case "airFryer": airFryer = false
             case "highFiber": highFiber = false
             case "maxCalories": maxCalories = FilterState.maxCaloriesCeiling
             case "minProtein": minProtein = 0
@@ -244,15 +255,18 @@ struct FilterState: Codable, Equatable {
         highFiber = (try? c.decode(Bool.self, forKey: .highFiber)) ?? false
         if c.contains(.section) { section = (try? c.decodeIfPresent(String.self, forKey: .section)) ?? nil } else { section = "creami" }
         dessertTypes = (try? c.decode(Set<String>.self, forKey: .dessertTypes)) ?? []
+        creamiTypes = (try? c.decode(Set<String>.self, forKey: .creamiTypes)) ?? []
         courses = (try? c.decode(Set<String>.self, forKey: .courses)) ?? []
         books = (try? c.decode(Set<String>.self, forKey: .books)) ?? []
         vegAsWritten = (try? c.decode(Bool.self, forKey: .vegAsWritten)) ?? false
         hasVegVersion = (try? c.decode(Bool.self, forKey: .hasVegVersion)) ?? false
         noEgg = (try? c.decode(Bool.self, forKey: .noEgg)) ?? false
+        airFryer = (try? c.decode(Bool.self, forKey: .airFryer)) ?? false
         verdicts = (try? c.decode(Set<String>.self, forKey: .verdicts)) ?? []
         proteinDensity = (try? c.decode(Double.self, forKey: .proteinDensity)) ?? 0
         cutOnly = (try? c.decode(Bool.self, forKey: .cutOnly)) ?? false
         hasUpgrade = (try? c.decode(Bool.self, forKey: .hasUpgrade)) ?? false
+        goodFor = (try? c.decode(Set<String>.self, forKey: .goodFor)) ?? []
         vegan = (try? c.decode(Bool.self, forKey: .vegan)) ?? false
         bulkOnly = (try? c.decode(Bool.self, forKey: .bulkOnly)) ?? false
     }
@@ -284,6 +298,24 @@ struct UserData: Codable, Equatable {
     var savedMigrated = true                        // false only while decoding an old file
     var ratings: [String: Int] = [:]                // recipeId -> 1...5 stars
     var recipeGoal: [String: Goal] = [:]            // per-recipe version (Cut / Maintain / Bulk); default = the global goal
+    // Food + Health
+    var appMode: AppMode = .food
+    var healthLockEnabled = true                    // Face ID / passcode before Health opens
+    var progressInBackup = false                    // progress photos are excluded from device backups unless this is on
+    var targetCalories: Int?                        // nil = the goal's default
+    var targetProtein: Int?
+    var weightLb: Double?
+    var plans: [String: DayPlan] = [:]              // "yyyy-MM-dd" -> that day's meal plan
+    var planFocus: String?                          // "Good for" focus for the planner (gut, skin, hair ...)
+    var skinProfile = SkinProfile()
+    var hairProfile = HairProfile()
+    var products: [SkinProduct] = []
+    var hairItems: [HairRoutineItem] = []
+    var extraItems: [ExtraCheckItem] = []
+    var skinRoutineId: String?                       // the chosen routine template
+    var skinRoutineStart: Date?                  // when the routine started (ramp-ups count from here)
+    var photoSchedules: [String: PhotoSchedule] = [:]   // PhotoSeries raw value -> schedule
+    var checks: [String: Set<String>] = [:]         // "yyyy-MM-dd" -> ticked checklist ids
     var greekYogurt: GreekYogurtPref = .zero        // "My Greek yogurt": 0% (default), 2%, full-fat or as written
     var useEstimates = true                         // guess amounts for lines that have none
     var lineGrams: [String: [String: Double]] = [:] // recipeId -> lineKey -> grams typed by the user
@@ -295,6 +327,8 @@ struct UserData: Codable, Equatable {
     var vegChoice: [String: [String: String]] = [:]   // recipeId -> lineKey -> alternative key
     var avoidsEggs = false
     var showOriginal: Set<String> = []     // recipe ids viewed as written instead of the vegetarian version
+    var preferAirFryer = true              // recipes with an air-fryer version open in it
+    var showFried: Set<String> = []        // recipe ids viewed as fried (or the reverse, when preferAirFryer is off)
 
     init() {}
 
@@ -323,10 +357,29 @@ struct UserData: Codable, Equatable {
         isVegetarian = (try? c.decode(Bool.self, forKey: .isVegetarian)) ?? true
         avoidsEggs = (try? c.decode(Bool.self, forKey: .avoidsEggs)) ?? false
         showOriginal = (try? c.decode(Set<String>.self, forKey: .showOriginal)) ?? []
+        preferAirFryer = (try? c.decode(Bool.self, forKey: .preferAirFryer)) ?? true
+        showFried = (try? c.decode(Set<String>.self, forKey: .showFried)) ?? []
         goal = (try? c.decode(Goal.self, forKey: .goal)) ?? .maintain
         saved = (try? c.decode([String: Goal].self, forKey: .saved)) ?? [:]
         ratings = (try? c.decode([String: Int].self, forKey: .ratings)) ?? [:]
         recipeGoal = (try? c.decode([String: Goal].self, forKey: .recipeGoal)) ?? [:]
+        appMode = (try? c.decode(AppMode.self, forKey: .appMode)) ?? .food
+        healthLockEnabled = (try? c.decode(Bool.self, forKey: .healthLockEnabled)) ?? true
+        progressInBackup = (try? c.decode(Bool.self, forKey: .progressInBackup)) ?? false
+        targetCalories = (try? c.decodeIfPresent(Int.self, forKey: .targetCalories)) ?? nil
+        targetProtein = (try? c.decodeIfPresent(Int.self, forKey: .targetProtein)) ?? nil
+        weightLb = (try? c.decodeIfPresent(Double.self, forKey: .weightLb)) ?? nil
+        plans = (try? c.decode([String: DayPlan].self, forKey: .plans)) ?? [:]
+        planFocus = (try? c.decodeIfPresent(String.self, forKey: .planFocus)) ?? nil
+        skinProfile = (try? c.decode(SkinProfile.self, forKey: .skinProfile)) ?? SkinProfile()
+        hairProfile = (try? c.decode(HairProfile.self, forKey: .hairProfile)) ?? HairProfile()
+        products = (try? c.decode([SkinProduct].self, forKey: .products)) ?? []
+        hairItems = (try? c.decode([HairRoutineItem].self, forKey: .hairItems)) ?? []
+        extraItems = (try? c.decode([ExtraCheckItem].self, forKey: .extraItems)) ?? []
+        skinRoutineId = (try? c.decodeIfPresent(String.self, forKey: .skinRoutineId)) ?? nil
+        skinRoutineStart = (try? c.decodeIfPresent(Date.self, forKey: .skinRoutineStart)) ?? nil
+        photoSchedules = (try? c.decode([String: PhotoSchedule].self, forKey: .photoSchedules)) ?? [:]
+        checks = (try? c.decode([String: Set<String>].self, forKey: .checks)) ?? [:]
         greekYogurt = (try? c.decode(GreekYogurtPref.self, forKey: .greekYogurt)) ?? .zero
         useEstimates = (try? c.decode(Bool.self, forKey: .useEstimates)) ?? true
         lineGrams = (try? c.decode([String: [String: Double]].self, forKey: .lineGrams)) ?? [:]

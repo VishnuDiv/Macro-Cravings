@@ -75,7 +75,7 @@ final class UserStore {
     private func signature(_ r: Recipe) -> Int {
         var h = Hasher()
         h.combine(data.recipeMilk[r.id] ?? data.defaultMilkId); h.combine(data.recipePowder[r.id] ?? data.defaultPowderId)
-        h.combine(data.isVegetarian); h.combine(data.showOriginal.contains(r.id)); h.combine(data.vegChoice[r.id] ?? [:]); h.combine(data.preferEasyAlternatives)
+        h.combine(data.isVegetarian); h.combine(data.showOriginal.contains(r.id)); h.combine(data.vegChoice[r.id] ?? [:]); h.combine(data.preferEasyAlternatives); h.combine(airFryActive(r))
         h.combine(data.swaps[r.id] ?? [:]); h.combine(data.pints[r.id]); h.combine(calorieSource(for: r.id).rawValue)
         h.combine(data.optionalOn[r.id] ?? []); h.combine(data.nutritionOverrides)
         h.combine(data.useEstimates); h.combine(data.lineGrams[r.id] ?? [:]); h.combine(data.greekYogurt)
@@ -90,7 +90,7 @@ final class UserStore {
         let calc = NutritionCalculator(catalog: catalog)
         let res = calc.compute(r, cfg)
         var title = r.name
-        if cfg.vegActive { title = VegAlternatives.resolve(r, catalog: catalog, choices: cfg.vegChoices, preferEasy: cfg.preferEasy).recipe.name }
+        if cfg.vegActive { title = VegAlternatives.meatFreeTitle(VegAlternatives.resolve(r, catalog: catalog, choices: cfg.vegChoices, preferEasy: cfg.preferEasy).recipe.name, of: r) }
         let v = Display(displayed: res.displayed, estimated: res.estimated, title: title, vegTitle: title != r.name)
         displayCache.items[r.id] = (sig, v)
         return v
@@ -159,10 +159,20 @@ final class UserStore {
         data.isVegetarian && r.vegAdaptation != nil && r.vegetarian != true && !data.showOriginal.contains(r.id)
     }
 
+    /// True when the air-fryer version of this recipe is the one in use ("Prefer air fryer versions" decides the default; the detail's
+    /// Fried | Air fryer control flips it for one recipe).
+    func airFryActive(_ r: Recipe) -> Bool {
+        guard let a = r.airFry, !a.steps.isEmpty else { return false }
+        return data.preferAirFryer != data.showFried.contains(r.id)
+    }
+    func setAirFry(_ r: Recipe, _ on: Bool) {
+        if on == data.preferAirFryer { data.showFried.remove(r.id) } else { data.showFried.insert(r.id) }
+    }
+
     /// The recipe as shown: vegetarian version first, then the protein upgrade (title, lines, steps, macros).
     func effectiveRecipe(_ r: Recipe, catalog: Catalog) -> Recipe {
         var out = ProteinUpgrades.effective(r, catalog: catalog, vegActive: vegActive(r), vegChoices: data.vegChoice[r.id] ?? [:],
-                                  preferEasy: data.preferEasyAlternatives, upgradeKey: data.upgradeChoice[r.id])
+                                  preferEasy: data.preferEasyAlternatives, upgradeKey: data.upgradeChoice[r.id], airFry: airFryActive(r))
         let picked = ProteinBoosts.lines(for: r, selected: data.proteinBoosts[r.id] ?? [], catalog: catalog, powder: powder(for: r.id, catalog: catalog))
         if !picked.isEmpty {
             out.instructions = ProteinBoosts.addStep(to: out.instructions, names: picked.map { b in ProteinBoosts.defs.first { $0.id == b.id }?.line ?? "protein" })
@@ -181,7 +191,7 @@ final class UserStore {
     func upgradeCard(_ r: Recipe, catalog: Catalog) -> UpgradeCardData? {
         guard r.proteinUpgrade != nil else { return nil }
         let base = ProteinUpgrades.effective(r, catalog: catalog, vegActive: vegActive(r), vegChoices: data.vegChoice[r.id] ?? [:],
-                                             preferEasy: data.preferEasyAlternatives, upgradeKey: nil)
+                                             preferEasy: data.preferEasyAlternatives, upgradeKey: nil, airFry: airFryActive(r))
         return ProteinUpgrades.card(for: base, catalog: catalog, choice: data.upgradeChoice[r.id])
     }
 
@@ -197,7 +207,7 @@ final class UserStore {
     /// The user's choices for a recipe. `applyGoal` adds the Cut / Bulk version last (detail, shopping list, cook mode);
     /// cards, filters and sorts pass false and use the recipe as written.
     func config(for r: Recipe, catalog: Catalog, applyGoal: Bool = true) -> RecipeConfig {
-        var base = RecipeConfig(milk: milk(for: r.id, catalog: catalog), powder: powder(for: r.id, catalog: catalog), vegActive: vegActive(r), vegChoices: data.vegChoice[r.id] ?? [:], preferEasy: data.preferEasyAlternatives, upgradeKey: applyGoal ? data.upgradeChoice[r.id] : nil, swaps: data.swaps[r.id] ?? [:],
+        var base = RecipeConfig(milk: milk(for: r.id, catalog: catalog), powder: powder(for: r.id, catalog: catalog), vegActive: vegActive(r), vegChoices: data.vegChoice[r.id] ?? [:], preferEasy: data.preferEasyAlternatives, airFryActive: airFryActive(r), upgradeKey: applyGoal ? data.upgradeChoice[r.id] : nil, swaps: data.swaps[r.id] ?? [:],
                      pints: max(1, min(5, data.pints[r.id] ?? 1)), source: calorieSource(for: r.id),
                      overrides: data.nutritionOverrides, optionalOn: data.optionalOn[r.id] ?? [],
                      missing: data.pantryMissing)
